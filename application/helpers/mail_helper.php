@@ -12,14 +12,6 @@ if(!function_exists('send_mail'))
 		$config['mailtype'] = 'html';
 		$config['protocol'] = 'smtp';
 		
-		$config['smtp_host'] = 'mail.parinyastechnologies.com';		
-		$config['smtp_user'] = 'info@parinyastechnologies.com';		
-		$config['smtp_pass'] = 'info@123';
-		
-		$config['smtp_host'] = 'mail.sanix.in';		
-		$config['smtp_user'] = 'development@sanix.in';		
-		$config['smtp_pass'] = 'development';		
-		
 		$config['smtp_port'] = '25';		
 		$config['smtp_keepalive'] = TRUE;		
 		$config['validate'] = false;		
