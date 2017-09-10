@@ -24,7 +24,7 @@
             <div>
                 <h1 class="logo-name">IN+</h1>
             </div>
-            <h3>Welcome to Ticket System</h3>
+            <h3>Welcome to Support System</h3>
             <p>Login in to enter the Panel.</p>
             <form class="m-t" role="form" action="javascript:;" id="login-form" autocomplete="off">
                 <div class="form-group">
@@ -38,13 +38,12 @@
         </div>
     </div>
 
-<div class="footer">
-			<footer style="float:left;width:100%;">
-				ALL RIGHTS RESERVED. Copyright © 2017 b4S Solutions Pvt. Ltd
-			</footer>
-		</div>
-	
-    </div>        
+	<div class="footer">
+		<footer style="float:left;width:100%;">
+			ALL RIGHTS RESERVED. Copyright © 2017
+		</footer>
+	</div>
+</div>        
 
 <style>
 .footer > footer {
@@ -70,13 +69,10 @@
 
 <?php 
 	$flashMessage = '';$flashType = '';
-	if($this->session->flashdata('success'))
-	{
+	if($this->session->flashdata('success')) {
 		$flashType = 'success';
 		$flashMessage = $this->session->flashdata('success');
-	}
-	else if($this->session->flashdata('error'))
-	{
+	} else if($this->session->flashdata('error')) {
 		$flashType = 'error';
 		$flashMessage = $this->session->flashdata('error');
 	}
@@ -86,19 +82,15 @@
 jQuery(document).ready(function() {
     var flashMessage = "<?php echo $flashMessage?>";
 	var flashType = "<?php echo $flashType?>";
-	if($.trim(flashType) === 'success')
-	{
+	if($.trim(flashType) === 'success') {
 		showToast('success',flashMessage);
-	}
-	else if($.trim(flashType) === 'error')
-	{
+	} else if($.trim(flashType) === 'error') {
 		showToast('error',flashMessage);
 	}	
 	
 	$(document).on('keyup','#form-email,#form-password',function(e){
 		var charCode = (e.which) ? e.which : e.keyCode;
-		if(charCode == 13)
-		{
+		if(charCode == 13) {
 			var btn = $('#thisSubmit');
 			loginSubmit(btn);
 		}
@@ -113,52 +105,39 @@ jQuery(document).ready(function() {
 
 function loginSubmit(btn)
 {
-	if($.trim($('input[name="username"]').val()) === '' && $.trim($('input[name="password"]').val()) === '')
-	{
+	if($.trim($('input[name="username"]').val()) === '' && $.trim($('input[name="password"]').val()) === '') {
 		showToast('error','Please enter both fields');
 		return false;
-	}
-	else if($.trim($('input[name="username"]').val()) === '')
-	{
+	} else if($.trim($('input[name="username"]').val()) === '') {
 		showToast('error','Please enter username');
 		return false;
-	}
-	else if($.trim($('input[name="password"]').val()) === '')
-	{
+	} else if($.trim($('input[name="password"]').val()) === '') {
 		showToast('error','Please enter password');
 		return false;
-	}
-	else 
-	{
+	} else  {
 		btn.val('Authenticating...').attr('disabled',true);
 		$.ajax({
 			type : 'POST',
 			url : BASE_URL+'login',
 			data : $('#login-form').serialize(),
+			dataType: 'JSON',
 			error : function(){
 				btn.val('Login').attr('disabled',false);
 				showToast('error','An internal error has occured.');
 			},
 			success : function(response){
-					var result = response.split('**');
-					if($.trim(result[0]) == 'success') {
-						btn.val('Redirecting...').attr('disabled',false);
+					if(response.status) {
+						btn.val('Redirecting...');
 						var href = window.location.href;
 						if(href.indexOf('return_url') > -1) {
 							href = href.split('=');
 							window.location.href = decodeURIComponent(href[1]);
 						} else {
-							location.replace(result[1]);
+							location.replace(response.redirectTo);
 						}
-					} else if($.trim(result[0]) == 'deactivated') {
-						btn.val('Login').attr('disabled',false);
-						swal('You account has been disabled.\n Contact administration.');						
-					} else if($.trim(result[0]) == 'disabled') {
-						btn.val('Login').attr('disabled',false);
-						swal('You account has been blocked.\nPlease contact administration.');
 					} else {
 						btn.val('Login').attr('disabled',false);
-						showToast('error','Please check your Username/Password.');
+						showToast('error','Please check your Username/Password.');					
 					}	
 			}
 		});
@@ -173,12 +152,9 @@ function showToast(type,message)
 		showMethod: 'slideDown',
 		timeOut: 2000
 	};
-	if($.trim(type) === 'success')
-	{
+	if($.trim(type) === 'success') {
 		toastr.success(message);
-	}
-	else
-	{
+	} else {
 		toastr.error(message);
 	}
 }

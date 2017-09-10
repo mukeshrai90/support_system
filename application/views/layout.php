@@ -11,7 +11,7 @@
 <link href="<?php echo ASSETS_URL?>font-awesome/css/font-awesome.css" rel="stylesheet">   
 <link href="<?php echo ASSETS_URL?>css/animate.css" rel="stylesheet">
 <link href="<?php echo ASSETS_URL?>css/style.css" rel="stylesheet">
-<link href="<?php echo ASSETS_URL?>css/developer.css" rel="stylesheet">	
+<link href="<?php echo ASSETS_URL?>css/developer.css?v=1.0" rel="stylesheet">	
 <script src="<?php echo ASSETS_URL?>js/jquery-2.1.1.js"></script>
 <link href="<?php echo ASSETS_URL?>css/sweet-alert.css" rel="stylesheet">
 <script src="<?php echo ASSETS_URL?>js/sweet-alert.min.js"></script>
@@ -19,7 +19,7 @@
 <style>
 .navbar-brand{height:52px;}
 .table > thead > tr > th{font-size:11px;text-align:center;vertical-align:middle;}
-.float-e-margins{width:70%;margin:0 auto;}
+/*.float-e-margins{width:70%;margin:0 auto;}*/
 </style>
 <script>
 var BASE_URL = '<?php echo BASE_URL?>';
@@ -27,7 +27,7 @@ var ASSETS_URL = '<?php echo ASSETS_URL?>';
 var pageTitle = '<?php echo $pageTitle?>';
 
 $(document).ready(function(){
-	$(document).ajaxComplete(function(event,xhr,settings){
+	$(document).ajaxComplete(function(x,xhr,settings){
 	   if($.trim(xhr.responseText) === 'login-error'){
 			swal('Your current session has been expired.Please login again.\n Redirecting you to login page...');
 			setTimeout(function(){
@@ -64,12 +64,23 @@ $(document).ready(function(){
 							?>
 							
 							<?php 
-								if(in_array('users',$actions)) {
+								if(in_array('admins',$actions) || 1) {
 							?>
-								<li class="<?php echo strstr($this->uri->segment(1),'employees')== 'employees' ? 'active' : ''?>">
-									<a href="<?php echo BASE_URL.'employees/list'?>">
+								<li class="<?php echo strstr($this->uri->segment(1), 'admins') == 'admins' ? 'active' : ''?>">
+									<a href="<?php echo BASE_URL.'admins/list'?>">
+										<i class="fa fa-user-md"></i> 
+										<span class="nav-label">Admins</span>
+									</a>
+								</li>
+							<?php } ?>
+							
+							<?php 
+								if(in_array('afe-users',$actions) || 1) {
+							?>
+								<li class="<?php echo strstr($this->uri->segment(1), 'afe-users')== 'afe-users' ? 'active' : ''?>">
+									<a href="<?php echo BASE_URL.'afe-users/list'?>">
 										<i class="fa fa-user"></i> 
-										<span class="nav-label">Employees</span>
+										<span class="nav-label">AFE User's</span>
 									</a>
 								</li>
 							<?php } ?>
@@ -132,6 +143,7 @@ $(document).ready(function(){
 <script src="<?php echo ASSETS_URL?>js/inspinia.js"></script>
 <script src="<?php echo ASSETS_URL?>js/sweet-alert.min.js"></script>
 <script src="<?php echo ASSETS_URL?>js/plugins/validate/jquery.validate.min.js"></script>
+<script src="<?php echo ASSETS_URL?>js/developer.js?v=1.0"></script>
 
 <link href="<?php echo ASSETS_URL?>css/sweet-alert.css" rel="stylesheet">
 <link href="<?php echo ASSETS_URL?>css/plugins/toastr/toastr.min.css" rel="stylesheet">
@@ -161,6 +173,33 @@ function showCustomLoader(show)
 		$('#loading_overlay').hide();
 		$('body').removeClass('loding-cursor');	
 	}
+}
+
+function customAlertBox(text, type, timer, title){
+	
+	if(type == undefined){
+		type = 'success';
+	} else if(type == 'e'){
+		type = 'error';
+	} else if(type == 'w'){
+		type = 'warning';
+	}
+	
+	if(title == undefined){
+		title = '';
+	}
+	
+	if(timer == undefined){
+		timer = 5000;
+	}
+	
+	swal({
+	  title: title,
+	  text: text,
+	  type : type,
+	  html : true,	
+	  timer: timer						  
+	});
 }
 
 function showToast(type,message)

@@ -32,35 +32,6 @@
 				<div class="ibox-content">
 					<form id="search-form" action="javascript:;">
 						<div class="col-lg-12 search-area">
-							<div class="col-md-3">
-								<label class="control-label">User Type</label>
-								<select class="form-control" name="verified">
-									<option value="">Select</option>
-									<option value="1" <?php echo @$_GET['verified'] == 1 ? 'selected' : ''?>>Active</option>
-									<option value="2" <?php echo @$_GET['verified'] === 2 ? 'selected' : ''?>>Inactive</option>
-								</select>
-							</div>
-							<div class="col-md-3 form-group">
-								<label class="control-label">Role</label>
-								<select class="form-control" name="role">
-									<option value="">Select</option>
-									<?php 
-										$role_id = @$_GET['role'];
-										if(isset($roles))
-										{
-											foreach($roles as $role)
-											{
-												$selected = '';
-												if($role['id'] == $role_id)
-												{
-													$selected = 'selected';
-												}
-												echo '<option value="'.$role['id'].'" '.$selected.'>'.$role['role_name'].'</option>';
-											}
-										}
-									?>
-								</select>	
-							</div> 
 							<div class="col-md-3 form-group">
 								<label class="control-label">Status</label>
 								<select class="form-control" name="verified">
@@ -68,6 +39,10 @@
 									<option value="1" <?php echo @$_GET['verified'] == 1 ? 'selected' : ''?>>Active</option>
 									<option value="2" <?php echo @$_GET['verified'] === 2 ? 'selected' : ''?>>Inactive</option>									
 								</select>	
+							</div>
+							<div class="col-md-3 form-group">
+								<label class="control-label">Name</label>
+								<input type="text" placeholder="Search By Name" class="form-control" name="name" value="<?php echo @$_GET['name']?>">
 							</div>
 							<div class="col-md-12">
 								<button type="button" class="btn btn-sm btn-primary search-btn">Search!</button>
