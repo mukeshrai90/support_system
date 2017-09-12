@@ -193,11 +193,13 @@ class Admin_model extends CI_Model
 		}	
 
 		if(isset($_GET['role']) && !empty($_GET['role'])) {
-			$like = array_merge($like,array('bs_admin_roles.admin_role_id' => $_GET['role']));
+			$where = array_merge($where,array('bs_admin_roles.admin_role_id' => $_GET['role']));
 		}			
 					
 		$this->db->where($where);
 		$this->db->like($like); 
+		$this->db->join('bs_admin_roles', 'bs_admin_roles.admin_id=bs_admins.admin_id', 'INNER');
+		$this->db->join('bs_roles', 'bs_roles.role_id=bs_admin_roles.admin_role_id', 'INNER');
 		$this->db->from('bs_admins');
 		$data['count'] = $this->db->count_all_results();
 		
@@ -220,14 +222,32 @@ class Admin_model extends CI_Model
 		$logged_admin_id = $logged_admin['admin_id'];
 		
 		$admin_id = $this->input->post('admin_id');
-		
-		$admin = array();						
+		$admin_id = DeCrypt($admin_id);
+							
 		$role_id = $this->input->post('role_id');										
 		$admin_role_id = $this->input->post('admin_role_id');										
+		$circle_id = $this->input->post('circle_id');										
+		$ssa_id = $this->input->post('ssa_id');	
+		
+		$admin = array();	
 		$admin['admin_name'] = $this->input->post('name');										
 		$admin['admin_username'] = $this->input->post('username');										
 		$admin['admin_email'] = $this->input->post('email');										
-		$admin['admin_mobile'] = $this->input->post('mobile');											
+		$admin['admin_mobile'] = $this->input->post('mobile');	
+
+		$sts = $this->check_admin_email($admin['admin_email'], $admin_id);
+		if($sts == 'false'){
+			$response['status'] = false;	
+			$response['message'] = 'Email Already Exist.<br/>Please enter a valid email';
+			echo json_encode($response);die;	
+		}
+		
+		$sts = $this->check_admin_username($admin['admin_username'], $admin_id);
+		if($sts == 'false'){
+			$response['status'] = false;	
+			$response['message'] = 'Username Already Exist.<br/>Please enter a valid username';
+			echo json_encode($response);die;	
+		}
 										
 		$result = array('status' => false);
 		try{
@@ -243,7 +263,7 @@ class Admin_model extends CI_Model
 				$password = md5($code);
 				
 				$admin['admin_password'] = $password;		
-				$admin['admin_emailed_pass'] = $code;					
+				$admin['admin_emailed_pass'] = $code;										
 				if($this->db->insert('bs_admins', $admin)){
 					$result['status'] = true;
 					$result['insert_id'] = $this->db->insert_id();
@@ -271,6 +291,14 @@ class Admin_model extends CI_Model
 			$RoleData['admin_id'] = $admin_id;
 			$RoleData['admin_role_id'] = $role_id;
 			$RoleData['admin_role_status'] = 1;
+			$RoleData['admin_role_ssa_id'] = 0;
+			$RoleData['admin_role_circle_id'] = 0;
+			
+			if($role_id == 2) {
+				$RoleData['admin_role_circle_id'] = $circle_id;
+			} else if($role_id == 3) {
+				$RoleData['admin_role_ssa_id'] = $ssa_id;
+			}
 			
 			if(empty($admin_role_id)){
 				$RoleData['admin_role_added_on'] = date('Y-m-d H:i:s');		
@@ -290,8 +318,8 @@ class Admin_model extends CI_Model
 			}
 			
 			$CallInsertData = array();
-			$CallInsertData['call_user_id'] = $logged_admin_id;
-			$CallInsertData['call_admin_id'] = $admin_id;
+			$CallInsertData['call_user_id'] = $admin_id;
+			$CallInsertData['call_logged_admin_id'] = $logged_admin_id;
 			$CallInsertData['call_desc'] = $call_description;
 			$CallInsertData['call_type'] = $call_type;
 			$CallInsertData['call_time'] = date('Y-m-d H:i:s');
@@ -346,35 +374,50 @@ class Admin_model extends CI_Model
 		$logged_admin_id = $logged_admin['admin_id'];
 		
 		$afe_id = $this->input->post('afe_id');
+		$afe_id = DeCrypt($afe_id);
 		
-		$user = array();
-		$user['afe_name'] = $this->input->post('name');							
-		$user['afe_email'] = $this->input->post('email');										
-		$user['afe_mobile'] = $this->input->post('mobile');										
-		$user['afe_pan_card'] = $this->input->post('pan_card');										
-		$user['afe_address '] = $this->input->post('address');											
-		$user['afe_bank_name'] = $this->input->post('bank_name');									
-		$user['afe_bank_account_no'] = $this->input->post('bank_account_no');									
-		$user['afe_bank_ifsc_code'] = $this->input->post('bank_ifsc_code');										
-		$user['afe_bank_branch_address'] = $this->input->post('bank_branch_address');										
+		$data = array();
+		$data['afe_name'] = $this->input->post('name');							
+		$data['afe_email'] = $this->input->post('email');										
+		$data['afe_mobile'] = $this->input->post('mobile');										
+		$data['afe_pan_card'] = $this->input->post('pan_card');										
+		$data['afe_address '] = $this->input->post('address');											
+		$data['afe_bank_name'] = $this->input->post('bank_name');									
+		$data['afe_bank_account_no'] = $this->input->post('bank_account_no');									
+		$data['afe_bank_ifsc_code'] = $this->input->post('bank_ifsc_code');										
+		$data['afe_bank_branch_address'] = $this->input->post('bank_branch_address');
+
+		$sts = $this->check_afe_user_email($data['afe_email'], $afe_id);
+		if($sts == 'false'){
+			$response['status'] = false;	
+			$response['message'] = 'Email Already Exist.<br/>Please enter a valid email';
+			echo json_encode($response);die;	
+		}
+		
+		$sts = $this->check_afe_user_mobile($data['afe_mobile'], $afe_id);
+		if($sts == 'false'){
+			$response['status'] = false;	
+			$response['message'] = 'Mobile Already Exist.<br/>Please enter another no';
+			echo json_encode($response);die;	
+		}
 										
 		$result = array('status' => false);
 		if(empty($afe_id)){			
 			
-			$user['afe_added_on'] = date('Y-m-d H:i:s');		
-			$user['afe_unique_referral_code'] = $this->generateReferralCode($user['afe_name']);		
+			$data['afe_added_on'] = date('Y-m-d H:i:s');		
+			$data['afe_unique_referral_code'] = $this->generateReferralCode($data['afe_name']);		
 						
-			if($this->db->insert('bs_afe_users', $user)){
+			if($this->db->insert('bs_afe_users', $data)){
 				$result['status'] = true;
 				$result['insert_id'] = $this->db->insert_id();
 			} 
 			
 		} else {
 			
-			$user['afe_updated_on'] = date('Y-m-d H:i:s');	
+			$data['afe_updated_on'] = date('Y-m-d H:i:s');	
 		
 			$this->db->where('afe_id', $afe_id);
-			if($this->db->update('bs_afe_users', $user)){
+			if($this->db->update('bs_afe_users', $data)){
 				$result['status'] = true;
 			}
 		}
@@ -416,5 +459,217 @@ class Admin_model extends CI_Model
 		$roles = $query->result_array();
 		
 		return $roles;
+	}
+	
+	public function manage_leads() {
+		$logged_admin = $this->session->userdata('admin');
+		$logged_admin_id = $logged_admin['admin_id'];
+		
+		$user_id = $this->input->post('user_id');
+		$user_id = DeCrypt($user_id);
+		
+		$user = $this->get_record('bs_users', 'user_id', $user_id);
+		if(!empty($user_id) && empty($user)){
+			$response['status'] = false;	
+			$response['message'] = 'Unable to process your request right now. <br/> Please try again or some time later.';
+			echo json_encode($response);die;	
+		}
+		
+		$data = array();
+		$user_id = $user['user_id'];
+		$data['user_full_name'] = $this->input->post('name');							
+		$data['user_email'] = $this->input->post('email');										
+		$data['user_mobile'] = $this->input->post('mobile');										
+		$data['user_address'] = $this->input->post('address');										
+		$data['user_circle_id'] = $this->input->post('circle_id');											
+		$data['user_ssa_id'] = $this->input->post('ssa_id');
+		
+		$sts = $this->check_user_email($data['user_email'], $user_id);
+		if($sts == 'false'){
+			$response['status'] = false;	
+			$response['message'] = 'Email Already Exist.<br/>Please enter a valid email';
+			echo json_encode($response);die;	
+		}
+		
+		$user_plan_id = $this->input->post('user_plan_id');										
+		$plan_id = $this->input->post('plan_id');										
+		$payment_status = $this->input->post('payment_status');										
+										
+		$result = array('status' => false);
+		if(empty($user)){			
+			
+			$user_status_id = 1;
+			$data['user_added_on'] = date('Y-m-d H:i:s');		
+			$data['user_status_id'] = $user_status_id;		
+			$data['user_active'] = 1;		
+						
+			if($this->db->insert('bs_users', $data)){
+				$result['status'] = true;
+				$user_id = $this->db->insert_id();
+				$result['insert_id'] = $user_id;
+			} 
+			
+			$call_description = 'New Lead Created Successfully';
+			$call_type = 1;
+			
+		} else {
+			
+			$user_status_id = $user['user_status_id'];
+			$data['user_updated_on'] = date('Y-m-d H:i:s');	
+		
+			$this->db->where('user_id', $user_id);
+			if($this->db->update('bs_users', $data)){
+				$result['status'] = true;
+			}
+			
+			$call_description = 'Lead Updated Successfully';
+		}
+		
+		$PlanData = array();
+		$PlanData['user_id'] = $user_id;
+		$PlanData['user_plan_id'] = $plan_id;
+		$PlanData['user_plan_status'] = 1;
+		
+		if(empty($user)){
+			$PlanData['user_plan_started_on'] = date('Y-m-d H:i:s');		
+			if(!$this->db->insert('bs_user_plans', $PlanData)){
+				throw new Exception('Unable to proocess your request right now.<br/> Please try again or some time later');	
+			}
+		} else {
+			
+			$PlanData['user_plan_ended_on'] = date('Y-m-d H:i:s');
+			
+			$this->db->where('user_id', $user_id);
+			if(!$this->db->update('bs_user_plans', $PlanData)){
+				throw new Exception('Unable to proocess your request right now.<br/> Please try again or some time later');
+			}
+			
+			if($user_plan_id != $plan_id) {
+				$pln = $this->get_record('bs_roles', 'plan_id', $plan_id, 'plan_name');
+				$call_description .= ' Plan has been changed to '.$pln['plan_name'];
+			}
+		}
+		
+		$CallInsertData = array();
+		$CallInsertData['call_user_id'] = $user_id;
+		$CallInsertData['call_logged_admin_id'] = $logged_admin_id;
+		$CallInsertData['call_desc'] = $call_description;
+		$CallInsertData['call_status_id'] = $user_status_id;
+		$CallInsertData['call_time'] = date('Y-m-d H:i:s');
+		
+		if($this->db->insert('bs_user_call_logs', $CallInsertData)) {
+			if($this->db->trans_status() === FALSE) {
+				throw new Exception('Unable to proocess your request right now.<br/> Please try again or some time later');								
+			} else {
+				$this->db->trans_commit(); // Transaction Commit
+				$result['status'] = true;
+			}
+		}
+		
+		return $result;
+	}
+	
+	public function get_all_leads($limit, $start) {        
+		
+		$data = array(); $where = array(); $like = array(); 
+		
+		if(isset($_GET['status'])) {	
+			$_GET['status'] = $_GET['status'] == 2 ? 0 : $_GET['status'];
+			$where = array_merge($where,array('bs_users.user_active' => $_GET['status']));			
+		}
+		
+		if(isset($_GET['name']) && !empty($_GET['name'])){
+			$like = array_merge($like,array('bs_users.user_full_name' => $_GET['name']));
+		}		
+					
+		$this->db->where($where);
+		$this->db->like($like); 
+		$this->db->from('bs_users');
+		$data['count'] = $this->db->count_all_results();
+		
+		$this->db->select('bs_users.*, bs_new_lead_status.status_name');
+		$this->db->where($where);
+		$this->db->like($like); 
+		$this->db->limit($limit, $start);
+		$this->db->order_by('bs_users.user_id','desc'); 
+		$this->db->join('bs_new_lead_status', 'bs_new_lead_status.status_id=bs_users.user_status_id', 'INNER'); 
+		$query = $this->db->get("bs_users");		
+		$data['result'] = $query->result_array();
+		
+		return $data;
+    }
+	
+	public function check_user_email($email, $user_id=NULL) {  
+		if(empty($user_id)){
+			$user_id = 9999;
+		}
+		$already = $this->db->get_where('bs_users',array('user_email' => $email, 'user_id != ' => $user_id))->row_array();
+		if(!empty($already)) {
+			$sts = 'false';
+		} else {
+			$sts = 'true';
+		}
+		
+		return $sts;
+	}
+	
+	public function check_admin_email($email, $admin_id=NULL){		
+		if(trim($admin_id) == ''){
+			$admin_id = 9999;
+		}
+		
+		$already = $this->db->get_where('bs_admins',array('admin_email' => $email, 'admin_id != ' => $admin_id))->row_array();
+		if(!empty($already)) {
+			$sts = 'false';
+		} else {
+			$sts = 'true';
+		}
+		
+		return $sts;
+	}
+	
+	public function check_admin_username($username, $admin_id=NULL){	
+		if(trim($admin_id) == ''){
+			$admin_id = 9999;
+		}
+		
+		$already = $this->db->get_where('bs_admins',array('admin_username' => $username, 'admin_id != ' => $admin_id))->row_array();
+		if(!empty($already)) {
+			$sts = 'false';
+		} else {
+			$sts = 'true';
+		}
+		
+		return $sts;
+	}
+	
+	public function check_afe_user_email($email, $user_id=NULL){		
+		if(trim($user_id) == ''){
+			$user_id = 9999;
+		}
+		
+		$already = $this->db->get_where('bs_afe_users',array('afe_email' => $email, 'afe_id != ' => $user_id))->row_array();
+		if(!empty($already)) {
+			$sts = 'false';
+		} else {
+			$sts = 'true';
+		}
+		
+		return $sts;
+	}
+	
+	public function check_afe_user_mobile($mobile, $user_id=NULL){	
+		if(trim($user_id) == ''){
+			$user_id = 9999;
+		}
+		
+		$already = $this->db->get_where('bs_afe_users',array('afe_mobile' => $mobile, 'admin_id != ' => $user_id))->row_array();
+		if(!empty($already)) {
+			$sts = 'false';
+		} else {
+			$sts = 'true';
+		}
+		
+		return $sts;
 	}
 }	

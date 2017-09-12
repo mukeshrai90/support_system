@@ -13,8 +13,16 @@
 								<?php 
 									$admin_roles = @$admin_roles[0];
 									$admin_role_id = @$admin_roles['admin_role_id'];
-									$role_circle_id = @$admin_roles['admin_circle_id'];
-									$role_ssa_id = @$admin_roles['admin_ssa_id'];
+									$role_circle_id = @$admin_roles['admin_role_circle_id'];
+									$role_ssa_id = @$admin_roles['admin_role_ssa_id'];
+									
+									$cirlDsplSts = $ssaDsplSts = 'display:none;';
+									if($admin_role_id == 2){
+										$cirlDsplSts = 'display:block;';
+									} else if($admin_role_id == 3){
+										$ssaDsplSts = 'display:block;';
+									}
+									
 								?>
 								<input type="hidden" name="admin_role_id" value="<?php echo $admin_role_id?>">
 								<select name="role_id" id="role_id" class="form-control">
@@ -36,35 +44,35 @@
 						<div class="form-group">
 							<label class="col-lg-4 control-label">Username</label>
 							<div class="col-lg-7">
-								<input type="hidden" name="id" value="<?php echo @$record['id']?>">
-								<input type="text" class="form-control" name="emp_code" id="emp_code"  placeholder="Username" value="<?php echo @$record['emp_code']?>">
+								<input type="hidden" name="admin_id" value="<?php echo @$record['admin_id']?>">
+								<input type="text" class="form-control" name="username" id="username"  placeholder="Username" value="<?php echo @$record['admin_username']?>">
 							</div>
 						</div>
 						<div class="form-group">
 							<label class="col-lg-4 control-label">Name</label>
 							<div class="col-lg-7">
-								<input type="text" class="form-control" name="name" id="name"  placeholder="Name" value="<?php echo @$record['name']?>">
+								<input type="text" class="form-control" name="name" id="name"  placeholder="Name" value="<?php echo @$record['admin_name']?>">
 							</div>
 						</div>
 						<div class="form-group">
 							<label class="col-lg-4 control-label">Email</label>
 							<div class="col-lg-7">
-								<input type="text" class="form-control" name="email" id="email"  placeholder="Email" value="<?php echo @$record['email']?>">
+								<input type="text" class="form-control" name="email" id="email"  placeholder="Email" value="<?php echo @$record['admin_email']?>">
 							</div>
 						</div>
 						<div class="form-group">
 							<label class="col-lg-4 control-label">Mobile</label>
 							<div class="col-lg-7">
-								<input type="text" class="form-control" name="mobile" id="mobile"  placeholder="Mobile" value="<?php echo @$record['mobile']?>" maxlength="10">
+								<input type="text" class="form-control" name="mobile" id="mobile"  placeholder="Mobile" value="<?php echo @$record['admin_mobile']?>" maxlength="10">
 							</div>
 						</div>				
 						<div class="form-group">
 							<label class="col-lg-4 control-label">Designation</label>
 							<div class="col-lg-7">
-								<input type="text" class="form-control" name="designation" id="designation"  placeholder="Designation" value="<?php echo @$record['designation']?>">
+								<input type="text" class="form-control" name="designation" id="designation"  placeholder="Designation" value="<?php echo @$record['admin_designation']?>">
 							</div>
 						</div>
-						<div class="form-group">
+						<div class="form-group" id="circle_row" style="<?=$cirlDsplSts?>">
 							<label class="col-lg-4 control-label">Circle</label>
 							<div class="col-lg-7">
 								<select name="circle_id" id="circle_id" class="form-control">
@@ -83,7 +91,7 @@
 								</select>
 							</div>
 						</div>	
-						<div class="form-group">
+						<div class="form-group" id="ssa_row" style="<?=$ssaDsplSts?>">
 							<label class="col-lg-4 control-label">SSA</label>
 							<div class="col-lg-7">
 								<select name="ssa_id" id="ssa_id" class="form-control">
@@ -120,12 +128,25 @@
 <script>
 $(document).ready(function() {
 	
+	//$('#circle_row, #ssa_row').hide();
+	
+	$(document).on('change','#role_id',function(){
+		var role_id = $(this).val();
+		
+		$('#circle_row, #ssa_row').slideUp();
+		if($.trim(role_id) == '2'){
+			$('#circle_row').slideDown();
+		} else if($.trim(role_id) == '3') {
+			$('#ssa_row').slideDown();
+		}
+	});
+	
 	$(document).on('click','#manage-form',function(){
 		if($("#manage_register_form").valid()){
 		
 			showCustomLoader(true);
 			$.ajax({
-				url: BASE_URL+'admin/add',
+				url: BASE_URL+'admins/add',
 				type: 'POST',
 				data: $('#manage_register_form').serialize(),
 				dataType: 'JSON',
@@ -148,13 +169,28 @@ $(document).ready(function() {
 		}
 	});			
 	
+	$.validator.addMethod("checkCrclRole", function(value, element, param){
+    	if($.trim($('#role_id').val()) == '2' && $.trim(value) == ''){
+			return false;
+		}
+		return true;
+    },("This field is required")); 
+
+	
+	$.validator.addMethod("checkSSARole", function(value, element, param){
+    	if($.trim($('#role_id').val()) == '3' && $.trim(value) == ''){
+			return false;
+		}
+		return true;
+    },("This field is required"));
+	
 	$("#manage_register_form").validate({
 		onkeyup: false,
 		rules: {			
 			username: {
 				required: true,	
 				alphaNumeric: true,			
-				remote : BASE_URL+'admin/check_username?id='+$('input[name="id"]').val(),
+				remote : BASE_URL+'admin/check_admin_username?id='+$('input[name="id"]').val(),
 			},
 			name: {
 				required: true,
@@ -163,7 +199,7 @@ $(document).ready(function() {
 			email: {
 				required: true,
 				email:true,
-				remote : BASE_URL+'admin/check_user_email?id='+$('input[name="id"]').val(),
+				remote: BASE_URL+'admin/check_admin_email?id='+$('input[name="id"]').val(),
 			},
 			mobile: {
 				required: true,
@@ -174,12 +210,15 @@ $(document).ready(function() {
 			designation: {
 				alphaSpace:true,
 			},
-			department: {
-				alphaSpace:true,
-			},					
+			circle_id: {
+				checkCrclRole:true,
+			},	
+			ssa_id: {
+				checkSSARole:true,
+			},
 		},
 		messages: {
-			emp_code:{
+			username:{
 				remote: 'Username Already Exist'
 			},
 			email:{

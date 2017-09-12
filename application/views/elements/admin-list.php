@@ -33,19 +33,19 @@
 						} else {
 							if($admin['admin_status'] == 0) {
 								echo 
-								'<a href="javascript:;" class="change-status" title="Click to Approve" data-toggle="tooltip" data-placement="bottom" data-status="1" data-adminid="'.$admin['admin_id'].'" data-field="status">
+								'<a href="javascript:;" class="change-status" title="Click to Approve" data-toggle="tooltip" data-placement="bottom" data-status="1" data-admin_id="'.$admin['admin_id'].'" data-field="status">
 									<i class="fa fa-star-o text-navy" style="color:#FF501E;"></i>
 								</a> &nbsp;&nbsp;&nbsp;(Inactive)';
 								
 							} else if($admin['admin_status'] == 1) {
 								echo 
-								'<a href="javascript:;" class="change-status" title="Click to Disable" data-toggle="tooltip" data-placement="bottom" data-status="2" data-adminid="'.$admin['admin_id'].'" data-field="status">
+								'<a href="javascript:;" class="change-status" title="Click to Disable" data-toggle="tooltip" data-placement="bottom" data-status="2" data-admin_id="'.$admin['admin_id'].'" data-field="status">
 									<i class="fa fa-star text-navy"></i>
 								</a> &nbsp;&nbsp;&nbsp;(Active)';
 								
 							} else if($admin['admin_status'] == 2) {
 								echo 
-								'<a href="javascript:;" class="change-status" title="Click to Enable" data-toggle="tooltip" data-placement="bottom" data-status="1" data-adminid="'.$admin['admin_id'].'" data-field="status">
+								'<a href="javascript:;" class="change-status" title="Click to Enable" data-toggle="tooltip" data-placement="bottom" data-status="1" data-admin_id="'.$admin['admin_id'].'" data-field="status">
 									<i class="fa fa-star-o text-navy" style="color:#FF501E;"></i>
 								</a> &nbsp;&nbsp;&nbsp;(Disabled)';
 							}
@@ -54,7 +54,7 @@
 				</td>							
 				<td><?php echo date('d-M-Y',strtotime($admin['admin_last_login']))?></td>
 				<td class="tooltip-demo">
-					<a href="javascript:;" title="Change Password" class="actions-a change-password-link" data-toggle="tooltip" data-placement="bottom" data-adminid="<?php echo $admin['admin_id']?>">
+					<a href="javascript:;" title="Change Password" class="actions-a change-password-link" data-toggle="tooltip" data-placement="bottom" data-admin_id="<?php echo $admin['admin_id']?>">
 						<i class="fa fa-pencil-square-o text-navy"></i>
 					</a>
 					<a href="<?php echo BASE_URL.'admins/edit/'.md5($admin['admin_id'])?>" title="Edit" class="actions-a" data-toggle="tooltip" data-placement="bottom">

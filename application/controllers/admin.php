@@ -52,6 +52,7 @@ class Admin extends CI_Controller {
 				$response['status'] = true;
 				if(isset($result['insert_id'])) {
 					$response['message'] = 'Added Successfully.';
+					$response['redirectTo'] = BASE_URL.'admins/list';
 					
 					/*$name = $this->input->post('name');
 					$username = $this->input->post('emp_code');
@@ -77,6 +78,7 @@ class Admin extends CI_Controller {
 					
 				} else {
 					$response['message'] = 'Updated Successfully.';
+					$response['redirectTo'] = $this->session->userdata('referer');
 				}	
 			} else {
 				$response['status'] = false;	
@@ -90,8 +92,13 @@ class Admin extends CI_Controller {
 			if(!empty($admin_id)) {
 				chk_access('admins' ,3, true);
 				
-				$data['record'] = $this->admin_model->get_record_md5('bs_admins', $admin_id);
+				$data['record'] = $this->admin_model->get_record_md5('bs_admins', 'admin_id', $admin_id);
 				$data['admin_roles'] = $this->admin_model->get_admin_roles($admin_id, 'md5');
+				
+				if(isset($_SERVER['HTTP_REFERER'])){			
+					$referer = array('referer' => $_SERVER['HTTP_REFERER']);
+					$this->session->set_userdata($referer);			
+				}
 				
 			} else {
 				chk_access('admins', 2, true);
@@ -273,22 +280,21 @@ class Admin extends CI_Controller {
 	
 	public function change_admin_status()
 	{
-		chk_admin_access('admins', 4, true);
+		chk_access('admins', 4, true);
 		
 		$logged_admin = $this->session->userdata('admin');
 		$logged_admin_id = $logged_admin['admin_id'];
 				
-		$status = @$_GET['status'];
-		$admin_id = @$_GET['admin_id'];
-		$field = @$_GET['field'];
+		$status = $this->input->post('status');
+		$admin_id = $this->input->post('admin_id');
 		
 		$response = array();
-		if(!empty($status) && !empty($admin_id) && !empty($field)) {			
+		if(!empty($status) && !empty($admin_id)) {			
 			
 			try{
 				$this->db->trans_begin();  // Transaction Start
 			
-				$UpdateData = array($field => $status);
+				$UpdateData = array('admin_status' => $status);
 				$this->db->where('admin_id' ,$admin_id);
 				if($this->db->update('bs_admins', $UpdateData)) {
 					
@@ -397,4 +403,36 @@ class Admin extends CI_Controller {
 			$this->load->view('layout',$data);
 		}
 	}	
+	
+	public function check_admin_username($return=false){		
+		$username = $this->input->get('username');
+		$admin_id = $this->input->get('id');
+		
+		$sts = $this->admin_model->check_admin_username($username, $admin_id);
+		echo $sts;
+	}
+	
+	public function check_admin_email($return=false){		
+		$email = $this->input->get('email');
+		$admin_id = $this->input->get('id');
+		
+		$sts = $this->admin_model->check_admin_email($email, $admin_id);
+		echo $sts;
+	}
+	
+	public function check_afe_user_email($return=false){		
+		$username = $this->input->get('email');
+		$user_id = $this->input->get('id');
+		
+		$sts = $this->admin_model->check_afe_user_email($username, $user_id);
+		echo $sts;
+	}
+	
+	public function check_afe_user_mobile($return=false){		
+		$email = $this->input->get('mobile');
+		$user_id = $this->input->get('id');
+		
+		$sts = $this->admin_model->check_afe_user_mobile($email, $user_id);
+		echo $sts;
+	}
 }

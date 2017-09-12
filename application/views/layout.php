@@ -86,6 +86,17 @@ $(document).ready(function(){
 							<?php } ?>
 							
 							<?php 
+								if(in_array('afe-users',$actions) || 1) {
+							?>
+								<li class="<?php echo strstr($this->uri->segment(1),'user-leads')== 'user-leads' ? 'active' : ''?>">
+									<a href="<?php echo BASE_URL.'user-leads/list'?>">
+										<i class="fa fa-user-md"></i> 
+										<span class="nav-label">User Leads</span>
+									</a>
+								</li>
+							<?php } ?>
+							
+							<?php 
 								/*if(in_array('ticket_reports',$actions) || in_array('expense_reports',$actions)) {
 							?>
 								<li class="<?php echo in_array($this->uri->segment(1),array('ticket-reports','expense-reports')) ? 'active' : ''?>">

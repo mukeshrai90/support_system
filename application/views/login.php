@@ -28,7 +28,7 @@
             <p>Login in to enter the Panel.</p>
             <form class="m-t" role="form" action="javascript:;" id="login-form" autocomplete="off">
                 <div class="form-group">
-                    <input type="email" class="form-control" placeholder="Email / Employee Code" id="form-email" name="username">
+                    <input type="email" class="form-control" placeholder="Username" id="form-email" name="username">
                 </div>
                 <div class="form-group">
                     <input type="password" class="form-control" placeholder="Password" id="form-password" name="password">

@@ -126,14 +126,14 @@ $(document).ready(function() {
 			email: {
 				//required: true,
 				email: true,
-				remote : BASE_URL+'admin/check_user_email?id='+$('input[name="id"]').val(),
+				remote : BASE_URL+'admin/check_afe_user_email?id='+$('input[name="id"]').val(),
 			},
 			mobile: {
 				required: true,
 				number:true,
 				maxlength:10,
 				minlength:10,
-				remote : BASE_URL+'admin/check_user_mobile?id='+$('input[name="id"]').val(),
+				remote : BASE_URL+'admin/check_afe_user_mobile?id='+$('input[name="id"]').val(),
 			},
 			pan_card: {
 				exactlength:10

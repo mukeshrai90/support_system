@@ -1,5 +1,5 @@
 <?php 
-//error_reporting(0);
+error_reporting(0);
 class User extends CI_Controller {
 
 	public function __construct()
@@ -458,19 +458,19 @@ class User extends CI_Controller {
 			echo json_encode($data);die;
 	}
 	
-	public function users()
+	public function list_leads()
 	{		
-		chk_access('users',1,true);
+		chk_access('user_leads',1,true);
 		
 		$per_page = 20; 
 		$page = @$_GET['per_page']? $_GET['per_page'] : 0;
 		
-		$result = $this->admin_model->get_all_users($per_page,$page);
+		$result = $this->admin_model->get_all_leads($per_page,$page);
 			
 		if(@$_GET['verified'] != '' || @$_GET['name'] != '')
-			$base_url = BASE_URL.'employees/list?'.$_SERVER['QUERY_STRING'];
+			$base_url = BASE_URL.'user-leads/list?'.$_SERVER['QUERY_STRING'];
 		else
-			$base_url = BASE_URL.'employees/list?page=true';
+			$base_url = BASE_URL.'user-leads/list?page=true';
 			
 		$total_rows = $result['count'];	
 		
@@ -480,14 +480,60 @@ class User extends CI_Controller {
 		
 		if($this->input->is_ajax_request())
 		{
-			$data['result'] = $this->load->view('elements/user-list',$data,true);
+			$data['result'] = $this->load->view('elements/user-leads-list',$data,true);
 			echo json_encode($data);die;
 		}
 		
-		$data['roles'] = $this->db->get_where('ts_user_roles',array('status' => 1))->result_array();
-		
-		$data['pageTitle'] = 'Employees';
-		$data['content'] = 'users';
+		$data['pageTitle'] = 'User Leads';
+		$data['content'] = 'user/user-leads';
 		$this->load->view('layout',$data);
+	}
+	
+	public function manage_users_lead($user_id=NULL){
+		if(!empty($_POST)) {					
+			$result = $this->admin_model->manage_leads();			
+			
+			$response = array();
+			if($result['status']) {
+				$response['status'] = true;
+				if(isset($result['insert_id'])) {
+					$response['message'] = 'Saved Successfully.';
+					$response['redirectTo'] = BASE_URL.'user-leads/list';
+				} else {
+					$response['message'] = 'Updated Successfully.';
+					$response['redirectTo'] = $this->session->userdata('referer');
+				}	
+			} else {
+				$response['status'] = false;	
+				$response['message'] = 'Unable to process your request right now. <br/> Please try again or some time later.';
+			}
+			
+			echo json_encode($response);die;	
+								
+		} else {												
+			
+			if(!empty($admin_id)) {
+				chk_access('user_leads' ,3, true);
+				$data['record'] = $this->admin_model->get_UserDetails($user_id);
+				if(isset($_SERVER['HTTP_REFERER'])){			
+					$referer = array('referer' => $_SERVER['HTTP_REFERER']);
+					$this->session->set_userdata($referer);			
+				}
+			} else {
+				chk_access('user_leads', 2, true);
+			}			
+			
+			$data['pageTitle'] = 'Manage Users';
+			$data['content'] = 'user/manage-user-leads';
+			$this->load->view('layout',$data);
+		}
+	}
+	
+	public function check_user_email(){		
+		$email = $this->input->get('email');
+		$user_id = $this->input->get('id');
+		
+		$sts = $this->admin_model->check_user_email($email, $user_id);
+		echo $sts;
 	}
 }

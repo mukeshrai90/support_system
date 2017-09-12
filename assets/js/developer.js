@@ -5,6 +5,11 @@ $(document).ready(function () {
 		return this.optional(element) || matchText.test(value);;
 	}, "Please enter only alphabets with space");
 	
+	$.validator.addMethod('alphaNumeric', function (value, element) {		
+		var matchText = /^[A-Za-z0-9]+$/i;
+		return this.optional(element) || matchText.test(value);;
+	}, "Please enter only alphabets with space");
+	
 	$.validator.addMethod('validAddress', function (value, element) {		
 		var matchText = /^[A-Za-z\s\.\#\-\,]+$/i;
 		return this.optional(element) || matchText.test(value);;

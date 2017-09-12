@@ -11,12 +11,14 @@
 			<div class="ibox float-e-margins">
 				<div class="ibox-title">
 					<h5>Admins </h5>
+					<?php $pageUrl = BASE_URL.'admins/list'?>
 					<div class="ibox-tools">
 						<button type="button" class="btn btn-sm btn-primary refresh-all add-new-btn" data-url="<?php echo BASE_URL.'admins/add'?>">Add New</button>
 					</div>
 				</div>
 				<div class="ibox-content">
 					<div class="row">
+						<form id="search-form" action="javascript:;">
 						<div class="col-lg-12 search-area">
 							<div class="col-md-3 form-group">
 								<label class="control-label">Role</label>
@@ -24,16 +26,13 @@
 									<option value="">Select</option>
 									<?php 
 										$role_id = @$_GET['role'];
-										if(isset($roles))
-										{
-											foreach($roles as $role)
-											{
+										if(isset($roles)) {
+											foreach($roles as $role) {
 												$selected = '';
-												if($role['id'] == $role_id)
-												{
+												if($role['role_id'] == $role_id) {
 													$selected = 'selected';
 												}
-												echo '<option value="'.$role['id'].'" '.$selected.'>'.$role['role_name'].'</option>';
+												echo '<option value="'.$role['role_id'].'" '.$selected.'>'.$role['role_name'].'</option>';
 											}
 										}
 									?>
@@ -56,6 +55,7 @@
 								<button type="button" class="btn btn-sm btn-default refresh-all" data-url="<?php echo $pageUrl?>">Reset</button>
 							</div>
 						</div>
+						</form>
 					</div>
 					<div class="table-responsive">
 						<?php $this->load->view('elements/admin-list');?>
@@ -89,11 +89,11 @@
 </div>
 
 <script>
-var pageUrl = BASE_URL+'admin/list';
+var pageUrl = '<?=$pageUrl?>';
 
 $(document).ready(function(){
 	$(document).on('click','.change-password-link',function(){
-		var user_id = $(this).attr('data-adminid');
+		var user_id = $(this).attr('data-admin_id');
 		$('input[name="admin_id"]').val(user_id);
 		
 		$('#myModal').modal('toggle');
@@ -130,11 +130,10 @@ $(document).ready(function(){
 	
 	$(document).on('click','.change-status',function(){
         var status = $(this).attr('data-status');
-		var UserId = $(this).attr('data-adminid');		
-		var field = $(this).attr('data-field');
+		var admin_id = $(this).attr('data-admin_id');		
 		var btn = $(this);
 		
-		var url = BASE_URL+'admin/change_admin_status?&user_id='+UserId+'&status='+status+'&field='+field;
+		var url = BASE_URL+'admin/change_admin_status';
 		
 		swal({			
 		  title:'',
@@ -149,6 +148,7 @@ $(document).ready(function(){
 			$.ajax({
 				type : 'POST',
 				url : url,
+				data: {admin_id:admin_id, status:status},
 				dataType: 'JSON',
 				error : function(){
 					showCustomLoader(false);	
