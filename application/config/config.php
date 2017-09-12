@@ -537,24 +537,30 @@ $config['proxy_ips'] = '';
 define('SECRET_KEY', '454ghg54GVMJGREDED55454454gfg34343');
 define('SECRET_IV', 'anmnmn355ATGRFRF909089');
 
-function EnCrypt($string) {
-    $output = false;
-    $encrypt_method = "AES-256-CBC";
-    $key = hash('sha256', SECRET_KEY);
-    $iv = substr(hash('sha256', SECRET_IV), 0, 16);
- 
-    $output = base64_encode(openssl_encrypt($string, $encrypt_method, $key, 0, $iv));
+function EnCrypt($string=NULL) {
+    
+	if(!empty($string)) {
+		$encrypt_method = "AES-256-CBC";
+		$key = hash('sha256', SECRET_KEY);
+		$iv = substr(hash('sha256', SECRET_IV), 0, 16);
+	 
+		$output = base64_encode(openssl_encrypt($string, $encrypt_method, $key, 0, $iv));
+	} else {
+		$output = '';
+	}
  
     return $output;
 }
 
-function DeCrypt($string) {
-	$output = false;
-    $encrypt_method = "AES-256-CBC";
-    $key = hash('sha256', SECRET_KEY);
-    $iv = substr(hash('sha256', SECRET_IV), 0, 16);
+function DeCrypt($string=NULL) {
+	if(!empty($string)) {
+		$encrypt_method = "AES-256-CBC";
+		$key = hash('sha256', SECRET_KEY);
+		$iv = substr(hash('sha256', SECRET_IV), 0, 16);
  
-    $output = openssl_decrypt(base64_decode($string), $encrypt_method, $key, 0, $iv);
- 
+		$output = openssl_decrypt(base64_decode($string), $encrypt_method, $key, 0, $iv);
+	} else {
+		$output = '';
+	}
     return $output;
 }

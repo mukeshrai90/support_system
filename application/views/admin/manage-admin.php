@@ -44,7 +44,7 @@
 						<div class="form-group">
 							<label class="col-lg-4 control-label">Username</label>
 							<div class="col-lg-7">
-								<input type="hidden" name="admin_id" value="<?php echo @$record['admin_id']?>">
+								<input type="hidden" name="admin_id" value="<?php echo !empty($record['admin_id']) ? EnCrypt($record['admin_id']) : ''?>">
 								<input type="text" class="form-control" name="username" id="username"  placeholder="Username" value="<?php echo @$record['admin_username']?>">
 							</div>
 						</div>
@@ -190,7 +190,7 @@ $(document).ready(function() {
 			username: {
 				required: true,	
 				alphaNumeric: true,			
-				remote : BASE_URL+'admin/check_admin_username?id='+$('input[name="id"]').val(),
+				remote : BASE_URL+'admin/check_admin_username?id='+$('input[name="admin_id"]').val(),
 			},
 			name: {
 				required: true,
@@ -199,7 +199,7 @@ $(document).ready(function() {
 			email: {
 				required: true,
 				email:true,
-				remote: BASE_URL+'admin/check_admin_email?id='+$('input[name="id"]').val(),
+				remote: BASE_URL+'admin/check_admin_email?id='+$('input[name="admin_id"]').val(),
 			},
 			mobile: {
 				required: true,

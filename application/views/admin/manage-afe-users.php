@@ -12,7 +12,7 @@
 								<label class="col-md-5 control-label">Name</label>
 								<div class="col-md-7">
 									<input type="text" class="form-control only-char-space" name="name" id="name"  placeholder="Name" value="<?php echo @$record['afe_name']?>">
-									<input type="hidden" name="afe_id" value="<?php echo @$record['afe_id']?>">
+									<input type="hidden" name="afe_id" value="<?php echo !empty($record['afe_id']) ? EnCrypt($record['afe_id']) : ''?>">
 								</div>
 							</div>
 							<div class="col-md-6">
@@ -126,14 +126,14 @@ $(document).ready(function() {
 			email: {
 				//required: true,
 				email: true,
-				remote : BASE_URL+'admin/check_afe_user_email?id='+$('input[name="id"]').val(),
+				remote : BASE_URL+'admin/check_afe_user_email?id='+$('input[name="afe_id"]').val(),
 			},
 			mobile: {
 				required: true,
 				number:true,
 				maxlength:10,
 				minlength:10,
-				remote : BASE_URL+'admin/check_afe_user_mobile?id='+$('input[name="id"]').val(),
+				remote : BASE_URL+'admin/check_afe_user_mobile?id='+$('input[name="afe_id"]').val(),
 			},
 			pan_card: {
 				exactlength:10

@@ -92,8 +92,10 @@ class Admin extends CI_Controller {
 			if(!empty($admin_id)) {
 				chk_access('admins' ,3, true);
 				
-				$data['record'] = $this->admin_model->get_record_md5('bs_admins', 'admin_id', $admin_id);
-				$data['admin_roles'] = $this->admin_model->get_admin_roles($admin_id, 'md5');
+				$admin_id = DeCrypt($admin_id);
+				
+				$data['record'] = $this->admin_model->get_record('bs_admins', 'admin_id', $admin_id);
+				$data['admin_roles'] = $this->admin_model->get_admin_roles($admin_id);
 				
 				if(isset($_SERVER['HTTP_REFERER'])){			
 					$referer = array('referer' => $_SERVER['HTTP_REFERER']);
@@ -112,14 +114,13 @@ class Admin extends CI_Controller {
 		}
 	}		
 	
-	public function admin_view($AdminId=NULL)
+	public function admin_view($admin_id=NULL)
 	{
 		chk_access('admins',1, true);
 		
-		$data['user'] = $this->admin_model->get_record_md5('bs_admins', $AdminId);
+		$admin_id = DeCrypt($admin_id);
 		
-		$data['actions'] = $this->manage_access($AdminId,true);		
-		
+		$data['user'] = $this->admin_model->get_record('bs_admins', 'admin_id', $admin_id);
 		$data['pageTitle'] = 'Admin Details';
 		$data['content'] = 'admin/admin-details';
 		$this->load->view('layout',$data);
@@ -224,6 +225,7 @@ class Admin extends CI_Controller {
 		$logged_admin_id = $logged_admin['admin_id'];
 		
 		$admin_id = @$_POST['admin_id'];
+		$admin_id = DeCrypt($admin_id);
 		$password = @$_POST['password'];
 		$cpassword = @$_POST['cpassword'];
 				
@@ -240,8 +242,8 @@ class Admin extends CI_Controller {
 					if($this->db->update('bs_admins', $UpdateData)) {
 						
 						$CallInsertData = array();
-						$CallInsertData['call_user_id'] = $logged_admin_id;
-						$CallInsertData['call_admin_id'] = $admin_id;
+						$CallInsertData['call_user_id'] = $admin_id;
+						$CallInsertData['call_logged_admin_id'] = $logged_admin_id;
 						$CallInsertData['call_desc'] = 'Password has been changed';
 						$CallInsertData['call_type'] = 4;
 						$CallInsertData['call_time'] = date('Y-m-d H:i:s');
@@ -287,6 +289,7 @@ class Admin extends CI_Controller {
 				
 		$status = $this->input->post('status');
 		$admin_id = $this->input->post('admin_id');
+		$admin_id = DeCrypt($admin_id);
 		
 		$response = array();
 		if(!empty($status) && !empty($admin_id)) {			
@@ -302,8 +305,8 @@ class Admin extends CI_Controller {
 					$sts_txt = $sts_array[$status];
 					
 					$CallInsertData = array();
-					$CallInsertData['call_user_id'] = $logged_admin_id;
-					$CallInsertData['call_admin_id'] = $admin_id;
+					$CallInsertData['call_user_id'] = $admin_id;
+					$CallInsertData['call_logged_admin_id'] = $logged_admin_id;
 					$CallInsertData['call_desc'] = 'Status has been changed to "'.$sts_txt.'"';
 					$CallInsertData['call_type'] = 3;
 					$CallInsertData['call_time'] = date('Y-m-d H:i:s');
@@ -392,6 +395,8 @@ class Admin extends CI_Controller {
 			if(trim($admin_id) != '') {
 				chk_access('afe_users', 3, true);
 				
+				$admin_id = DeCrypt($admin_id);
+				
 				$data['record'] = $this->admin_model->get_record_md5('bs_afe_users', 'afe_id', $admin_id);
 				
 			} else {
@@ -407,6 +412,7 @@ class Admin extends CI_Controller {
 	public function check_admin_username($return=false){		
 		$username = $this->input->get('username');
 		$admin_id = $this->input->get('id');
+		$admin_id = DeCrypt($admin_id);
 		
 		$sts = $this->admin_model->check_admin_username($username, $admin_id);
 		echo $sts;
@@ -415,6 +421,7 @@ class Admin extends CI_Controller {
 	public function check_admin_email($return=false){		
 		$email = $this->input->get('email');
 		$admin_id = $this->input->get('id');
+		$admin_id = DeCrypt($admin_id);
 		
 		$sts = $this->admin_model->check_admin_email($email, $admin_id);
 		echo $sts;
@@ -423,6 +430,7 @@ class Admin extends CI_Controller {
 	public function check_afe_user_email($return=false){		
 		$username = $this->input->get('email');
 		$user_id = $this->input->get('id');
+		$user_id = DeCrypt($user_id);
 		
 		$sts = $this->admin_model->check_afe_user_email($username, $user_id);
 		echo $sts;
@@ -431,6 +439,7 @@ class Admin extends CI_Controller {
 	public function check_afe_user_mobile($return=false){		
 		$email = $this->input->get('mobile');
 		$user_id = $this->input->get('id');
+		$user_id = DeCrypt($user_id);
 		
 		$sts = $this->admin_model->check_afe_user_mobile($email, $user_id);
 		echo $sts;

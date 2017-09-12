@@ -27,24 +27,24 @@
 					<?php 
 						if($user['afe_status'] == 0) {
 							echo 
-							'<a href="javascript:;" class="change-status" title="Pending" data-toggle="tooltip" data-placement="bottom" data-status="1" data-userid="'.$user['afe_id'].'" data-field="status">
+							'<a href="javascript:;" class="change-status" title="Pending" data-toggle="tooltip" data-placement="bottom" data-status="1" data-userid="'.EnCrypt($user['afe_id']).'" data-field="status">
 								<i class="fa fa-star-o text-navy" style="color:#FF501E;"></i>
 							</a> &nbsp;&nbsp;&nbsp;';
 							
 						} else if($user['afe_status'] == 1) {
 							echo 
-							'<a href="javascript:;" class="change-status" title="Approved" data-toggle="tooltip" data-placement="bottom" data-status="0" data-userid="'.$user['afe_id'].'" data-field="status">
+							'<a href="javascript:;" class="change-status" title="Approved" data-toggle="tooltip" data-placement="bottom" data-status="0" data-userid="'.EnCrypt($user['afe_id']).'" data-field="status">
 								<i class="fa fa-star text-navy"></i>
 							</a> &nbsp;&nbsp;&nbsp;';
 						}
 					?>
 				</td>
 				<td class="tooltip-demo">
-					<a href="<?php echo BASE_URL.'afe-users/edit/'.md5($user['afe_id'])?>" title="Edit" class="actions-a" data-toggle="tooltip" data-placement="bottom"">
+					<a href="<?php echo BASE_URL.'afe-users/edit/'.EnCrypt($user['afe_id'])?>" title="Edit" class="actions-a" data-toggle="tooltip" data-placement="bottom"">
 						<i class="fa fa-pencil-square-o text-navy"></i>
 					</a>
 					
-					<a href="<?php echo BASE_URL.'afe-users/view/'.md5($user['afe_id'])?>" title="View" class="actions-a" data-toggle="tooltip" data-placement="bottom">
+					<a href="<?php echo BASE_URL.'afe-users/view/'.EnCrypt($user['afe_id'])?>" title="View" class="actions-a" data-toggle="tooltip" data-placement="bottom">
 						<i class="fa fa-eye text-navy"></i>
 					</a>
 				</td>

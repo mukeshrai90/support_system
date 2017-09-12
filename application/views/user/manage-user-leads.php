@@ -12,7 +12,7 @@
 								<label class="col-md-5 control-label">Name</label>
 								<div class="col-md-7">
 									<input type="text" class="form-control only-char-space" name="name" id="name"  placeholder="Name" value="<?php echo @$record['user_full_name']?>">
-									<input type="hidden" name="afe_id" value="<?php echo @$record['afe_id']?>">
+									<input type="hidden" name="user_id" value="<?php echo !empty($record['afe_id']) ? EnCrypt($record['afe_id']) : ''?>">
 								</div>
 							</div>
 							<div class="col-md-6">
@@ -202,7 +202,7 @@ $(document).ready(function() {
 			email: {
 				required: true,
 				email:true,
-				remote : BASE_URL+'user/check_user_email?id='+$('input[name="id"]').val(),
+				remote : BASE_URL+'user/check_user_email?id='+$('input[name="user_id"]').val(),
 			},
 			mobile: {
 				required: true,
