@@ -387,29 +387,16 @@ class User extends CI_Controller {
 				$password = md5($password);
 				$UpdateData = array('password' => $password);
 				$this->db->where('id',$user_id);
-				if($this->db->update('ts_users',$UpdateData))
-				{
+				if($this->db->update('ts_users',$UpdateData)) {
 					$response['status'] = true;
 					$response['message'] = 'Password Changed Successfully';
 					
-					$emailTemplate = $this->admin_model->get_record('ts_email_config',38);
-					$template = @$emailTemplate['description'];						
-					$template = str_replace('{{name}}',$user['name'],$template);
-					
-					$mail = array(); $email = $user['email'];
-					$mail['subject'] = @$emailTemplate['subject'];
-					$mail['message'] = $template;
-					$mail['purpose'] = @$emailTemplate['purpose'];
-					$sent = send_mail($email,$mail,$attachment);
-				}
-				else
-				{
+				} else {
 					$response['status'] = false;
 					$response['message'] = 'Unable to change password';
 				}
-			}
-			else
-			{
+				
+			} else {
 				$response['status'] = false;
 				$response['message'] = 'Both password must be same';
 			}
@@ -483,6 +470,8 @@ class User extends CI_Controller {
 			$data['result'] = $this->load->view('elements/user-leads-list',$data,true);
 			echo json_encode($data);die;
 		}
+		
+		$data['status_arr'] = $this->admin_model->get_all_leadsStatus();
 		
 		$data['pageTitle'] = 'User Leads';
 		$data['content'] = 'user/user-leads';

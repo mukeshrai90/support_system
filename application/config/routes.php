@@ -82,4 +82,16 @@ $route['user-leads/view/(:any)'] = "user/view_users_lead/$1";
 $route['user-leads/add'] = "user/manage_users_lead";
 $route['user-leads/edit/(:any)'] = "user/manage_users_lead/$1";
 
+$route['cms/circles/list'] = "cms/circles_list";
+$route['cms/circles/add'] = "cms/manage_circles";
+$route['cms/circles/edit/(:any)'] = "cms/manage_circles/$1";
+
+$route['cms/ssa/list'] = "cms/ssa_list";
+$route['cms/ssa/add'] = "cms/manage_ssa";
+$route['cms/ssa/edit/(:any)'] = "cms/manage_ssa/$1";
+
+$route['cms/plans/list'] = "cms/all_plans";
+$route['cms/plans/add'] = "cms/manage_plans";
+$route['cms/plans/edit/(:any)'] = "cms/manage_plans/$1";
+
 

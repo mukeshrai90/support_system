@@ -587,12 +587,12 @@ class Admin_model extends CI_Model
 		$this->db->from('bs_users');
 		$data['count'] = $this->db->count_all_results();
 		
-		$this->db->select('bs_users.*, bs_new_lead_status.status_name');
+		$this->db->select('bs_users.*, bs_lead_status.status_name');
 		$this->db->where($where);
 		$this->db->like($like); 
 		$this->db->limit($limit, $start);
 		$this->db->order_by('bs_users.user_id','desc'); 
-		$this->db->join('bs_new_lead_status', 'bs_new_lead_status.status_id=bs_users.user_status_id', 'INNER'); 
+		$this->db->join('bs_lead_status', 'bs_lead_status.status_id=bs_users.user_status_id', 'INNER'); 
 		$query = $this->db->get("bs_users");		
 		$data['result'] = $query->result_array();
 		
@@ -671,5 +671,143 @@ class Admin_model extends CI_Model
 		}
 		
 		return $sts;
+	}
+	
+	public function get_all_leadsStatus(){
+		$statss_arr = $this->db->get_where('bs_lead_status',array('status_active' => 1))->result_array();
+		
+		return $statss_arr;
+	}
+	
+	public function check_circle_name($circle_name, $circle_id=NULL){	
+		if(trim($circle_id) == ''){
+			$circle_id = 9999;
+		}
+		
+		$already = $this->db->get_where('bs_circles',array('circle_name' => $circle_name, 'circle_id != ' => $circle_id))->row_array();
+		if(!empty($already)) {
+			$sts = 'false';
+		} else {
+			$sts = 'true';
+		}
+		
+		return $sts;
+	}
+	
+	public function check_ssa_name($ssa_name, $ssa_id=NULL){	
+		if(trim($ssa_id) == ''){
+			$ssa_id = 9999;
+		}
+		
+		$already = $this->db->get_where('bs_ssa',array('ssa_name' => $ssa_name, 'circle_id != ' => $ssa_id))->row_array();
+		if(!empty($already)) {
+			$sts = 'false';
+		} else {
+			$sts = 'true';
+		}
+		
+		return $sts;
+	}
+	
+	public function check_plan_name($plan_name, $plan_id=NULL){	
+		if(trim($plan_id) == ''){
+			$plan_id = 9999;
+		}
+		
+		$already = $this->db->get_where('bs_plans',array('plan_name' => $plan_name, 'plan_id != ' => $plan_id))->row_array();
+		if(!empty($already)) {
+			$sts = 'false';
+		} else {
+			$sts = 'true';
+		}
+		
+		return $sts;
+	}
+	
+	public function check_plan_rental($plan_rental, $plan_id=NULL){	
+		if(trim($plan_id) == ''){
+			$plan_id = 9999;
+		}
+		
+		$already = $this->db->get_where('bs_plans',array('plan_rental' => $plan_rental, 'plan_id != ' => $plan_id))->row_array();
+		if(!empty($already)) {
+			$sts = 'false';
+		} else {
+			$sts = 'true';
+		}
+		
+		return $sts;
+	}
+	
+	public function get_all_circles_list($limit, $start) {        
+		
+		$data = array(); $where = array(); $like = array(); 
+		
+		if(isset($_GET['status'])) {	
+			$_GET['status'] = $_GET['status'] == 2 ? 0 : $_GET['status'];
+			$where = array_merge($where,array('bs_circles.circle_status' => $_GET['status']));			
+		}
+		
+		if(isset($_GET['name']) && !empty($_GET['name'])){
+			$like = array_merge($like,array('bs_circles.circle_name' => $_GET['name']));
+		}		
+					
+		$this->db->where($where);
+		$this->db->like($like); 
+		$this->db->from('bs_circles');
+		$data['count'] = $this->db->count_all_results();
+		
+		$this->db->select('bs_circles.*');
+		$this->db->where($where);
+		$this->db->like($like); 
+		$this->db->limit($limit, $start);
+		$this->db->order_by('bs_circles.circle_id','desc'); 
+		$query = $this->db->get("bs_circles");		
+		$data['result'] = $query->result_array();
+		
+		return $data;
+    }
+	
+	public function manage_circles() {
+		$logged_admin = $this->session->userdata('admin');
+		$logged_admin_id = $logged_admin['admin_id'];
+		
+		$circle_id = $this->input->post('circle_id');
+		$circle_id = DeCrypt($circle_id);
+		
+		$data = array();
+		$data['circle_name'] = $this->input->post('circle_name');							
+		$data['circle_code'] = $this->input->post('circle_code');										
+		$data['circle_status'] = $this->input->post('circle_status');										
+		
+		$sts = $this->check_circle_name($data['circle_name'], $circle_id);
+		if($sts == 'false'){
+			$response['status'] = false;	
+			$response['message'] = 'Circle Name Already Exist.';
+			echo json_encode($response);die;	
+		}
+		
+		$result = array('status' => false);
+		if(empty($circle_id)){			
+			
+			$data['circle_added_on'] = date('Y-m-d H:i:s');				
+	
+			if($this->db->insert('bs_circles', $data)){
+				$result['status'] = true;
+				$user_id = $this->db->insert_id();
+				$result['insert_id'] = $user_id;
+			} 
+		
+		} else {
+			
+			$data['circle_updated_on'] = date('Y-m-d H:i:s');	
+		
+			$this->db->where('circle_id', $circle_id);
+			if($this->db->update('bs_circles', $data)){
+				$result['status'] = true;
+			}
+		}
+		
+		return $result;
 	}
 }	
