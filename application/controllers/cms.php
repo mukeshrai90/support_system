@@ -6,6 +6,7 @@ class Cms extends CI_Controller {
 	{
 		parent::__construct();		
 		$this->load->database();	
+		$this->load->model('admin_model');	
 	}
 	
 	public function circles_list()
@@ -27,8 +28,7 @@ class Cms extends CI_Controller {
 		
         $data["links"] = create_links($per_page,$total_rows,$base_url);
 		
-		if($this->input->is_ajax_request())
-		{
+		if($this->input->is_ajax_request()) {
 			$data['result'] = $this->load->view('elements/circles-list',$data,true);
 			echo json_encode($data);die;
 		}
@@ -41,7 +41,8 @@ class Cms extends CI_Controller {
 	public function manage_circles($circle_id=0)
 	{				
 		if($this->input->post('circle_name') != '') {
-			$this->admin_model->manage_circles();
+			
+			$result = $this->admin_model->manage_circles();
 			
 			$response = array();
 			if($result['status']) {
@@ -55,7 +56,7 @@ class Cms extends CI_Controller {
 				}	
 			} else {
 				$response['status'] = false;	
-				$response['message'] = 'Unable to process your request right now. <br/> Please try again or some time later.';
+				$response['message'] = 'Unable to process your request right now. <br/> Please try again or some time later..';
 			}
 			
 			echo json_encode($response);die;							
@@ -105,15 +106,18 @@ class Cms extends CI_Controller {
 			echo json_encode($data);die;
 		}
 		
+		$data['circles'] = $this->admin_model->get_allCircles();
+		
 		$data['pageTitle'] = 'SSA';
-		$data['content'] = 'cms/ssa-list';
+		$data['content'] = 'cms/ssa';
 		$this->load->view('layout',$data);
 	}
 	
 	public function manage_ssa($ssa_id=0)
 	{				
 		if($this->input->post('ssa_name') != '') {
-			$this->admin_model->manage_ssa();
+			
+			$result = $this->admin_model->manage_ssa();
 			
 			$response = array();
 			if($result['status']) {
@@ -145,6 +149,8 @@ class Cms extends CI_Controller {
 			} else {
 				chk_access('cms',2,true);
 			}	
+			
+			$data['circles'] = $this->admin_model->get_allCircles();
 				
 			$data['pageTitle'] = 'Manage SSA';
 			$data['content'] = 'cms/manage-ssa';
@@ -159,7 +165,7 @@ class Cms extends CI_Controller {
 		$per_page = 20; 
         $page = @$_GET['per_page']? $_GET['per_page'] : 0;
 						
-        $result = $this->admin_model->get_all_plans_list($per_page, $page);		
+        $result = $this->admin_model->get_all_plans($per_page, $page);		
 		$data['records'] = @$result['results'];
 	
 		$total_rows = $result['count'];
@@ -177,15 +183,18 @@ class Cms extends CI_Controller {
 			echo json_encode($data);die;
 		}
 		
+		$data['circles'] = $this->admin_model->get_allCircles();
+		
 		$data['pageTitle'] = 'Plans';
-		$data['content'] = 'cms/plans-list';
+		$data['content'] = 'cms/plans';
 		$this->load->view('layout',$data);
 	}
 	
 	public function manage_plans($plan_id=0)
 	{				
 		if($this->input->post('plan_name') != '') {
-			$this->admin_model->manage_plans();
+			
+			$result =$this->admin_model->manage_plans();
 			
 			$response = array();
 			if($result['status']) {
@@ -216,11 +225,42 @@ class Cms extends CI_Controller {
 			} else {
 				chk_access('cms',2,true);
 			}	
+			
+			$data['circles'] = $this->admin_model->get_allCircles();
 				
 			$data['pageTitle'] = 'Manage Plans';
 			$data['content'] = 'cms/manage-plans';
 			$this->load->view('layout',$data);
 		}
+	}
+	
+	public function change_plans_status(){
+		chk_access('admins', 4, true);
+		
+		$logged_admin = $this->session->userdata('admin');
+		$logged_admin_id = $logged_admin['admin_id'];
+				
+		$status = $this->input->post('status');
+		$plan_id = $this->input->post('plan_id');
+		$plan_id = DeCrypt($plan_id);
+		
+		$response = array();
+		if(!empty($status) && !empty($plan_id)) {			
+			
+			$UpdateData = array('plan_status' => $status);
+			$this->db->where('plan_id' ,$plan_id);
+			if($this->db->update('bs_plans', $UpdateData)) {
+				$response['status'] = true;
+				$response['message'] = 'Status Changed Successfully';	
+			} else {
+				throw new Exception('Unable to proocess your request right now.<br/> Please try again or some time later');
+			}
+		} else {
+			$response['status'] = false;
+			$response['message'] = 'Unable to process your request. <br/> Please try again or some later';
+		}
+		
+		echo json_encode($response);die;
 	}
 	
 	public function check_circle_name(){

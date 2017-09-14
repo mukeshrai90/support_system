@@ -4,18 +4,37 @@
 		<div class="col-lg-8">
 			<div class="ibox float-e-margins">
 				<div class="ibox-title">
-					<h5>Add/Edit Circles</h5>
+					<h5>Add/Edit Plans</h5>
 				</div>
 				<div class="ibox-content">
 					<form class="form-horizontal" action="javascript:;" id="manage-cms-form" method="post">
+						<div class="form-group">
+							<label class="col-md-4 control-label">Circle</label>
+							<div class="col-md-8">
+								<select name="circle_id" id="circle_id" class="form-control">
+									<option value="">Select</option>									
+									<?php 
+										if(isset($circles)) {
+											foreach($circles as $rcd) {
+												$selected = '';
+												if($rcd['circle_id'] == $record['circle_id']) {
+													$selected = 'selected';
+												}
+												echo '<option value="'.$rcd['circle_id'].'" '.$selected.'>'.$rcd['circle_name'].'</option>';
+											}
+										}
+									?>   									
+							   </select>
+							</div>
+						</div>
 						<div class="form-group">
 							<label class="col-lg-4 control-label">
 								Name
 							</label>
 							<div class="col-lg-8">
-								<input type="text" placeholder="Circle Name" class="form-control" name="circle_name" value="<?php echo @$record['circle_name']?>"> 
+								<input type="text" placeholder="Plan Name" class="form-control" name="plan_name" value="<?php echo @$record['plan_name']?>"> 
 								<input type="hidden" name="referer" value="<?php echo $this->session->userdata('referer')?>" />
-								<input type="hidden" name="circle_id" value="<?php echo !empty($record['circle_id']) ? EnCrypt($record['circle_id']) : ''?>">
+								<input type="hidden" name="plan_id" value="<?php echo !empty($record['plan_id']) ? EnCrypt($record['plan_id']) : ''?>">
 							</div>
 						</div>
 						<div class="form-group">
@@ -23,17 +42,23 @@
 								Code
 							</label>
 							<div class="col-lg-8">
-								<input type="text" placeholder="Circle Code" class="form-control" name="circle_code" value="<?php echo @$record['circle_code']?>"> 
+								<input type="text" placeholder="Plan Code" class="form-control" name="plan_code" value="<?php echo @$record['plan_code']?>"> 
 							</div>
 						</div>
 						<div class="form-group">
 							<label class="col-lg-4 control-label">
-								Status
+								Rental
 							</label>
 							<div class="col-lg-8">
-								<select name="circle_status" id="circle_status" class="form-control">
-									<option value="1" <?php echo $record['circle_status'] == 1 ? 'selected="selected"':''?>>Active</option>
-									<option value="0" <?php echo $record['circle_status'] === 0 ? 'selected="selected"':''?>>Inactive</option></select>
+								<input type="text" placeholder="Plan Monthly Rental" class="form-control only-number" name="plan_rental" value="<?php echo @$record['plan_rental']?>"> 
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-lg-4 control-label">
+								Features
+							</label>
+							<div class="col-lg-8">
+								<textarea name="plan_features" id="plan_features" class="form-control" placeholder="Plan Features Here"><?php echo @$record['plan_features']?></textarea>
 							</div>
 						</div>
 						<div class="form-group">
@@ -58,7 +83,7 @@ jQuery(document).ready(function() {
 		
 			showCustomLoader(true);
 			$.ajax({
-				url: BASE_URL+'cms/circles/add',
+				url: BASE_URL+'cms/plans/add',
 				type: 'POST',
 				data: $('#manage-cms-form').serialize(),
 				dataType: 'JSON',
@@ -83,21 +108,27 @@ jQuery(document).ready(function() {
 	$("#manage-cms-form").validate({
 		onkeyup: false,
 		rules: {
-			circle_name: {
+			circle_id: {
+				required: true,
+			},
+			plan_name: {
 				required: true,
 				alphaSpace:true,
-				remote : BASE_URL+'cms/check_circle_name?id='+$('input[name="circle_id"]').val(),
 			},
-			circle_code: {
+			plan_code: {
 				//required: true,
 			},
-			circle_status: {
+			plan_rental: {
 				required: true,
+				number: true,
+			},
+			plan_features: {
+				//required: true,
 			},			
 		},
 		messages: {
-			circle_name:{
-				remote: 'Circle Already Exist'
+			plan_name:{
+				remote: 'Plan Already Exist'
 			}
 		},
 		submitHandler: function(form) {

@@ -709,12 +709,12 @@ class Admin_model extends CI_Model
 		return $sts;
 	}
 	
-	public function check_plan_name($plan_name, $plan_id=NULL){	
+	public function check_plan_name($plan_name, $plan_id=NULL, $circle_id=NULL){	
 		if(trim($plan_id) == ''){
 			$plan_id = 9999;
 		}
 		
-		$already = $this->db->get_where('bs_plans',array('plan_name' => $plan_name, 'plan_id != ' => $plan_id))->row_array();
+		$already = $this->db->get_where('bs_plans',array('plan_name' => $plan_name, 'plan_id != ' => $plan_id, 'circle_id != ' => $circle_id))->row_array();
 		if(!empty($already)) {
 			$sts = 'false';
 		} else {
@@ -724,12 +724,12 @@ class Admin_model extends CI_Model
 		return $sts;
 	}
 	
-	public function check_plan_rental($plan_rental, $plan_id=NULL){	
+	public function check_plan_rental($plan_rental, $plan_id=NULL, $circle_id=NULL){	
 		if(trim($plan_id) == ''){
 			$plan_id = 9999;
 		}
 		
-		$already = $this->db->get_where('bs_plans',array('plan_rental' => $plan_rental, 'plan_id != ' => $plan_id))->row_array();
+		$already = $this->db->get_where('bs_plans',array('plan_rental' => $plan_rental, 'plan_id != ' => $plan_id, 'circle_id != ' => $circle_id))->row_array();
 		if(!empty($already)) {
 			$sts = 'false';
 		} else {
@@ -794,8 +794,7 @@ class Admin_model extends CI_Model
 	
 			if($this->db->insert('bs_circles', $data)){
 				$result['status'] = true;
-				$user_id = $this->db->insert_id();
-				$result['insert_id'] = $user_id;
+				$result['insert_id'] = $this->db->insert_id();
 			} 
 		
 		} else {
@@ -809,5 +808,175 @@ class Admin_model extends CI_Model
 		}
 		
 		return $result;
+	}
+	
+	public function get_all_ssa_list($limit, $start) {        
+		
+		$data = array(); $where = array(); $like = array(); 
+		
+		if(isset($_GET['status'])) {	
+			$_GET['status'] = $_GET['status'] == 2 ? 0 : $_GET['status'];
+			$where = array_merge($where,array('bs_ssa.ssa_status' => $_GET['status']));			
+		}
+		
+		if(isset($_GET['circle'])) {	
+			$where = array_merge($where,array('bs_ssa.circle_id' => $_GET['circle']));			
+		}
+		
+		if(isset($_GET['name']) && !empty($_GET['name'])){
+			$like = array_merge($like,array('bs_ssa.ssa_name' => $_GET['name']));
+		}		
+					
+		$this->db->where($where);
+		$this->db->like($like); 
+		$this->db->from('bs_ssa');
+		$this->db->join('bs_circles', 'bs_circles.circle_id=bs_ssa.circle_id', 'INNER'); 
+		$data['count'] = $this->db->count_all_results();
+		
+		$this->db->select('bs_ssa.*, bs_circles.circle_name');
+		$this->db->where($where);
+		$this->db->like($like); 
+		$this->db->limit($limit, $start);
+		$this->db->order_by('bs_ssa.ssa_id','desc'); 
+		$this->db->join('bs_circles', 'bs_circles.circle_id=bs_ssa.circle_id', 'INNER'); 
+		$query = $this->db->get("bs_ssa");		
+		$data['result'] = $query->result_array();
+		
+		return $data;
+    }
+	
+	public function manage_ssa() {
+		$logged_admin = $this->session->userdata('admin');
+		$logged_admin_id = $logged_admin['admin_id'];
+		
+		$ssa_id = $this->input->post('ssa_id');
+		$ssa_id = DeCrypt($ssa_id);
+		
+		$data = array();
+		$data['circle_id'] = $this->input->post('circle_id');
+		$data['ssa_name'] = $this->input->post('ssa_name');							
+		$data['ssa_code'] = $this->input->post('ssa_code');										
+		$data['ssa_status'] = $this->input->post('ssa_status');										
+		
+		$sts = $this->check_ssa_name($data['ssa_name'], $ssa_id);
+		if($sts == 'false'){
+			$response['status'] = false;	
+			$response['message'] = 'SSA Name Already Exist.';
+			echo json_encode($response);die;	
+		}
+		
+		$result = array('status' => false);
+		if(empty($ssa_id)){			
+			
+			$data['ssa_added_on'] = date('Y-m-d H:i:s');				
+	
+			if($this->db->insert('bs_ssa', $data)){
+				$result['status'] = true;
+				$result['insert_id'] = $this->db->insert_id();
+			} 
+		
+		} else {
+			
+			$data['ssa_updated_on'] = date('Y-m-d H:i:s');	
+		
+			$this->db->where('ssa_id', $ssa_id);
+			if($this->db->update('bs_ssa', $data)){
+				$result['status'] = true;
+			}
+		}
+		
+		return $result;
+	}
+	
+	public function get_all_plans($limit, $start) {        
+		
+		$data = array(); $where = array(); $like = array(); 
+		
+		if(isset($_GET['status'])) {	
+			$_GET['status'] = $_GET['status'] == 2 ? 0 : $_GET['status'];
+			$where = array_merge($where,array('bs_plans.plan_status' => $_GET['status']));			
+		}
+		
+		if(isset($_GET['circle'])) {	
+			$where = array_merge($where,array('bs_plans.circle_id' => $_GET['circle']));			
+		}
+		
+		if(isset($_GET['name']) && !empty($_GET['name'])){
+			$like = array_merge($like,array('bs_plans.plan_name' => $_GET['name']));
+		}		
+					
+		$this->db->where($where);
+		$this->db->like($like); 
+		$this->db->from('bs_plans');
+		$this->db->join('bs_circles', 'bs_circles.circle_id=bs_plans.circle_id', 'INNER'); 
+		$data['count'] = $this->db->count_all_results();
+		
+		$this->db->select('bs_plans.*, bs_circles.circle_name');
+		$this->db->where($where);
+		$this->db->like($like); 
+		$this->db->limit($limit, $start);
+		$this->db->order_by('bs_plans.plan_id','desc'); 
+		$this->db->join('bs_circles', 'bs_circles.circle_id=bs_plans.circle_id', 'INNER'); 
+		$query = $this->db->get("bs_plans");		
+		$data['result'] = $query->result_array();
+		
+		return $data;
+    }
+	
+	public function manage_plans() {
+		$logged_admin = $this->session->userdata('admin');
+		$logged_admin_id = $logged_admin['admin_id'];
+		
+		$plan_id = $this->input->post('plan_id');
+		$plan_id = DeCrypt($plan_id);
+		
+		$data = array();
+		$data['circle_id'] = $this->input->post('circle_id');
+		$data['plan_name'] = $this->input->post('plan_name');							
+		$data['plan_code'] = $this->input->post('plan_code');										
+		$data['plan_rental'] = $this->input->post('plan_rental');										
+		$data['plan_status'] = $this->input->post('plan_status');										
+		$data['plan_features'] = $this->input->post('plan_features');										
+		
+		$sts = $this->check_plan_name($data['plan_name'], $plan_id, $data['circle_id']);
+		if($sts == 'false'){
+			$response['status'] = false;	
+			$response['message'] = 'Plan Name Already Exist in this Circle.';
+			echo json_encode($response);die;	
+		}
+		
+		$sts = $this->check_plan_rental($data['plan_rental'], $plan_id, $data['circle_id']);
+		if($sts == 'false'){
+			$response['status'] = false;	
+			$response['message'] = 'Plan Rental Already Exist in this Circle.';
+			echo json_encode($response);die;	
+		}
+		
+		$result = array('status' => false);
+		if(empty($plan_id)){			
+			
+			$data['plan_added_on'] = date('Y-m-d H:i:s');				
+	
+			if($this->db->insert('bs_plans', $data)){
+				$result['status'] = true;
+				$result['insert_id'] = $this->db->insert_id();
+			} 
+		
+		} else {
+			
+			$data['plan_updated_on'] = date('Y-m-d H:i:s');	
+		
+			$this->db->where('plan_id', $plan_id);
+			if($this->db->update('bs_plans', $data)){
+				$result['status'] = true;
+			}
+		}
+		
+		return $result;
+	}
+	
+	public function get_allCircles(){
+		$circles = $this->db->get_where('bs_circles', array('circle_status' => 1))->result_array();
+		return $circles;
 	}
 }	

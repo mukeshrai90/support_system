@@ -4,18 +4,37 @@
 		<div class="col-lg-8">
 			<div class="ibox float-e-margins">
 				<div class="ibox-title">
-					<h5>Add/Edit Circles</h5>
+					<h5>Add/Edit SSA</h5>
 				</div>
 				<div class="ibox-content">
 					<form class="form-horizontal" action="javascript:;" id="manage-cms-form" method="post">
+						<div class="form-group">
+							<label class="col-md-4 control-label">Circle</label>
+							<div class="col-md-8">
+								<select name="circle_id" id="circle_id" class="form-control">
+									<option value="">Select</option>									
+									<?php 
+										if(isset($circles)) {
+											foreach($circles as $rcd) {
+												$selected = '';
+												if($rcd['circle_id'] == $record['circle_id']) {
+													$selected = 'selected';
+												}
+												echo '<option value="'.$rcd['circle_id'].'" '.$selected.'>'.$rcd['circle_name'].'</option>';
+											}
+										}
+									?>   									
+							   </select>
+							</div>
+						</div>
 						<div class="form-group">
 							<label class="col-lg-4 control-label">
 								Name
 							</label>
 							<div class="col-lg-8">
-								<input type="text" placeholder="Circle Name" class="form-control" name="circle_name" value="<?php echo @$record['circle_name']?>"> 
+								<input type="text" placeholder="SSA Name" class="form-control" name="ssa_name" value="<?php echo @$record['ssa_name']?>"> 
 								<input type="hidden" name="referer" value="<?php echo $this->session->userdata('referer')?>" />
-								<input type="hidden" name="circle_id" value="<?php echo !empty($record['circle_id']) ? EnCrypt($record['circle_id']) : ''?>">
+								<input type="hidden" name="circle_id" value="<?php echo !empty($record['ssa_id']) ? EnCrypt($record['ssa_id']) : ''?>">
 							</div>
 						</div>
 						<div class="form-group">
@@ -23,7 +42,7 @@
 								Code
 							</label>
 							<div class="col-lg-8">
-								<input type="text" placeholder="Circle Code" class="form-control" name="circle_code" value="<?php echo @$record['circle_code']?>"> 
+								<input type="text" placeholder="SSA Code" class="form-control" name="ssa_code" value="<?php echo @$record['ssa_code']?>"> 
 							</div>
 						</div>
 						<div class="form-group">
@@ -31,9 +50,9 @@
 								Status
 							</label>
 							<div class="col-lg-8">
-								<select name="circle_status" id="circle_status" class="form-control">
-									<option value="1" <?php echo $record['circle_status'] == 1 ? 'selected="selected"':''?>>Active</option>
-									<option value="0" <?php echo $record['circle_status'] === 0 ? 'selected="selected"':''?>>Inactive</option></select>
+								<select name="ssa_status" id="ssa_status" class="form-control">
+									<option value="1" <?php echo $record['ssa_status']== 1 ? 'selected="selected"':''?>>Active</option>
+									<option value="0" <?php echo $record['ssa_status']=== 0 ? 'selected="selected"':''?>>Inactive</option></select>
 							</div>
 						</div>
 						<div class="form-group">
@@ -58,7 +77,7 @@ jQuery(document).ready(function() {
 		
 			showCustomLoader(true);
 			$.ajax({
-				url: BASE_URL+'cms/circles/add',
+				url: BASE_URL+'cms/ssa/add',
 				type: 'POST',
 				data: $('#manage-cms-form').serialize(),
 				dataType: 'JSON',
@@ -83,21 +102,24 @@ jQuery(document).ready(function() {
 	$("#manage-cms-form").validate({
 		onkeyup: false,
 		rules: {
-			circle_name: {
+			ssa_name: {
 				required: true,
 				alphaSpace:true,
-				remote : BASE_URL+'cms/check_circle_name?id='+$('input[name="circle_id"]').val(),
+				remote : BASE_URL+'cms/check_ssa_name?id='+$('input[name="ssa_id"]').val(),
 			},
-			circle_code: {
+			ssa_code: {
 				//required: true,
 			},
-			circle_status: {
+			circle_id: {
+				required: true,
+			},
+			ssa_status: {
 				required: true,
 			},			
 		},
 		messages: {
 			circle_name:{
-				remote: 'Circle Already Exist'
+				remote: 'SSA Already Exist'
 			}
 		},
 		submitHandler: function(form) {

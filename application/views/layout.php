@@ -90,31 +90,43 @@ $(document).ready(function(){
 							?>
 								<li class="<?php echo strstr($this->uri->segment(1),'user-leads')== 'user-leads' ? 'active' : ''?>">
 									<a href="<?php echo BASE_URL.'user-leads/list'?>">
-										<i class="fa fa-user-md"></i> 
+										<i class="fa fa-reply-all"></i> 
 										<span class="nav-label">User Leads</span>
 									</a>
 								</li>
 							<?php } ?>
 							
 							<?php 
-								/*if(in_array('ticket_reports',$actions) || in_array('expense_reports',$actions)) {
+								if(in_array('cms',$actions) || in_array('cms',$actions) || 1) {
 							?>
-								<li class="<?php echo in_array($this->uri->segment(1),array('ticket-reports','expense-reports')) ? 'active' : ''?>">
+								<li class="<?php echo strstr($this->uri->segment(1),'cms')== 'cms' ? 'active' : ''?>">
 									<a aria-expanded="false" role="button" href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
-										<i class="fa fa-bookmark"></i> 
-										<span class="nav-label">Reports</span>
+										<i class="fa fa-gears"></i> 
+										<span class="nav-label">CMS</span>
 										<span class="caret"></span>
 									</a>
 									<ul role="menu" class="dropdown-menu">
-										<li class="<?php echo strstr($this->uri->segment(1),'ticket-reports')== 'ticket-reports' ? 'active' : ''?>">
-											<a href="<?php echo BASE_URL.'ticket-reports/list'?>">Ticket Reports</a>
+										<li class="<?php echo strstr($this->uri->segment(2),'circles')== 'circles' ? 'active' : ''?>">
+											<a href="<?php echo BASE_URL.'cms/circles/list'?>">
+												<i class="fa fa-wrench"></i>&nbsp;&nbsp;
+												<span class="nav-label">Circles</span>
+											</a>
 										</li>
-										<li class="<?php echo strstr($this->uri->segment(1),'expense-reports')== 'expense-reports' ? 'active' : ''?>">
-											<a href="<?php echo BASE_URL.'expense-reports/list'?>">Expense Reports</a>
+										<li class="<?php echo strstr($this->uri->segment(2),'ssa')== 'ssa' ? 'active' : ''?>">
+											<a href="<?php echo BASE_URL.'cms/ssa/list'?>">
+												<i class="fa fa-link"></i>&nbsp;&nbsp;
+												<span class="nav-label">SSA</span>
+											</a>
+										</li>
+										<li class="<?php echo strstr($this->uri->segment(2),'plans')== 'plans' ? 'active' : ''?>">
+											<a href="<?php echo BASE_URL.'cms/plans/list'?>">
+												<i class="fa fa-rupee"></i>&nbsp;&nbsp;&nbsp;&nbsp;
+												<span class="nav-label">Plans</span>
+											</a>
 										</li>
 									</ul>
 								</li>
-							<?php } */?>
+							<?php } ?>
 						</ul>
 						<ul class="nav navbar-top-links navbar-right">
 							<li>
