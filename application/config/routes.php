@@ -77,10 +77,10 @@ $route['afe-users/list'] = "admin/afe_users";
 $route['afe-users/add'] = "admin/manage_afe";
 $route['afe-users/edit/(:any)'] = "admin/manage_afe/$1";
 
-$route['user-leads/list'] = "user/list_leads";
-$route['user-leads/view/(:any)'] = "user/view_users_lead/$1";
-$route['user-leads/add'] = "user/manage_users_lead";
-$route['user-leads/edit/(:any)'] = "user/manage_users_lead/$1";
+$route['leads/list'] = "user/list_leads";
+$route['leads/view/(:any)'] = "user/view_lead/$1";
+$route['leads/new-lead'] = "user/manage_lead";
+$route['leads/edit/(:any)'] = "user/manage_lead/$1";
 
 $route['cms/circles/list'] = "cms/circles_list";
 $route['cms/circles/add'] = "cms/manage_circles";

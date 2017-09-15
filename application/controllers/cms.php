@@ -18,7 +18,7 @@ class Cms extends CI_Controller {
 						
         $result = $this->admin_model->get_all_circles_list($per_page, $page);		
 		$data['records'] = @$result['results'];
-	
+		
 		$total_rows = $result['count'];
 		
 		if(@$_GET['name'] != '')
@@ -106,7 +106,7 @@ class Cms extends CI_Controller {
 			echo json_encode($data);die;
 		}
 		
-		$data['circles'] = $this->admin_model->get_allCircles();
+		$data['circles'] = $this->admin_model->get_Circles();
 		
 		$data['pageTitle'] = 'SSA';
 		$data['content'] = 'cms/ssa';
@@ -150,7 +150,7 @@ class Cms extends CI_Controller {
 				chk_access('cms',2,true);
 			}	
 			
-			$data['circles'] = $this->admin_model->get_allCircles();
+			$data['circles'] = $this->admin_model->get_Circles();
 				
 			$data['pageTitle'] = 'Manage SSA';
 			$data['content'] = 'cms/manage-ssa';
@@ -183,7 +183,7 @@ class Cms extends CI_Controller {
 			echo json_encode($data);die;
 		}
 		
-		$data['circles'] = $this->admin_model->get_allCircles();
+		$data['circles'] = $this->admin_model->get_Circles();
 		
 		$data['pageTitle'] = 'Plans';
 		$data['content'] = 'cms/plans';
@@ -226,7 +226,7 @@ class Cms extends CI_Controller {
 				chk_access('cms',2,true);
 			}	
 			
-			$data['circles'] = $this->admin_model->get_allCircles();
+			$data['circles'] = $this->admin_model->get_Circles();
 				
 			$data['pageTitle'] = 'Manage Plans';
 			$data['content'] = 'cms/manage-plans';
@@ -245,7 +245,7 @@ class Cms extends CI_Controller {
 		$plan_id = DeCrypt($plan_id);
 		
 		$response = array();
-		if(!empty($status) && !empty($plan_id)) {			
+		if($status != '' && !empty($plan_id)) {			
 			
 			$UpdateData = array('plan_status' => $status);
 			$this->db->where('plan_id' ,$plan_id);
@@ -253,11 +253,12 @@ class Cms extends CI_Controller {
 				$response['status'] = true;
 				$response['message'] = 'Status Changed Successfully';	
 			} else {
-				throw new Exception('Unable to proocess your request right now.<br/> Please try again or some time later');
+				$response['status'] = false;
+				$response['message'] = 'Unable to process your request. <br/> Please try again or some later.';
 			}
 		} else {
 			$response['status'] = false;
-			$response['message'] = 'Unable to process your request. <br/> Please try again or some later';
+			$response['message'] = 'Unable to process your request. <br/> Please try again or some later..';
 		}
 		
 		echo json_encode($response);die;
@@ -271,7 +272,7 @@ class Cms extends CI_Controller {
 		echo $sts;
 	}
 	
-	public function check_sss_name(){
+	public function check_ssa_name(){
 		$ssa_name = $this->input->get('ssa_name');
 		$ssa_id = $this->input->get('ssa_id');
 		

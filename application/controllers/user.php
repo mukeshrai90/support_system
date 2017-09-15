@@ -6,6 +6,7 @@ class User extends CI_Controller {
 	{
 		parent::__construct();		
 		$this->load->database();	
+		$this->load->model('admin_model');	
 	}
 	
 	public function index()
@@ -447,38 +448,39 @@ class User extends CI_Controller {
 	
 	public function list_leads()
 	{		
-		chk_access('user_leads',1,true);
+		chk_access('leads',1,true);
 		
 		$per_page = 20; 
 		$page = @$_GET['per_page']? $_GET['per_page'] : 0;
 		
 		$result = $this->admin_model->get_all_leads($per_page,$page);
 			
-		if(@$_GET['verified'] != '' || @$_GET['name'] != '')
-			$base_url = BASE_URL.'user-leads/list?'.$_SERVER['QUERY_STRING'];
+		if(@$_GET['status'] != '' || @$_GET['name'] != '')
+			$base_url = BASE_URL.'leads/list?'.$_SERVER['QUERY_STRING'];
 		else
-			$base_url = BASE_URL.'user-leads/list?page=true';
+			$base_url = BASE_URL.'leads/list?page=true';
 			
 		$total_rows = $result['count'];	
 		
 		$data['links'] = create_links($per_page,$total_rows,$base_url);
 		
-		$data['users'] = $result['result'];
+		$data['leads'] = $result['results'];
 		
 		if($this->input->is_ajax_request())
 		{
-			$data['result'] = $this->load->view('elements/user-leads-list',$data,true);
+			$data['result'] = $this->load->view('elements/leads-list',$data,true);
 			echo json_encode($data);die;
 		}
 		
 		$data['status_arr'] = $this->admin_model->get_all_leadsStatus();
+		$data['circles'] = $this->admin_model->get_Circles();
 		
-		$data['pageTitle'] = 'User Leads';
-		$data['content'] = 'user/user-leads';
+		$data['pageTitle'] = 'Leads';
+		$data['content'] = 'user/leads';
 		$this->load->view('layout',$data);
 	}
 	
-	public function manage_users_lead($user_id=NULL){
+	public function manage_lead($lead_id=NULL){
 		if(!empty($_POST)) {					
 			$result = $this->admin_model->manage_leads();			
 			
@@ -487,7 +489,7 @@ class User extends CI_Controller {
 				$response['status'] = true;
 				if(isset($result['insert_id'])) {
 					$response['message'] = 'Saved Successfully.';
-					$response['redirectTo'] = BASE_URL.'user-leads/list';
+					$response['redirectTo'] = BASE_URL.'leads/list';
 				} else {
 					$response['message'] = 'Updated Successfully.';
 					$response['redirectTo'] = $this->session->userdata('referer');
@@ -501,21 +503,37 @@ class User extends CI_Controller {
 								
 		} else {												
 			
-			if(!empty($admin_id)) {
-				chk_access('user_leads' ,3, true);
-				$data['record'] = $this->admin_model->get_UserDetails($user_id);
+			if(!empty($lead_id)) {
+				chk_access('leads' ,3, true);
+				
+				$lead_id = DeCrypt($lead_id);
+				$data['record'] = $this->admin_model->get_LeadDetails($lead_id);
+				$data['afeUsers'] = $this->admin_model->get_allAFEs();
+				
+				$data['ssa'] = $this->admin_model->get_SSA($data['record']['user_circle_id']);
+				
 				if(isset($_SERVER['HTTP_REFERER'])){			
 					$referer = array('referer' => $_SERVER['HTTP_REFERER']);
 					$this->session->set_userdata($referer);			
 				}
 			} else {
-				chk_access('user_leads', 2, true);
+				chk_access('leads', 2, true);
+				$data['afeUsers'] = $this->admin_model->get_allAFEs('only_active');
 			}			
 			
-			$data['pageTitle'] = 'Manage Users';
-			$data['content'] = 'user/manage-user-leads';
+			$data['status_arr'] = $this->admin_model->get_all_leadsStatus();
+			$data['circles'] = $this->admin_model->get_Circles();
+			$data['plans'] = $this->admin_model->get_Plans();
+			
+			$data['pageTitle'] = 'Manage Leads';
+			$data['content'] = 'user/manage-leads';
 			$this->load->view('layout',$data);
 		}
+	}
+	
+	public function viewe_lead($lead_id=NULL){
+		$lead_id = DeCrypt($lead_id);
+		$data['record'] = $this->admin_model->get_LeadDetails($lead_id);
 	}
 	
 	public function check_user_email(){		
@@ -524,5 +542,32 @@ class User extends CI_Controller {
 		
 		$sts = $this->admin_model->check_user_email($email, $user_id);
 		echo $sts;
+	}
+	
+	public function getCirclesSSA(){
+		$circle_id = $this->input->post('circle_id');
+		
+		$response = array();
+		if(!empty($circle_id)){
+			$records = $this->admin_model->get_SSA($circle_id);
+			
+			$html = '<option value="">Select</option>';
+			if(!empty($records)) {
+				foreach($records as $rcd) {
+					$html .= '<option value="'.$rcd['ssa_id'].'">'.$rcd['ssa_name'].'</option>';
+				}
+			} else {
+				$html = '<option value="">No Record Found</option>';
+			}
+			
+			$response['status'] = true;	
+			$response['html'] = $html;	
+			
+		} else {
+			$response['status'] = false;	
+			$response['message'] = 'Unable to process your request right now. <br/> Please try again or some time later.';
+		}
+		
+		echo json_encode($response);die;	
 	}
 }

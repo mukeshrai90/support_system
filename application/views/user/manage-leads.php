@@ -12,7 +12,7 @@
 								<label class="col-md-5 control-label">Name</label>
 								<div class="col-md-7">
 									<input type="text" class="form-control only-char-space" name="name" id="name"  placeholder="Name" value="<?php echo @$record['user_full_name']?>">
-									<input type="hidden" name="user_id" value="<?php echo !empty($record['afe_id']) ? EnCrypt($record['afe_id']) : ''?>">
+									<input type="hidden" name="lead_id" value="<?php echo !empty($record['user_id']) ? EnCrypt($record['user_id']) : ''?>">
 								</div>
 							</div>
 							<div class="col-md-6">
@@ -26,7 +26,7 @@
 							<div class="col-md-6">
 								<label class="col-md-5 control-label">Mobile</label>
 								<div class="col-md-7">
-									<input type="text" class="form-control only-number" name="mobile" id="mobile"  placeholder="Mobile" value="<?php echo @$record['user_mobile']?>">
+									<input type="text" class="form-control only-number" name="mobile" id="mobile"  placeholder="Mobile" value="<?php echo @$record['user_mobile']?>" maxlength="10">
 								</div>
 							</div>
 							<div class="col-md-6">
@@ -62,8 +62,8 @@
 									<select name="ssa_id" id="ssa_id" class="form-control">
 										<option value="">Select</option>									
 										<?php 
-											if(isset($circles)) {
-												foreach($circles as $rcd) {
+											if(isset($ssa)) {
+												foreach($ssa as $rcd) {
 													$selected = '';
 													if($rcd['ssa_id'] == $record['user_ssa_id']) {
 														$selected = 'selected';
@@ -137,7 +137,7 @@
 											if(isset($afeUsers)) {
 												foreach($afeUsers as $rcd) {
 													$selected = '';
-													if($rcd['afe_id'] == $record['user_plan_id']) {
+													if($rcd['afe_id'] == $record['user_afe_referer_id']) {
 														$selected = 'selected';
 													}
 													echo '<option value="'.$rcd['afe_id'].'" '.$selected.'>'.$rcd['afe_name'].' ('.$rcd['afe_mobile'].')</option>';
@@ -165,12 +165,39 @@
 
 <script>
 $(document).ready(function() {
+	$(document).on('change','#circle_id',function(){
+		var circle_id = $(this).val();
+		$('#ssa_id').html('<option value="">Select</option>');
+		if($.trim(circle_id) != ''){
+		
+			showCustomLoader(true);
+			$.ajax({
+				url: BASE_URL+'user/getCirclesSSA',
+				type: 'POST',
+				data: {circle_id: circle_id},
+				dataType: 'JSON',
+				error: function(){
+					showCustomLoader(false);
+					customAlertBox('Unable to proocess your request right now.<br/> Please try again or some time later', 'e');
+				},
+				success: function(response){
+					showCustomLoader(false);		
+					if(response.status){
+						$('#ssa_id').html(response.html);
+					} else{
+						customAlertBox(response.message, 'e');
+					}
+				}
+			});
+		}
+	});
+	
 	$(document).on('click','#manage-form',function(){
 		if($("#manage_lead_form").valid()){
 		
 			showCustomLoader(true);
 			$.ajax({
-				url: BASE_URL+'user-leads/add',
+				url: BASE_URL+'leads/new-lead',
 				type: 'POST',
 				data: $('#manage_lead_form').serialize(),
 				dataType: 'JSON',

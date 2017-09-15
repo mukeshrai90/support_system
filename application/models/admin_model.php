@@ -465,7 +465,7 @@ class Admin_model extends CI_Model
 		$logged_admin = $this->session->userdata('admin');
 		$logged_admin_id = $logged_admin['admin_id'];
 		
-		$user_id = $this->input->post('user_id');
+		$user_id = $this->input->post('lead_id');
 		$user_id = DeCrypt($user_id);
 		
 		$user = $this->get_record('bs_users', 'user_id', $user_id);
@@ -483,6 +483,7 @@ class Admin_model extends CI_Model
 		$data['user_address'] = $this->input->post('address');										
 		$data['user_circle_id'] = $this->input->post('circle_id');											
 		$data['user_ssa_id'] = $this->input->post('ssa_id');
+		$data['user_afe_referer_id'] = $this->input->post('afe_id');
 		
 		$sts = $this->check_user_email($data['user_email'], $user_id);
 		if($sts == 'false'){
@@ -494,76 +495,83 @@ class Admin_model extends CI_Model
 		$user_plan_id = $this->input->post('user_plan_id');										
 		$plan_id = $this->input->post('plan_id');										
 		$payment_status = $this->input->post('payment_status');										
-										
+		
 		$result = array('status' => false);
-		if(empty($user)){			
+		try{
+			$this->db->trans_begin();  // Transaction Start
 			
-			$user_status_id = 1;
-			$data['user_added_on'] = date('Y-m-d H:i:s');		
-			$data['user_status_id'] = $user_status_id;		
-			$data['user_active'] = 1;		
-						
-			if($this->db->insert('bs_users', $data)){
-				$result['status'] = true;
-				$user_id = $this->db->insert_id();
-				$result['insert_id'] = $user_id;
-			} 
-			
-			$call_description = 'New Lead Created Successfully';
-			$call_type = 1;
-			
-		} else {
-			
-			$user_status_id = $user['user_status_id'];
-			$data['user_updated_on'] = date('Y-m-d H:i:s');	
-		
-			$this->db->where('user_id', $user_id);
-			if($this->db->update('bs_users', $data)){
-				$result['status'] = true;
-			}
-			
-			$call_description = 'Lead Updated Successfully';
-		}
-		
-		$PlanData = array();
-		$PlanData['user_id'] = $user_id;
-		$PlanData['user_plan_id'] = $plan_id;
-		$PlanData['user_plan_status'] = 1;
-		
-		if(empty($user)){
-			$PlanData['user_plan_started_on'] = date('Y-m-d H:i:s');		
-			if(!$this->db->insert('bs_user_plans', $PlanData)){
-				throw new Exception('Unable to proocess your request right now.<br/> Please try again or some time later');	
-			}
-		} else {
-			
-			$PlanData['user_plan_ended_on'] = date('Y-m-d H:i:s');
-			
-			$this->db->where('user_id', $user_id);
-			if(!$this->db->update('bs_user_plans', $PlanData)){
-				throw new Exception('Unable to proocess your request right now.<br/> Please try again or some time later');
-			}
-			
-			if($user_plan_id != $plan_id) {
-				$pln = $this->get_record('bs_roles', 'plan_id', $plan_id, 'plan_name');
-				$call_description .= ' Plan has been changed to '.$pln['plan_name'];
-			}
-		}
-		
-		$CallInsertData = array();
-		$CallInsertData['call_user_id'] = $user_id;
-		$CallInsertData['call_logged_admin_id'] = $logged_admin_id;
-		$CallInsertData['call_desc'] = $call_description;
-		$CallInsertData['call_status_id'] = $user_status_id;
-		$CallInsertData['call_time'] = date('Y-m-d H:i:s');
-		
-		if($this->db->insert('bs_user_call_logs', $CallInsertData)) {
-			if($this->db->trans_status() === FALSE) {
-				throw new Exception('Unable to proocess your request right now.<br/> Please try again or some time later');								
+			if(empty($user)){			
+				
+				$user_status_id = 1;
+				$data['user_added_on'] = date('Y-m-d H:i:s');		
+				$data['user_status_id'] = $user_status_id;		
+				$data['user_active'] = 1;		
+							
+				if($this->db->insert('bs_users', $data)){
+					$result['status'] = true;
+					$user_id = $this->db->insert_id();
+					$result['insert_id'] = $user_id;
+				} 
+				
+				$call_description = 'New Lead Created Successfully';
+				$call_type = 1;
+				
 			} else {
-				$this->db->trans_commit(); // Transaction Commit
-				$result['status'] = true;
+				
+				$user_status_id = $user['user_status_id'];
+				$data['user_updated_on'] = date('Y-m-d H:i:s');	
+			
+				$this->db->where('user_id', $user_id);
+				if($this->db->update('bs_users', $data)){
+					$result['status'] = true;
+				}
+				
+				$call_description = 'Lead Updated Successfully';
 			}
+			
+			$PlanData = array();
+			$PlanData['user_id'] = $user_id;
+			$PlanData['user_plan_id'] = $plan_id;
+			$PlanData['user_plan_status'] = 1;
+			
+			if(empty($user)){
+				$PlanData['user_plan_started_on'] = date('Y-m-d H:i:s');		
+				if(!$this->db->insert('bs_user_plans', $PlanData)){
+					throw new Exception('Unable to proocess your request right now.<br/> Please try again or some time later');	
+				}
+			} else {
+				
+				$PlanData['user_plan_ended_on'] = date('Y-m-d H:i:s');
+				
+				$this->db->where('user_id', $user_id);
+				if(!$this->db->update('bs_user_plans', $PlanData)){
+					throw new Exception('Unable to proocess your request right now.<br/> Please try again or some time later');
+				}
+				
+				if($user_plan_id != $plan_id) {
+					$pln = $this->get_record('bs_roles', 'plan_id', $plan_id, 'plan_name');
+					$call_description .= ' Plan has been changed to '.$pln['plan_name'];
+				}
+			}
+			
+			$CallInsertData = array();
+			$CallInsertData['call_user_id'] = $user_id;
+			$CallInsertData['call_logged_admin_id'] = $logged_admin_id;
+			$CallInsertData['call_desc'] = $call_description;
+			$CallInsertData['call_status_id'] = $user_status_id;
+			$CallInsertData['call_time'] = date('Y-m-d H:i:s');
+			
+			if($this->db->insert('bs_user_call_logs', $CallInsertData)) {
+				if($this->db->trans_status() === FALSE) {
+					throw new Exception('Unable to proocess your request right now.<br/> Please try again or some time later');								
+				} else {
+					$this->db->trans_commit(); // Transaction Commit
+					$result['status'] = true;
+				}
+			}
+		} catch(Exception $e){
+			$this->db->trans_rollback(); // Transaction Rollback
+			$result['status'] = false;	
 		}
 		
 		return $result;
@@ -573,28 +581,36 @@ class Admin_model extends CI_Model
 		
 		$data = array(); $where = array(); $like = array(); 
 		
-		if(isset($_GET['status'])) {	
-			$_GET['status'] = $_GET['status'] == 2 ? 0 : $_GET['status'];
-			$where = array_merge($where,array('bs_users.user_active' => $_GET['status']));			
+		if(!empty($_GET['status'])) {	
+			$where = array_merge($where,array('bs_lead_status.status_id' => $_GET['status']));			
 		}
 		
-		if(isset($_GET['name']) && !empty($_GET['name'])){
+		if(!empty($_GET['circle'])) {	
+			$where = array_merge($where,array('bs_users.user_circle_id' => $_GET['circle']));			
+		}
+		
+		if(!empty($_GET['name'])){
 			$like = array_merge($like,array('bs_users.user_full_name' => $_GET['name']));
 		}		
 					
 		$this->db->where($where);
 		$this->db->like($like); 
 		$this->db->from('bs_users');
+		$this->db->join('bs_lead_status', 'bs_lead_status.status_id=bs_users.user_status_id', 'INNER'); 
+		$this->db->join('bs_user_plans', 'bs_user_plans.user_id=bs_users.user_id', 'INNER'); 
+		$this->db->join('bs_plans', 'bs_plans.plan_id=bs_user_plans.user_plan_id', 'INNER'); 
 		$data['count'] = $this->db->count_all_results();
 		
-		$this->db->select('bs_users.*, bs_lead_status.status_name');
+		$this->db->select('bs_users.*, bs_lead_status.status_name as current_status, bs_plans.plan_name');
 		$this->db->where($where);
 		$this->db->like($like); 
 		$this->db->limit($limit, $start);
 		$this->db->order_by('bs_users.user_id','desc'); 
 		$this->db->join('bs_lead_status', 'bs_lead_status.status_id=bs_users.user_status_id', 'INNER'); 
+		$this->db->join('bs_user_plans', 'bs_user_plans.user_id=bs_users.user_id', 'INNER'); 
+		$this->db->join('bs_plans', 'bs_plans.plan_id=bs_user_plans.user_plan_id', 'INNER'); 
 		$query = $this->db->get("bs_users");		
-		$data['result'] = $query->result_array();
+		$data['results'] = $query->result_array();
 		
 		return $data;
     }
@@ -699,7 +715,7 @@ class Admin_model extends CI_Model
 			$ssa_id = 9999;
 		}
 		
-		$already = $this->db->get_where('bs_ssa',array('ssa_name' => $ssa_name, 'circle_id != ' => $ssa_id))->row_array();
+		$already = $this->db->get_where('bs_ssa',array('ssa_name' => $ssa_name, 'ssa_id != ' => $ssa_id))->row_array();
 		if(!empty($already)) {
 			$sts = 'false';
 		} else {
@@ -763,7 +779,7 @@ class Admin_model extends CI_Model
 		$this->db->limit($limit, $start);
 		$this->db->order_by('bs_circles.circle_id','desc'); 
 		$query = $this->db->get("bs_circles");		
-		$data['result'] = $query->result_array();
+		$data['results'] = $query->result_array();
 		
 		return $data;
     }
@@ -814,16 +830,16 @@ class Admin_model extends CI_Model
 		
 		$data = array(); $where = array(); $like = array(); 
 		
-		if(isset($_GET['status'])) {	
+		if(!empty($_GET['status'])) {	
 			$_GET['status'] = $_GET['status'] == 2 ? 0 : $_GET['status'];
 			$where = array_merge($where,array('bs_ssa.ssa_status' => $_GET['status']));			
 		}
 		
-		if(isset($_GET['circle'])) {	
+		if(!empty($_GET['circle'])) {	
 			$where = array_merge($where,array('bs_ssa.circle_id' => $_GET['circle']));			
 		}
 		
-		if(isset($_GET['name']) && !empty($_GET['name'])){
+		if(!empty($_GET['name'])){
 			$like = array_merge($like,array('bs_ssa.ssa_name' => $_GET['name']));
 		}		
 					
@@ -840,7 +856,7 @@ class Admin_model extends CI_Model
 		$this->db->order_by('bs_ssa.ssa_id','desc'); 
 		$this->db->join('bs_circles', 'bs_circles.circle_id=bs_ssa.circle_id', 'INNER'); 
 		$query = $this->db->get("bs_ssa");		
-		$data['result'] = $query->result_array();
+		$data['results'] = $query->result_array();
 		
 		return $data;
     }
@@ -892,16 +908,16 @@ class Admin_model extends CI_Model
 		
 		$data = array(); $where = array(); $like = array(); 
 		
-		if(isset($_GET['status'])) {	
+		if(!empty($_GET['status'])) {	
 			$_GET['status'] = $_GET['status'] == 2 ? 0 : $_GET['status'];
 			$where = array_merge($where,array('bs_plans.plan_status' => $_GET['status']));			
 		}
 		
-		if(isset($_GET['circle'])) {	
+		if(!empty($_GET['circle'])) {	
 			$where = array_merge($where,array('bs_plans.circle_id' => $_GET['circle']));			
 		}
 		
-		if(isset($_GET['name']) && !empty($_GET['name'])){
+		if(!empty($_GET['name'])){
 			$like = array_merge($like,array('bs_plans.plan_name' => $_GET['name']));
 		}		
 					
@@ -918,7 +934,7 @@ class Admin_model extends CI_Model
 		$this->db->order_by('bs_plans.plan_id','desc'); 
 		$this->db->join('bs_circles', 'bs_circles.circle_id=bs_plans.circle_id', 'INNER'); 
 		$query = $this->db->get("bs_plans");		
-		$data['result'] = $query->result_array();
+		$data['results'] = $query->result_array();
 		
 		return $data;
     }
@@ -935,7 +951,7 @@ class Admin_model extends CI_Model
 		$data['plan_name'] = $this->input->post('plan_name');							
 		$data['plan_code'] = $this->input->post('plan_code');										
 		$data['plan_rental'] = $this->input->post('plan_rental');										
-		$data['plan_status'] = $this->input->post('plan_status');										
+		$data['plan_status'] = 1;																			
 		$data['plan_features'] = $this->input->post('plan_features');										
 		
 		$sts = $this->check_plan_name($data['plan_name'], $plan_id, $data['circle_id']);
@@ -975,8 +991,51 @@ class Admin_model extends CI_Model
 		return $result;
 	}
 	
-	public function get_allCircles(){
+	public function get_Circles($circle_id=NULL){
+		if(!empty($circle_id)) {
+			$this->db->where('circle_id', $circle_id);
+		}
 		$circles = $this->db->get_where('bs_circles', array('circle_status' => 1))->result_array();
 		return $circles;
+	}
+	
+	public function get_SSA($circle_id=NULL, $ssa_id=NULL){
+		if(!empty($circle_id)) {
+			$this->db->where('circle_id', $circle_id);
+		}
+		if(!empty($ssa_id)) {
+			$this->db->where('ssa_id', $ssa_id);
+		}
+		$ssa = $this->db->get_where('bs_ssa', array('ssa_status' => 1))->result_array();
+		return $ssa;
+	}
+	
+	public function get_Plans($plan_id=NULL){
+		if(!empty($plan_id)) {
+			$this->db->where('plan_id', $plan_id);
+		}
+		$plans = $this->db->get_where('bs_plans', array('plan_status' => 1))->result_array();
+		return $plans;
+	}
+	
+	public function get_allAFEs($only_Active=NULL){
+		
+		if(!empty($only_Active)) {
+			$this->db->where('afe_status', 1);
+		}
+		$this->db->select('afe_id, afe_name, afe_name, afe_mobile');
+		$results = $this->db->get("bs_afe_users")->result_array();
+		
+		return $results;
+	}
+	
+	public function get_LeadDetails($lead_id){
+		$this->db->select('bs_users.*, bs_user_plans.user_plan_id');
+		$this->db->where('bs_users.user_id', $lead_id);
+		$this->db->order_by('bs_users.user_id','desc'); 
+		$this->db->join('bs_user_plans', 'bs_user_plans.user_id=bs_users.user_id', 'INNER'); 
+		$query = $this->db->get("bs_users");	
+
+		return $query->row_array();	
 	}
 }	

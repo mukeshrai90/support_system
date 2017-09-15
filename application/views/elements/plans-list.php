@@ -1,10 +1,5 @@
-<style>
-.fa{font-size:20px;}
-.level-2{margin-left:35px;}
-.level-3{margin-left:70px;}
-</style>
 
-<table class="table table-striped">
+<table class="table table-bordered">
 	<thead>
 		<tr>
 			<th>#</th>

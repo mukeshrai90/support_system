@@ -83,3 +83,4 @@ option:disabled{
 .table-responsive{width:100%;}
 .pagination_head{float:left;margin: 24px 10px;font-size: 15px;font-weight: bold;}
 .custom-wdth{width:70%;margin:0 auto;}
+.table-bordered thead tr th{text-align:left !important;}

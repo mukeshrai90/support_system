@@ -1,10 +1,5 @@
-<style>
-.fa{font-size:20px;}
-.level-2{margin-left:35px;}
-.level-3{margin-left:70px;}
-</style>
 
-<table class="table table-striped">
+<table class="table table-bordered">
 	<thead>
 		<tr>
 			<th>#</th>
@@ -16,9 +11,9 @@
 	</thead>
 	<tbody>
 		<?php 
-			if(!empty($circles)) {
+			if(!empty($records)) {
 				$k = 1;
-				foreach($circles as $rcd) {
+				foreach($records as $rcd) {
 		?>
 			<tr class="">
 				<td><?php echo $k?></td>

@@ -34,7 +34,7 @@
 							<div class="col-lg-8">
 								<input type="text" placeholder="SSA Name" class="form-control" name="ssa_name" value="<?php echo @$record['ssa_name']?>"> 
 								<input type="hidden" name="referer" value="<?php echo $this->session->userdata('referer')?>" />
-								<input type="hidden" name="circle_id" value="<?php echo !empty($record['ssa_id']) ? EnCrypt($record['ssa_id']) : ''?>">
+								<input type="hidden" name="ssa_id" value="<?php echo !empty($record['ssa_id']) ? EnCrypt($record['ssa_id']) : ''?>">
 							</div>
 						</div>
 						<div class="form-group">

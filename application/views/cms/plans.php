@@ -31,8 +31,8 @@
 									<option value="">Select</option>
 									<?php 
 										$circle_id = @$_GET['circle'];
-										if(isset($roles)) {
-											foreach($roles as $rcd) {
+										if(isset($circles)) {
+											foreach($circles as $rcd) {
 												$selected = '';
 												if($rcd['circle_id'] == $circle_id) {
 													$selected = 'selected';
