@@ -1,58 +1,6 @@
 
-function reloadSearch() 
-{	
-	var pageUrlTemp = pageUrl.split('?');
-	if(pageUrlTemp[1] != undefined){
-		var url = pageUrl+'&'+$('#search-form').serialize();
-	} else {
-		var url = pageUrl+'?'+$('#search-form').serialize();
-	}
-	
-	
-	history.pushState({isMine:true},pageTitle,url);
-	
-	showCustomLoader(true);
-	$.ajax({
-		type : 'POST',
-		url : url,				
-		dataType : 'json',
-		error : function(){
-			showCustomLoader(false);
-		},
-		success : function(response){
-					showCustomLoader(false);
-					$('.table-responsive').html(response.result);
-				  }
-	});
-} 
-
 $(document).ready(function () {
 
-    $(document).on('click','.search-btn',function(){
-        reloadSearch();
-	});
-	
-	$(document).on('click','.paginate_button a',function(e){
-		e.preventDefault();
-		var url = $(this).attr('href');
-		
-		history.pushState({isMine:true},pageTitle,url);
-		
-		showCustomLoader(true);
-		$.ajax({
-			type : 'POST',
-			url : url,				
-			dataType : 'json',
-			error : function(){
-				showCustomLoader(false);
-			},
-			success : function(response){
-						 showCustomLoader(false);
-						 $('.table-responsive').html(response.result);
-					  }
-		});
-	});
-	
 	// Add body-small class if window less than 768px
     if ($(this).width() < 769) {
         $('body').addClass('body-small')
@@ -63,12 +11,6 @@ $(document).ready(function () {
     // MetsiMenu
     $('#side-menu').metisMenu();
 	
-	$(document).on('click','.refresh-all',function(e){
-		e.preventDefault();
-		var url = $(this).attr('data-url');
-		window.location.href = url;
-	});
-
     // Collapse ibox function
     $('.collapse-link').click( function() {
         var ibox = $(this).closest('div.ibox');

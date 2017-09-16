@@ -1,18 +1,8 @@
 <?php  if(!defined('BASEPATH')) exit('No direct script access allowed');
 
-if(!function_exists('get_short_url'))
-{
+if(!function_exists('get_short_url')) {
 	
-	function get_short_url($long_url)
-	{		
-		/*$key = GOOGLE_API_KEY;
-		
-		require_once(APPPATH.'third_party/url_shortener.php');
-		$googer = new GoogleURLAPI($key);
-		
-		$shortDWName = $googer->shorten($long_url);
-		return $shortDWName;*/
-		
+	function get_short_url($long_url) {	
 		$key = BITLY_API_KEY;
 		
 		$api_url = 'https://api-ssl.bitly.com/v3/shorten?access_token='.$key.'&longUrl='.urlencode($long_url);		
@@ -40,34 +30,24 @@ if(!function_exists('get_short_url'))
 	
 }
 
-if(!function_exists('get_record'))
-{
+if(!function_exists('get_record')) {
 	
-	function get_record($table,$id)
-	{		
+	function get_record($table, $prim_key, $id) {		
 		$CI = & get_instance();
 		 			
-		$info = $CI->db->get_where($table,array('id' => $id))->row_array(); 
+		$info = $CI->db->get_where($table,array($prim_key => $id))->row_array(); 
 		return $info;
 	}
 }
 
-if(!function_exists('get_all_allowed_actions'))
-{
+if(!function_exists('get_all_allowed_actions')) {
 	
-	function get_all_allowed_actions($role_id, $all=false, $admin_id=0, $have_admin_access=0)
-	{		
+	function get_all_allowed_actions($role_id, $all=false) {		
 		$CI = & get_instance();
 		
-		if($role_id == 1 && $admin_id > 1 && $have_admin_access <= 0){
-			$CI->db->select('action, GROUP_CONCAT(type) as access');
-			$CI->db->group_by('action');
-			$info = $CI->db->get_where('ts_subadmin_access',array('admin_id' => $admin_id))->result_array(); 
-		} else {		 						
-			$CI->db->select('action,access');
-			$CI->db->group_by('action');
-			$info = $CI->db->get_where('ts_admin_access',array('role_id' => $role_id))->result_array(); 
-		}
+		$CI->db->select('action, access');
+		$CI->db->group_by('action');
+		$info = $CI->db->get_where('bs_admin_access',array('role_id' => $role_id, 'status' => 1))->result_array(); 
 		
 		return $info;
 	}
