@@ -44,7 +44,7 @@
 				</td>
 				<td class="tooltip-demo">										
 					<a href="<?php echo BASE_URL.'cms/plans/edit/'.$plan_id?>" title="Edit" class="actions-a" data-toggle="tooltip" data-placement="bottom">
-						<i class="fa fa-pencil-square-o text-navy"></i>
+						<i class="fa fa-pencilo text-navy"></i>
 					</a>			
 				</td>
 			</tr>

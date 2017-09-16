@@ -229,7 +229,7 @@ $(document).ready(function() {
 			email: {
 				required: true,
 				email:true,
-				remote : BASE_URL+'user/check_user_email?id='+$('input[name="user_id"]').val(),
+				remote : BASE_URL+'user/check_user_email?id='+$('input[name="lead_id"]').val(),
 			},
 			mobile: {
 				required: true,

@@ -37,7 +37,7 @@
 				</td>
 				<td class="tooltip-demo">										
 					<a href="<?php echo BASE_URL.'cms/circles/edit/'.EnCrypt($rcd['circle_id'])?>" title="Edit" class="actions-a" data-toggle="tooltip" data-placement="bottom">
-						<i class="fa fa-pencil-square-o text-navy"></i>
+						<i class="fa fa-pencil text-navy"></i>
 					</a>			
 				</td>
 			</tr>

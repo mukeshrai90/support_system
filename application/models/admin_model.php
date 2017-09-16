@@ -468,7 +468,7 @@ class Admin_model extends CI_Model
 		$user_id = $this->input->post('lead_id');
 		$user_id = DeCrypt($user_id);
 		
-		$user = $this->get_record('bs_users', 'user_id', $user_id);
+		$user = $this->get_LeadDetails($user_id);
 		if(!empty($user_id) && empty($user)){
 			$response['status'] = false;	
 			$response['message'] = 'Unable to process your request right now. <br/> Please try again or some time later.';
@@ -548,8 +548,8 @@ class Admin_model extends CI_Model
 					throw new Exception('Unable to proocess your request right now.<br/> Please try again or some time later');
 				}
 				
-				if($user_plan_id != $plan_id) {
-					$pln = $this->get_record('bs_roles', 'plan_id', $plan_id, 'plan_name');
+				if($user['user_plan_id'] != $plan_id) {
+					$pln = $this->get_record('bs_plans', 'plan_id', $plan_id, 'plan_name');
 					$call_description .= ' Plan has been changed to '.$pln['plan_name'];
 				}
 			}
@@ -596,16 +596,18 @@ class Admin_model extends CI_Model
 		$this->db->where($where);
 		$this->db->like($like); 
 		$this->db->from('bs_users');
+		$this->db->join('bs_circles', 'bs_circles.circle_id=bs_users.user_circle_id', 'INNER'); 
 		$this->db->join('bs_lead_status', 'bs_lead_status.status_id=bs_users.user_status_id', 'INNER'); 
 		$this->db->join('bs_user_plans', 'bs_user_plans.user_id=bs_users.user_id', 'INNER'); 
 		$this->db->join('bs_plans', 'bs_plans.plan_id=bs_user_plans.user_plan_id', 'INNER'); 
 		$data['count'] = $this->db->count_all_results();
 		
-		$this->db->select('bs_users.*, bs_lead_status.status_name as current_status, bs_plans.plan_name');
+		$this->db->select('bs_users.*, bs_lead_status.status_name as current_status, bs_plans.plan_name, bs_circles.circle_name');
 		$this->db->where($where);
 		$this->db->like($like); 
 		$this->db->limit($limit, $start);
 		$this->db->order_by('bs_users.user_id','desc'); 
+		$this->db->join('bs_circles', 'bs_circles.circle_id=bs_users.user_circle_id', 'INNER');  
 		$this->db->join('bs_lead_status', 'bs_lead_status.status_id=bs_users.user_status_id', 'INNER'); 
 		$this->db->join('bs_user_plans', 'bs_user_plans.user_id=bs_users.user_id', 'INNER'); 
 		$this->db->join('bs_plans', 'bs_plans.plan_id=bs_user_plans.user_plan_id', 'INNER'); 
@@ -1030,12 +1032,28 @@ class Admin_model extends CI_Model
 	}
 	
 	public function get_LeadDetails($lead_id){
-		$this->db->select('bs_users.*, bs_user_plans.user_plan_id');
+		$this->db->select('bs_users.*, bs_user_plans.user_plan_id, bs_plans.plan_name, bs_circles.circle_name, bs_ssa.ssa_name, bs_afe_users.afe_name, bs_afe_users.afe_mobile, bs_lead_status.status_name as current_status');
 		$this->db->where('bs_users.user_id', $lead_id);
 		$this->db->order_by('bs_users.user_id','desc'); 
 		$this->db->join('bs_user_plans', 'bs_user_plans.user_id=bs_users.user_id', 'INNER'); 
+		$this->db->join('bs_circles', 'bs_circles.circle_id=bs_users.user_circle_id', 'INNER'); 
+		$this->db->join('bs_ssa', 'bs_ssa.ssa_id=bs_users.user_ssa_id', 'INNER'); 
+		$this->db->join('bs_plans', 'bs_plans.plan_id=bs_user_plans.user_plan_id', 'INNER'); 
+		$this->db->join('bs_afe_users', 'bs_afe_users.afe_id=bs_users.user_afe_referer_id', 'INNER'); 
+		$this->db->join('bs_lead_status', 'bs_lead_status.status_id=bs_users.user_status_id', 'INNER');
 		$query = $this->db->get("bs_users");	
 
 		return $query->row_array();	
+	}
+	
+	public function get_LeadLogs($lead_id){
+		$this->db->select('bs_user_call_logs.*, bs_admins.admin_name, bs_admins.admin_username, bs_lead_status.status_name');
+		$this->db->where('bs_user_call_logs.call_user_id', $lead_id);
+		$this->db->join('bs_lead_status', 'bs_lead_status.status_id=bs_user_call_logs.call_status_id', 'LEFT'); 
+		$this->db->join('bs_admins', 'bs_admins.admin_id=bs_user_call_logs.call_logged_admin_id', 'LEFT'); 
+		$this->db->order_by('bs_user_call_logs.call_id', 'DESC');
+		$results = $this->db->get("bs_user_call_logs")->result_array();
+		
+		return $results;
 	}
 }	

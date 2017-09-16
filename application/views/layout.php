@@ -8,9 +8,9 @@
 
 <link rel="shortcut icon" type="image/png" href="<?php echo ASSETS_URL?>frontend/images/favicon.png"/>
 <link href="<?php echo ASSETS_URL?>css/bootstrap.min.css" rel="stylesheet">
-<link href="<?php echo ASSETS_URL?>font-awesome/css/font-awesome.css" rel="stylesheet">   
+<link href="<?php echo ASSETS_URL?>font-awesome/css/font-awesome.min.css" rel="stylesheet">   
 <link href="<?php echo ASSETS_URL?>css/animate.css" rel="stylesheet">
-<link href="<?php echo ASSETS_URL?>css/style.css" rel="stylesheet">
+<link href="<?php echo ASSETS_URL?>css/style.min.css" rel="stylesheet">
 <link href="<?php echo ASSETS_URL?>css/developer.css?v=1.0" rel="stylesheet">	
 <script src="<?php echo ASSETS_URL?>js/jquery-2.1.1.js"></script>
 <link href="<?php echo ASSETS_URL?>css/sweet-alert.css" rel="stylesheet">
@@ -88,8 +88,8 @@ $(document).ready(function(){
 							<?php 
 								if(in_array('afe-users',$actions) || 1) {
 							?>
-								<li class="<?php echo strstr($this->uri->segment(1),'user-leads')== 'user-leads' ? 'active' : ''?>">
-									<a href="<?php echo BASE_URL.'user-leads/list'?>">
+								<li class="<?php echo strstr($this->uri->segment(1),'leads')== 'leads' ? 'active' : ''?>">
+									<a href="<?php echo BASE_URL.'leads/list'?>">
 										<i class="fa fa-reply-all"></i> 
 										<span class="nav-label">User Leads</span>
 									</a>
@@ -168,7 +168,6 @@ $(document).ready(function(){
 <script src="<?php echo ASSETS_URL?>js/plugins/validate/jquery.validate.min.js"></script>
 <script src="<?php echo ASSETS_URL?>js/developer.js?v=1.0"></script>
 
-<link href="<?php echo ASSETS_URL?>css/sweet-alert.css" rel="stylesheet">
 <link href="<?php echo ASSETS_URL?>css/plugins/toastr/toastr.min.css" rel="stylesheet">
 
 <style>

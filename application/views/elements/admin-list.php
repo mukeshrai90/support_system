@@ -55,7 +55,7 @@
 				<td><?php echo date('d-M-Y',strtotime($admin['admin_last_login']))?></td>
 				<td class="tooltip-demo">
 					<a href="javascript:;" title="Change Password" class="actions-a change-password-link" data-toggle="tooltip" data-placement="bottom" data-admin_id="<?php echo EnCrypt($admin['admin_id'])?>">
-						<i class="fa fa-pencil-square-o text-navy"></i>
+						<i class="fa fa-pencil text-navy"></i>
 					</a>
 					<a href="<?php echo BASE_URL.'admins/edit/'.EnCrypt($admin['admin_id'])?>" title="Edit" class="actions-a" data-toggle="tooltip" data-placement="bottom">
 						<i class="fa fa-pencil text-navy"></i>

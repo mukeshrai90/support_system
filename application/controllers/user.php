@@ -296,66 +296,6 @@ class User extends CI_Controller {
 		echo json_encode($response); die;
 	}
 	
-	public function check_userId($return=false){		
-		$userId = $this->input->get('userId');
-		$id = $this->input->get('id');
-		if(trim($id) == ''){
-			$id = 999999999999;
-		}
-		
-		$already = $this->db->get_where(TBL_USERS,array('UserId' => $userId,'id != ' => $id))->row_array();
-		if(!empty($already)) {
-			$status = false;
-		} else {
-			$status = true;
-		}
-		
-		if($return){
-			return $status;
-		}
-		echo $status;
-	}
-	
-	public function check_userEmail($return=false){		
-		$email = $this->input->get('email');
-		$id = $this->input->get('id');
-		if(trim($id) == ''){
-			$id = 999999999999;
-		}
-		
-		$already = $this->db->get_where(TBL_USERS,array('email' => $email,'id != ' => $id))->row_array();
-		if(!empty($already)) {
-			$status = false;
-		} else {
-			$status = true;
-		}
-		
-		if($return){
-			return $status;
-		}
-		echo $status;
-	}
-	
-	public function check_userMobile($return=false){		
-		$mobile = $this->input->get('mobile');
-		$id = $this->input->get('id');
-		if(trim($id) == ''){
-			$id = 999999999999;
-		}
-		
-		$already = $this->db->get_where(TBL_USERS,array('mobile' => $mobile,'id != ' => $id))->row_array();
-		if(!empty($already)) {
-			$status = false;
-		} else {
-			$status = true;
-		}
-		
-		if($return){
-			return $status;
-		}
-		echo $status;
-	}
-	
 	public function user_view($UserId=NULL)
 	{
 		chk_access('users',1,true);
@@ -531,15 +471,22 @@ class User extends CI_Controller {
 		}
 	}
 	
-	public function viewe_lead($lead_id=NULL){
+	public function view_lead($lead_id=NULL){
 		$lead_id = DeCrypt($lead_id);
 		$data['record'] = $this->admin_model->get_LeadDetails($lead_id);
+		
+		$data['lead_logs'] = $this->admin_model->get_LeadLogs($lead_id);
+		
+		$data['pageTitle'] = 'View Lead Details';
+		$data['content'] = 'user/view-lead-details';
+		$this->load->view('layout',$data);
 	}
 	
 	public function check_user_email(){		
 		$email = $this->input->get('email');
 		$user_id = $this->input->get('id');
-		
+		$user_id = DeCrypt($user_id);
+
 		$sts = $this->admin_model->check_user_email($email, $user_id);
 		echo $sts;
 	}

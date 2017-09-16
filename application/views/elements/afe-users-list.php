@@ -1,6 +1,3 @@
-<style>
-.fa{font-size:20px;}
-</style>
 
 <table class="table table-bordered">
 	<thead>
@@ -40,8 +37,8 @@
 					?>
 				</td>
 				<td class="tooltip-demo">
-					<a href="<?php echo BASE_URL.'afe-users/edit/'.EnCrypt($user['afe_id'])?>" title="Edit" class="actions-a" data-toggle="tooltip" data-placement="bottom"">
-						<i class="fa fa-pencil-square-o text-navy"></i>
+					<a href="<?php echo BASE_URL.'afe-users/edit/'.EnCrypt($user['afe_id'])?>" title="Edit" class="actions-a" data-toggle="tooltip" data-placement="bottom">
+						<i class="fa fa-pencil text-navy"></i>
 					</a>
 					
 					<a href="<?php echo BASE_URL.'afe-users/view/'.EnCrypt($user['afe_id'])?>" title="View" class="actions-a" data-toggle="tooltip" data-placement="bottom">
