@@ -58,69 +58,40 @@ $route['profile/view'] = "home/admin_profile";
 $route['dashboard'] = "home/index";
 $route['auth/user/password/forgot'] = "welcome/forget_password";
 
-$route['employees/list'] = "home/users";
-$route['employees/view/(:any)'] = "home/user_view/$1";
-$route['employees/edit/(:any)'] = "admin/register_user/$1";
+$route['users/list'] = "home/users";
+$route['users/view/(:any)'] = "home/user_view/$1";
+$route['users/add'] = "user/register_user";
+$route['users/edit/(:any)'] = "user/register_user/$1";
 
 $route['emails/list'] = "home/email_templates";
 $route['emails/edit/(:any)'] = "home/edit_email_templates/$1";
 
-$route['tickets/list'] = "home/tickets";
-$route['tickets/list/(:any)'] = "home/tickets/$1";
-$route['tickets/add'] = "home/manage_tickets";
-$route['tickets/add/invoices'] = "auth/upload_ticket_invoice";
-$route['tickets/add/invoices/(:any)'] = "auth/upload_ticket_invoice/$1";
-$route['tickets/edit/(:any)'] = "home/manage_tickets/$1";
-$route['tickets/view/(:any)'] = "auth/view_ticket_details/$1";
-$route['tickets/change/status'] = "auth/change_ticket_status";
-$route['tickets/change/close'] = "auth/close_ticket";
-$route['tickets/print/(:any)'] = "home/genetare_ticket_pdf/$1";
+$route['admins/list'] = "admin/index";
+$route['admins/add'] = "admin/manage_admin";
+$route['admins/edit/(:any)'] = "admin/manage_admin/$1";
+$route['admins/view/(:any)'] = "admin/admin_view/$1";
+$route['admins/access/manage/(:any)'] = "admin/manage_access/$1";
+$route['admins/access/update'] = "admin/access_update";
 
-$route['categories/list'] = "home/categories";
-$route['categories/add'] = "home/manage_categories";
-$route['categories/edit/(:any)'] = "home/manage_categories/$1";
+$route['afe-users/list'] = "admin/afe_users";
+$route['afe-users/add'] = "admin/manage_afe";
+$route['afe-users/edit/(:any)'] = "admin/manage_afe/$1";
 
-$route['request-types/list'] = "home/request_types";
-$route['request-types/add'] = "home/manage_request_types";
-$route['request-types/edit/(:any)'] = "home/manage_request_types/$1";
+$route['leads/list'] = "user/list_leads";
+$route['leads/view/(:any)'] = "user/view_lead/$1";
+$route['leads/new-lead'] = "user/manage_lead";
+$route['leads/edit/(:any)'] = "user/manage_lead/$1";
 
-$route['machine-types/list'] = "home/machine_types";
-$route['machine-types/add'] = "home/manage_machine_types";
-$route['machine-types/edit/(:any)'] = "home/manage_machine_types/$1";
+$route['cms/circles/list'] = "cms/circles_list";
+$route['cms/circles/add'] = "cms/manage_circles";
+$route['cms/circles/edit/(:any)'] = "cms/manage_circles/$1";
 
-$route['machine-parts/list'] = "home/machine_parts";
-$route['machine-parts/add'] = "home/manage_machine_parts";
-$route['machine-parts/edit/(:any)'] = "home/manage_machine_parts/$1";
+$route['cms/ssa/list'] = "cms/ssa_list";
+$route['cms/ssa/add'] = "cms/manage_ssa";
+$route['cms/ssa/edit/(:any)'] = "cms/manage_ssa/$1";
 
-$route['csv-user_registration'] = "admin/index";
-$route['users/upload'] = "admin/upload_users";
-$route['users/register'] = "admin/register_user";
-$route['general-settings'] = "home/site_settings";
+$route['cms/plans/list'] = "cms/all_plans";
+$route['cms/plans/add'] = "cms/manage_plans";
+$route['cms/plans/edit/(:any)'] = "cms/manage_plans/$1";
 
-$route['surrender-devices'] = "home/surrender_devices";
-$route['surrender-fnf'] = "home/surrender_fnf";
-$route['surrender-devices-logs/list'] = "home/surrender_device_logs";
 
-$route['ticket-reports/list'] = "admin/ticket_reports";
-$route['ticket-reports/list/(:any)'] = "admin/ticket_reports/$1";
-$route['ticket-reports/view/(:any)'] = "auth/view_ticket_details/$1";
-
-$route['expense-reports/list'] = "admin/expense_reports";
-$route['expense-reports/list/(:any)'] = "admin/expense_reports/$1";
-$route['expense-reports/view/(:any)'] = "admin/expense_report_details/$1";
-
-$route['csv-devices-upload'] = "admin/upload_devices";
-$route['devices-inventory/list'] = "admin/devices";
-$route['devices-inventory/list/(:any)'] = "admin/devices/$1";
-$route['devices-inventory/add'] = "admin/register_devices";
-$route['devices-inventory/edit/(:any)'] = "admin/register_devices/$1";
-$route['device-details/view/(:any)'] = "admin/device_details/$1";
-
-$route['assign-devices'] = "admin/assign_devices_to_user";
-
-$route['admin/list'] = "subadmin/index";
-$route['admin/add'] = "subadmin/manage_admin";
-$route['admin/edit/(:any)'] = "subadmin/manage_admin/$1";
-$route['admin/view/(:any)'] = "subadmin/admin_view/$1";
-$route['admin/access/manage/(:any)'] = "subadmin/manage_access/$1";
-$route['admin/access/update'] = "subadmin/access_update";

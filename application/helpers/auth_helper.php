@@ -1,18 +1,19 @@
 <?php  if(!defined('BASEPATH')) exit('No direct script access allowed');
 
-if(!function_exists('chk_admin_access'))
+if(!function_exists('chk_access'))
 {
-	function chk_admin_access($action=NULL, $type=NULL, $role_check=false)
+	function chk_access($action=NULL, $type=NULL, $role_check=false)
 	{		
 		$CI = & get_instance();		
 		$CI->load->database();
 		$CI->load->model('admin_model');	
 		
-		$user_id = $CI->session->userdata('admin_id');
-		$user = $CI->admin_model->get_user($user_id, 'id,role_id,have_admin_access');
+		$admin_data = $CI->session->userdata('admin');
+		$admin_id = $admin_data['admin_id'];
+		$admin = $CI->admin_model->get_admin($admin_id, 'admin_id');
 		
-		if(!empty($user)){
-			if($role_check){
+		if(!empty($admin)){
+			if($role_check && 0){
 				
 				$role_id = $user['role_id'];
 				$user_id = $user['id'];
