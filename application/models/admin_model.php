@@ -1056,4 +1056,20 @@ class Admin_model extends CI_Model
 		
 		return $results;
 	}
+	
+	public function get_LeadsStatus($lead){
+		$this->db->where('bs_lead_status.previous_status_id', $lead['user_status_id']);
+		$this->db->order_by('bs_lead_status.status_id', 'DESC');
+		$results = $this->db->get("bs_lead_status")->result_array();
+		
+		return $results;
+	}
+	
+	public function get_LeadFiles($lead){
+		$this->db->where('bs_lead_files.lead_id', $lead['user_id']);
+		$this->db->order_by('bs_lead_files.file_id', 'DESC');
+		$results = $this->db->get("bs_lead_files")->result_array();
+		
+		return $results;
+	}
 }	

@@ -65,7 +65,7 @@
         </div>
 		
 		<?php 
-			if(($can_change_status && !empty($status_array)) || 1){
+			if(($can_change_status && !empty($lead_status))){
 		?>
 			<div class="col-lg-4">
 				<div class="ibox float-e-margins">
@@ -77,36 +77,43 @@
 							<div class="form-group">
 								<label class="col-lg-3 control-label">Status</label>
 								<div class="col-lg-8">
-									<input type="hidden" value="<?=md5($ticket['id'])?>" name="ticket_id">
+									<input type="hidden" value="<?=EnCrypt($record['user_id'])?>" name="lead_id">
 									<select class="form-control" name="status_id" id="status_id"> 
 										<option value="">Select</option>
 										<?php 
-											foreach($status_array as $st){
-												$value = $st['id'];
-												$text = $st['title_short_text'];
+											foreach($lead_status as $st){
+												$value = $st['status_id'];
+												$text = $st['status_name'];
 												
 												echo "<option value='$value'>$text</option>";
 											}
 										?>
 									</select>
 								</div>
-							</div>		
-							<?php			
-								if(in_array($ticket['status'], array(12,19))) { 
-							?>
-								<div class="form-group">
-									<label class="col-sm-3 control-label">Date</label>
-									<div class="col-sm-8">
-										<input type="text" class="form-control datepick" name="date" name="bill_amount" readOnly />
-									</div>
+							</div>	
+							<div class="form-group" id="cpe_pmn_dv" style="display:none;">
+								<label class="col-lg-3 control-label">Status</label>
+								<div class="col-lg-8">
+									<select class="form-control" name="cpe_payment_status" id="cpe_payment_status"> 
+										<option value="Y">Payment Done</option>
+										<option value="N">Payment Not Done</option>
+									</select>
 								</div>
-							<?php } ?>
+							</div>	
 							<div class="form-group">
 								<label class="col-lg-3 control-label">Description</label>
 								<div class="col-lg-8">
 									<textarea class="form-control" name="description" id="description"></textarea>
 								</div>
 							</div>		
+							<div class="form-group" id="upld_fl_dv" style="display:none;">							
+								<label class="col-lg-3 control-label">Upload CAF</label>
+								<div class="col-lg-8">
+									<input type="file" class="form-control upld_file" name="upld_file" id="upld_file" style="padding:0;">
+									<br/>
+									<span style="color:red;width:100%;float:left;">Accepted Formats: PNG|JPG|JPEG|PDF|DOC<br/>DOCS|XLS|XSLX</span>
+								</div>							
+							</div>
 							<div class="form-group">
 								<label class="col-lg-3 control-label">
 									
@@ -119,111 +126,48 @@
 					</div>
 				</div>
 			</div>
-		<?php } ?>
+		<?php } ?>		
 		
-		<?php			
-			if(($role_id == 1 && $ticket['status'] > 6 && !in_array($ticket['status'],array(7,11))) || ($role_id == 5 && in_array($ticket['status'], array(13,15,17)))) { 
-		?>
-			
-			<div class="col-lg-4">
-				<div class="ibox float-e-margins">
-					<div class="ibox-title">
-						<h5>
-							<?php 
-								if($role_id == 5 && in_array($ticket['status'], array(13,17))){
-									echo "Upload Purchase Order";
-								} else {
-									echo "Upload Bill/Invoices";
-								}
-							?>							
-						</h5>
-					</div>
-					<div class="ibox-content">		
-						<form method="post" class="form-horizontal" action="javascript:;" id="bill-form">
-							<div class="form-group">
-								<label class="col-sm-4 control-label">Ticket Id</label>
-								<div class="col-sm-8">								
-									<select class="form-control" name="ticket_id" ud="ticket_id">
-										<option value="<?php echo @$ticket['id']?>"><?php echo @$ticket['ticket_id']?></option>
-									</select>
-									<input type="hidden" name="id" value="<?php echo @$info['id']?>"/>
-									<input type="hidden" name="referer" value="<?php echo $this->session->userdata('referer');?>"/>
-								</div>
-							</div>
-							<div class="form-group">
-								<label class="col-sm-4 control-label">Amount</label>
-								<div class="col-sm-8">
-									<input type="text" class="form-control only-number" name="bill_amount" name="bill_amount" value="<?php echo @$info['amount']?>"/>
-								</div>
-							</div>
-							<div class="form-group">
-								<label class="col-sm-4 control-label">Short Desc</label>
-								<div class="col-sm-8">
-									<textarea name="description" id="description" class="form-control tinymce"><?php echo @$info['description']?></textarea>
-								</div>
-							</div>
-							<div class="form-group">							
-								<label class="col-lg-4 control-label">Upload Invoice/Bill</label>
-								<div class="col-lg-8">
-									<input type="file" class="form-control upld_file" name="bill_file" id="bill_file" style="padding:0;">
-									<br/>
-									<span style="color:red;width:100%;float:left;">Accepted Formats: PNG|JPG|JPEG|PDF|DOC<br/>DOCS|XLS|XSLX</span>
-								</div>							
-							</div>
-							<div class="form-group">
-								<label class="col-lg-4"></label>
-								<div class="col-sm-8">
-									<button class="btn btn-primary submit-btn" id="submit-btn" type="button">Submit</button>
-								</div>
-							</div>
-						</form>
-					</div>
-				</div>
-			</div>			
-		<?php } ?>	
-						
+
 		<?php 
-			if(!empty($bills)){
+			if(!empty($lead_files)){
 		?>
 			<div class="col-lg-12">
 				<div class="ibox float-e-margins">
 					<div class="ibox-title">
-						<h5>Ticket Invoices/Bills</h5>
+						<h5>Leads File</h5>
 					</div>
 					<div class="ibox-content no-padding">
 						<ul class="list-group">
-							<table class="table table-striped">
+							<table class="table table-bordered">
 								<thead>
 									<tr>
-										<th style="">#</th>
-										<th style="">User</th>	
-										<th style="">Amount</th>
-										<th style="">Description</th>
-										<th style="">Bill Type</th>
-										<th style="">Invoice/Bill</th>
+										<th style="">#</th>	
+										<th style="">File Type</th>
+										<th style="">File</th>
 										<th style="">Date/Time</th>
 									</tr>
 								</thead>
 								<tbody>
 									<?php 
-										if(!empty($bills)) { 
+										
+										$file_type_arr = array('2' => 'CAF File', '3' => 'DNCS File', '4' => 'Installation & Activation File');
+										
+										if(!empty($lead_files)) { 
 											$k = 1;
-											foreach($bills as $bill) { 
+											foreach($lead_files as $rcd) { 
 									?>
 										<tr class="">
 											<td><?php echo $k?></td>	
-											<td><?php echo $bill['name'] != '' ? $bill['name'].' ('.$bill['emp_code'].')' : '-NA-'?></td>
-											<td><?php echo CURRENCY_CONSTANT.' '.$bill['amount']?></td>
-											<td><?php echo $bill['description']?></td>
-											<td><?php echo $bill['bill_type'] == 1 ? 'PO' : 'Bill/Invoice'?></td>
+											<td><?php echo $file_type_arr[$rcd['file_type']]?></td>
 											<td>
 												<?php 
-													if($bill['file'] != ''){
-														echo '<a href="'.BASE_URL.'assets/uploads/bills/'.$bill['file'].'" target="_blank">View</a>';
+													if($rcd['file_name'] != ''){
+														echo '<a href="'.BASE_URL.'assets/uploads/leads/'.$rcd['file_name'].'" target="_blank">View</a>';
 													}
 												?>												
 											</td>										
-											<td><?php echo date('d-M-Y H:i a',strtotime($bill['date_added']))?></td>	
+											<td><?=date('d-M-Y H:i a',strtotime($rcd['file_added_on']))?></td>	
 										</tr>
 									<?php 
 											$k++;
@@ -232,7 +176,7 @@
 										else
 										{
 											echo '<tr>
-													<td colspan="4" align="center">No Bills Uploaded</td>
+													<td colspan="4" align="center">No Files Uploaded</td>
 												</tr>';
 										}
 									?>
@@ -242,10 +186,10 @@
 					</div>
 				</div>
 			</div>
-		<?php }	?>			
+		<?php }	?>	
 		
 		<?php 
-			if($can_see_logs || 1){
+			if($can_see_logs){
 		?>
 			<div class="col-lg-12">
 				<div class="ibox float-e-margins">
@@ -293,30 +237,44 @@
 					</div>
 				</div>
 			</div>
-		<?php } ?>		
-    </div>
+		<?php } ?>
+
+	 </div>
 </div>
 
 <script>
 jQuery(document).ready(function() {
 
 	$(document).on('change','#status_id',function(e){
-		if($(this).val() == 16){
-			if(!confirm('In this case this request will be changed to CarryIn Request.')){
-				$(this).val('');
-				return false;
+		var stsId = $(this).val();
+		$('#cpe_pmn_dv').hide();
+		if(stsId == 2 || stsId == 3 || stsId == 4){
+			$('#upld_fl_dv').show();
+			$('#upld_fl_dv').find('label').html('Upload CAF');
+			if(stsId == 3){
+				$('#cpe_pmn_dv').show();
+				$('#upld_fl_dv').find('label').html('Upload DNCS File');
+			} else if(stsId == 4){
+				$('#upld_fl_dv').find('label').html('Upload Inst & Act File');
 			}
 		}
 	});
 	
 	$(document).on('click','#update-status-btn',function(){
 		if($("#update-status-form").valid()){
+			
+			var formData = new FormData($("#update-status-form")[0]);
+			
 			showCustomLoader(true);		
 			$.ajax({
-				url: BASE_URL+'tickets/change/status',
+				url: BASE_URL+'leads/change/status',
 				type: "POST",
 				dataType:'json',
-				data: $('#update-status-form').serialize(),
+				data: formData,
+				async: false,				
+				cache: false,
+				contentType: false,
+				processData: false,
 				error: function(){
 					showCustomLoader(false);		
 					swal({
@@ -356,10 +314,7 @@ jQuery(document).ready(function() {
 		ignore: '',
 		onkeyup: false,
 		rules: {
-			ticket_id: {
-				required: true,
-			},
-			date: {
+			lead_id: {
 				required: true,
 			},
 			status_id: {
@@ -368,7 +323,13 @@ jQuery(document).ready(function() {
 			description: {
 				required: true,
 				minlength: 10
-			},					
+			},	
+			upld_file: {
+				required: true,
+			},
+			cpe_payment_status: {
+				required: true,
+			},
 		 },
 		submitHandler: function(form) {
 			return false;

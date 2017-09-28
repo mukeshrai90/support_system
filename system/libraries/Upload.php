@@ -1199,7 +1199,7 @@ class CI_Upload {
 
 		$ext = substr($filename, $ext_pos);
 		$filename = substr($filename, 0, $ext_pos);
-		return str_replace('.', '_', $filename).$ext;
+		return $filename.$ext;
 	}
 
 	// --------------------------------------------------------------------

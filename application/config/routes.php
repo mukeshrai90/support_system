@@ -81,6 +81,7 @@ $route['leads/list'] = "user/list_leads";
 $route['leads/view/(:any)'] = "user/view_lead/$1";
 $route['leads/new-lead'] = "user/manage_lead";
 $route['leads/edit/(:any)'] = "user/manage_lead/$1";
+$route['leads/change/status'] = "user/change_lead_status";
 
 $route['cms/circles/list'] = "cms/circles_list";
 $route['cms/circles/add'] = "cms/manage_circles";
