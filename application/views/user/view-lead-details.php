@@ -91,7 +91,7 @@
 									</select>
 								</div>
 							</div>	
-							<div class="form-group" id="cpe_pmn_dv" style="display:none;">
+							<div class="form-group cpe_pmn_dv" style="display:none;">
 								<label class="col-lg-3 control-label">Status</label>
 								<div class="col-lg-8">
 									<select class="form-control" name="cpe_payment_status" id="cpe_payment_status"> 
@@ -99,7 +99,19 @@
 										<option value="N">Payment Not Done</option>
 									</select>
 								</div>
-							</div>	
+							</div>
+							<div class="form-group cpe_pmn_dv" style="display:none;">
+								<label class="col-lg-3 control-label">BSNL ID</label>
+								<div class="col-lg-8">
+									<input type="text" placeholder="BSNL User ID" class="form-control" name="bsnl_user_id">
+								</div>
+							</div>
+							<div class="form-group instln_dv" style="display:none;">
+								<label class="col-lg-3 control-label">Instt Date</label>
+								<div class="col-lg-8">
+									<input type="text" placeholder="Installation Date" class="form-control" name="installation_date" id="installation_date">
+								</div>
+							</div>
 							<div class="form-group">
 								<label class="col-lg-3 control-label">Description</label>
 								<div class="col-lg-8">
@@ -242,19 +254,32 @@
 	 </div>
 </div>
 
+<script src="<?php echo ASSETS_URL?>js/jquery.datetimepicker.js"></script>
+<link href="<?php echo ASSETS_URL?>css/jquery.datetimepicker.css" rel="stylesheet">
+
 <script>
 jQuery(document).ready(function() {
-
+	
+	$("#installation_date").datetimepicker({
+		timepicker:false,
+		format:'Y-m-d',
+		validateOnBlur:false,
+		maxDate:'<?php echo date('Y-m-d');?>',
+		scrollInput:false
+	});
+	
 	$(document).on('change','#status_id',function(e){
 		var stsId = $(this).val();
-		$('#cpe_pmn_dv').hide();
+		$('.cpe_pmn_dv').hide();
+		$('.instln_dv').hide();
 		if(stsId == 2 || stsId == 3 || stsId == 4){
 			$('#upld_fl_dv').show();
 			$('#upld_fl_dv').find('label').html('Upload CAF');
 			if(stsId == 3){
-				$('#cpe_pmn_dv').show();
+				$('.cpe_pmn_dv').show();
 				$('#upld_fl_dv').find('label').html('Upload DNCS File');
 			} else if(stsId == 4){
+				$('.instln_dv').show();
 				$('#upld_fl_dv').find('label').html('Upload Inst & Act File');
 			}
 		}
@@ -277,33 +302,16 @@ jQuery(document).ready(function() {
 				processData: false,
 				error: function(){
 					showCustomLoader(false);		
-					swal({
-					  title: "",
-					  text: 'Unable to proocess your request right now.<br/> Please try again or some time later',
-					  type : 'error',
-					  html : true,	
-					  timer: 5000						  
-					});
+					customAlertBox('Unable to proocess your request right now.<br/> Please try again or some time later', 'e');
 				},
 				success: function(response){
 					showCustomLoader(false);		
 					if(response.status){
-						swal({
-						  title: "",
-						  text: response.message,
-						  type : 'success',
-						  html : true,						  
-						});
+						customAlertBox(response.message);
 						$('#update-status-form')[0].reset();
 						setTimeout(function(){location.reload();},500);
 					} else{
-						swal({
-						  title: "",
-						  text: response.message,
-						  type : 'error',
-						  html : true,	
-						  timer: 5000						  
-						});
+						customAlertBox(response.message, 'e');
 					}
 				}
 			});
@@ -330,6 +338,12 @@ jQuery(document).ready(function() {
 			cpe_payment_status: {
 				required: true,
 			},
+			bsnl_user_id: {
+				required: true,
+			},
+			installation_date: {
+				required: true,
+			},
 		 },
 		submitHandler: function(form) {
 			return false;
@@ -348,85 +362,6 @@ jQuery(document).ready(function() {
 		}
 	});  
 		
-	$(document).on('input','.only-number',function(){ 		
-		var $this = $(this);
-		var regexp = /[^0-9\.]/g;
-		var value = $this.val();
-		
-		if(value != '' && regexp.test(value)){			
-			$this.val(value.replace(regexp,'')); 
-		}
-		return false;
-	});
-	
-	$(document).on('click','#submit-btn',function(){
-		if($("#bill-form").valid()){
-			
-			var formData = new FormData($("#bill-form")[0]);
-			
-			showCustomLoader(true);		
-			$.ajax({
-				type: 'POST',
-				url: BASE_URL+'tickets/add/invoices',
-				data: formData,
-				dataType: 'json',
-				async: false,				
-				cache: false,
-				contentType: false,
-				processData: false,
-				error: function(){
-					showCustomLoader(false);		
-					swal({
-					  title: "",
-					  text: 'Unable to proocess your request right now.<br/> Please try again or some time later',
-					  type : 'error',
-					  html : true,	
-					  timer: 5000						  
-					});
-				},
-				success: function(response){
-					showCustomLoader(false);		
-					if(response.status){
-						swal({
-						  title: "",
-						  text: response.message,
-						  type : 'success',
-						  html : true,						  
-						});
-						$('#bill-form')[0].reset();
-						setTimeout(function(){window.location.reload();},2000);
-						
-					} else{
-						swal({
-						  title: "",
-						  text: response.message,
-						  type : 'error',
-						  html : true,	
-						  timer: 5000						  
-						});
-					}
-				}
-			});
-		} 
-	});
-	
-	$("#bill-form").validate({
-		rules: {
-			ticket_id: {
-				required: true,
-			},
-			bill_amount: {
-				required: true,
-			},
-			description: {
-				required: true,
-			},
-			bill_file: {
-				//required: true,
-			},
-		 }
-	});
-
 	$(document).on('change','.upld_file',function(){	
 
 		var imagePath = $(this).val();

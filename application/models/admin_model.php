@@ -502,9 +502,9 @@ class Admin_model extends CI_Model
 			
 			if(empty($user)){			
 				
-				$user_status_id = 1;
+				$user_lead_status_id = 1;
 				$data['user_added_on'] = date('Y-m-d H:i:s');		
-				$data['user_status_id'] = $user_status_id;		
+				$data['user_lead_status_id'] = $user_lead_status_id;		
 				$data['user_active'] = 1;		
 							
 				if($this->db->insert('bs_users', $data)){
@@ -518,7 +518,7 @@ class Admin_model extends CI_Model
 				
 			} else {
 				
-				$user_status_id = $user['user_status_id'];
+				$user_lead_status_id = $user['user_lead_status_id'];
 				$data['user_updated_on'] = date('Y-m-d H:i:s');	
 			
 				$this->db->where('user_id', $user_id);
@@ -558,7 +558,7 @@ class Admin_model extends CI_Model
 			$CallInsertData['call_user_id'] = $user_id;
 			$CallInsertData['call_logged_admin_id'] = $logged_admin_id;
 			$CallInsertData['call_desc'] = $call_description;
-			$CallInsertData['call_status_id'] = $user_status_id;
+			$CallInsertData['call_status_id'] = $user_lead_status_id;
 			$CallInsertData['call_time'] = date('Y-m-d H:i:s');
 			
 			if($this->db->insert('bs_user_call_logs', $CallInsertData)) {
@@ -582,7 +582,7 @@ class Admin_model extends CI_Model
 		$data = array(); $where = array(); $like = array(); 
 		
 		if(!empty($_GET['status'])) {	
-			$where = array_merge($where,array('bs_lead_status.status_id' => $_GET['status']));			
+			$where = array_merge($where,array('bs_users.user_lead_status_id' => $_GET['status']));			
 		}
 		
 		if(!empty($_GET['circle'])) {	
@@ -597,7 +597,7 @@ class Admin_model extends CI_Model
 		$this->db->like($like); 
 		$this->db->from('bs_users');
 		$this->db->join('bs_circles', 'bs_circles.circle_id=bs_users.user_circle_id', 'INNER'); 
-		$this->db->join('bs_lead_status', 'bs_lead_status.status_id=bs_users.user_status_id', 'INNER'); 
+		$this->db->join('bs_lead_status', 'bs_lead_status.status_id=bs_users.user_lead_status_id', 'INNER'); 
 		$this->db->join('bs_user_plans', 'bs_user_plans.user_id=bs_users.user_id', 'INNER'); 
 		$this->db->join('bs_plans', 'bs_plans.plan_id=bs_user_plans.user_plan_id', 'INNER'); 
 		$data['count'] = $this->db->count_all_results();
@@ -608,7 +608,7 @@ class Admin_model extends CI_Model
 		$this->db->limit($limit, $start);
 		$this->db->order_by('bs_users.user_id','desc'); 
 		$this->db->join('bs_circles', 'bs_circles.circle_id=bs_users.user_circle_id', 'INNER');  
-		$this->db->join('bs_lead_status', 'bs_lead_status.status_id=bs_users.user_status_id', 'INNER'); 
+		$this->db->join('bs_lead_status', 'bs_lead_status.status_id=bs_users.user_lead_status_id', 'INNER'); 
 		$this->db->join('bs_user_plans', 'bs_user_plans.user_id=bs_users.user_id', 'INNER'); 
 		$this->db->join('bs_plans', 'bs_plans.plan_id=bs_user_plans.user_plan_id', 'INNER'); 
 		$query = $this->db->get("bs_users");		
@@ -1040,7 +1040,7 @@ class Admin_model extends CI_Model
 		$this->db->join('bs_ssa', 'bs_ssa.ssa_id=bs_users.user_ssa_id', 'INNER'); 
 		$this->db->join('bs_plans', 'bs_plans.plan_id=bs_user_plans.user_plan_id', 'INNER'); 
 		$this->db->join('bs_afe_users', 'bs_afe_users.afe_id=bs_users.user_afe_referer_id', 'INNER'); 
-		$this->db->join('bs_lead_status', 'bs_lead_status.status_id=bs_users.user_status_id', 'INNER');
+		$this->db->join('bs_lead_status', 'bs_lead_status.status_id=bs_users.user_lead_status_id', 'INNER');
 		$query = $this->db->get("bs_users");	
 
 		return $query->row_array();	
@@ -1059,6 +1059,7 @@ class Admin_model extends CI_Model
 	
 	public function get_LeadsStatus($lead){
 		$this->db->where('bs_lead_status.previous_status_id', $lead['user_status_id']);
+		$this->db->where('bs_lead_status.status_type', 'L');
 		$this->db->order_by('bs_lead_status.status_id', 'DESC');
 		$results = $this->db->get("bs_lead_status")->result_array();
 		
@@ -1071,5 +1072,63 @@ class Admin_model extends CI_Model
 		$results = $this->db->get("bs_lead_files")->result_array();
 		
 		return $results;
+	}
+	
+	public function get_afe_commissions($limit, $start, $month){
+		$data = array(); $where = array(); $like = array(); 
+		
+		$this->db->where($where);
+		$this->db->like($like); 
+		$this->db->from('bs_afe_users');
+		$data['count'] = $this->db->count_all_results();
+		
+		$this->db->where($where);
+		$this->db->like($like); 
+		$this->db->limit($limit, $start);
+		$this->db->order_by('bs_afe_users.afe_name','asc'); 
+		$afe_users = $this->db->get("bs_afe_users")->result_array();		
+		
+		foreach($afe_users as $k=>$usr){
+			$afe_id = $usr['afe_id'];
+			
+			$this->db->select('bs_plans.plan_name, bs_plans.plan_rental');
+			$this->db->where('user_afe_referer_id', $afe_id);
+			$this->db->where('user_lead_status_id', 1);
+			$this->db->where('MONTH(installation_date)', $month);
+			$this->db->order_by('bs_users.user_id','desc'); 
+			$this->db->join('bs_user_plans', 'bs_user_plans.user_id=bs_users.user_id', 'INNER'); 
+			$this->db->join('bs_plans', 'bs_plans.plan_id=bs_user_plans.user_plan_id', 'INNER'); 
+			$leads = $this->db->get("bs_users")->result_array();	
+			
+			$total_leads = count($leads); $total_plans_amt = 0;
+			foreach($leads as $lead){
+				$total_plans_amt = $total_plans_amt + $lead['plan_rental'];
+			}
+			
+			$afe_users[$k]['total_leads'] = $total_leads;
+			$afe_users[$k]['total_plans_amt'] = $total_plans_amt;
+		}
+		
+		$data['results'] = $afe_users;
+		return $data;
+	}
+	
+	public function get_afe_leads($afe_id, $month){
+		$data = array();
+		
+		$this->db->select('bs_users.*, bs_plans.plan_name, bs_plans.plan_rental, bs_lead_status.status_name as current_status');
+		$this->db->where('user_afe_referer_id', $afe_id);
+		//$this->db->where('user_lead_status_id', 1);
+		$this->db->where('MONTH(installation_date)', $month);
+		$this->db->order_by('bs_users.user_id','desc'); 
+		$this->db->join('bs_lead_status', 'bs_lead_status.status_id=bs_users.user_lead_status_id', 'INNER');
+		$this->db->join('bs_user_plans', 'bs_user_plans.user_id=bs_users.user_id', 'INNER'); 
+		$this->db->join('bs_plans', 'bs_plans.plan_id=bs_user_plans.user_plan_id', 'INNER'); 
+		$leads = $this->db->get("bs_users")->result_array();
+		
+		$data['count'] = 0;
+		$data['results'] = $leads;
+		
+		return $data;
 	}
 }	

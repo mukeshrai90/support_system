@@ -537,6 +537,8 @@ class User extends CI_Controller {
 		$status_id = $this->input->post('status_id');
 		$description = $this->input->post('description');
 		$cpe_payment_status = $this->input->post('cpe_payment_status');
+		$bsnl_user_id = $this->input->post('bsnl_user_id');
+		$installation_date = $this->input->post('installation_date');
 		
 		$logged_admin = $this->session->userdata('admin');
 		$logged_admin_id = $logged_admin['admin_id']; 
@@ -574,15 +576,17 @@ class User extends CI_Controller {
 		try{
 			$this->db->trans_begin();  // Transaction Start
 			
-			$LeadData = array('user_status_id' => $status_id, 'user_updated_on' => date('Y-m-d H:i:s'));
+			$LeadData = array('user_lead_status_id' => $status_id, 'user_updated_on' => date('Y-m-d H:i:s'));
 			
 			$and_sts_Desc = '';
 			if($status_id == 3){
-				$LeadData = array_merge($LeadData, array('user_cpe_payment_status' => $cpe_payment_status));
+				$LeadData = array_merge($LeadData, array('user_cpe_payment_status' => $cpe_payment_status, 'user_bsnl_id' => $bsnl_user_id));
 				$and_sts_Desc = '<br/><b>CPE Payment Not Done</b>';
 				if($cpe_payment_status == 'Y'){
 					$and_sts_Desc = '<br/><b>CPE Payment Done</b>';
 				}
+			} else if($status_id == 4){
+				$LeadData = array_merge($LeadData, array('installation_date' => date('Y-m-d', strtotime($installation_date))));
 			}
 			
 			$this->db->where('user_id', $lead_id);

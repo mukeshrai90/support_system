@@ -95,4 +95,7 @@ $route['cms/plans/list'] = "cms/all_plans";
 $route['cms/plans/add'] = "cms/manage_plans";
 $route['cms/plans/edit/(:any)'] = "cms/manage_plans/$1";
 
+$route['commissions/afe/list'] = "commission/afe_commissions";
+$route['commissions/afe/view/leads'] = "commission/get_afe_leads";
+
 

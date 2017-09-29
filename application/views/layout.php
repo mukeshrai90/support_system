@@ -127,6 +127,26 @@ $(document).ready(function(){
 									</ul>
 								</li>
 							<?php } ?>
+							
+							<?php 
+								if(in_array('commissions',$actions) || in_array('commissions',$actions) || 1) {
+							?>
+								<li class="<?php echo strstr($this->uri->segment(1),'commissions')== 'commissions' ? 'active' : ''?>">
+									<a aria-expanded="false" role="button" href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
+										<i class="fa fa-gears"></i> 
+										<span class="nav-label">Commissions</span>
+										<span class="caret"></span>
+									</a>
+									<ul role="menu" class="dropdown-menu">
+										<li class="<?php echo strstr($this->uri->segment(2),'afe')== 'afe' ? 'active' : ''?>">
+											<a href="<?php echo BASE_URL.'commissions/afe/list'?>">
+												<i class="fa fa-wrench"></i>&nbsp;&nbsp;
+												<span class="nav-label">AFE</span>
+											</a>
+										</li>
+									</ul>
+								</li>
+							<?php } ?>
 						</ul>
 						<ul class="nav navbar-top-links navbar-right">
 							<li>
@@ -138,7 +158,16 @@ $(document).ready(function(){
 					</div>
 				</nav>
 			</div>
-        
+			<div class="row back_to_lst_dv">
+				<?php 
+					$refrer = $this->agent->referrer();
+					if(!empty($refrer)){
+						$this->session->set_userdata('http_referer', $refrer);
+					}
+				?>
+				
+				<button type="button" class="btn btn-sm btn-warning refresh-all add-new-btn" data-url="<?php echo $this->session->userdata('http_referer');?>">Back to Previous Page</button>
+			</div>
 			<?php $this->load->view($content) ?>
 		
 		</div>
