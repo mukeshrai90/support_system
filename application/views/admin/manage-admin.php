@@ -12,6 +12,7 @@
 							<div class="col-lg-7">
 								<?php 
 									$admin_roles = @$admin_roles[0];
+									$admin_role_prim_id = @$admin_roles['id'];
 									$admin_role_id = @$admin_roles['admin_role_id'];
 									$role_circle_id = @$admin_roles['admin_role_circle_id'];
 									$role_ssa_id = @$admin_roles['admin_role_ssa_id'];
@@ -20,11 +21,12 @@
 									if($admin_role_id == 2){
 										$cirlDsplSts = 'display:block;';
 									} else if($admin_role_id == 3){
+										$cirlDsplSts = 'display:block;';
 										$ssaDsplSts = 'display:block;';
 									}
 									
 								?>
-								<input type="hidden" name="admin_role_id" value="<?php echo $admin_role_id?>">
+								<input type="hidden" name="admin_role_id" value="<?php echo EnCrypt($admin_role_prim_id)?>">
 								<select name="role_id" id="role_id" class="form-control">
 									<option value="">Select</option>									
 									<?php 
@@ -97,8 +99,8 @@
 								<select name="ssa_id" id="ssa_id" class="form-control">
 									<option value="">Select</option>									
 									<?php 
-										if(isset($circles)) {
-											foreach($circles as $rcd) {
+										if(isset($ssa)) {
+											foreach($ssa as $rcd) {
 												$selected = '';
 												if($rcd['ssa_id'] == $role_ssa_id) {
 													$selected = 'selected';
@@ -128,7 +130,32 @@
 <script>
 $(document).ready(function() {
 	
-	//$('#circle_row, #ssa_row').hide();
+	$(document).on('change','#circle_id',function(){
+		var circle_id = $(this).val();
+		$('#ssa_id').html('<option value="">Select</option>');
+		if($.trim(circle_id) != ''){
+		
+			showCustomLoader(true);
+			$.ajax({
+				url: BASE_URL+'user/getCirclesSSA',
+				type: 'POST',
+				data: {circle_id: circle_id},
+				dataType: 'JSON',
+				error: function(){
+					showCustomLoader(false);
+					customAlertBox('Unable to proocess your request right now.<br/> Please try again or some time later', 'e');
+				},
+				success: function(response){
+					showCustomLoader(false);		
+					if(response.status){
+						$('#ssa_id').html(response.html);
+					} else{
+						customAlertBox(response.message, 'e');
+					}
+				}
+			});
+		}
+	});
 	
 	$(document).on('change','#role_id',function(){
 		var role_id = $(this).val();
@@ -137,6 +164,7 @@ $(document).ready(function() {
 		if($.trim(role_id) == '2'){
 			$('#circle_row').slideDown();
 		} else if($.trim(role_id) == '3') {
+			$('#circle_row').slideDown();
 			$('#ssa_row').slideDown();
 		}
 	});

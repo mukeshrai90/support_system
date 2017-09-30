@@ -4,7 +4,10 @@
 		<div class="col-lg-12">
 			<div class="ibox float-e-margins">
 				<div class="ibox-title">
-					<h5>AFE Commissions </h5>	
+					<h5>
+						AFE Commissions 
+						<span id="com-mnth"><?=' | Month: '.date('M-y') ?></span>
+					</h5>	
 					<?php 
 						$pageUrl = BASE_URL.'commissions/afe/list';
 					?>

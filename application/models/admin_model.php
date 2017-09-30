@@ -226,6 +226,7 @@ class Admin_model extends CI_Model
 							
 		$role_id = $this->input->post('role_id');										
 		$admin_role_id = $this->input->post('admin_role_id');										
+		$admin_role_id = DeCrypt($admin_role_id);										
 		$circle_id = $this->input->post('circle_id');										
 		$ssa_id = $this->input->post('ssa_id');	
 		
@@ -297,6 +298,7 @@ class Admin_model extends CI_Model
 			if($role_id == 2) {
 				$RoleData['admin_role_circle_id'] = $circle_id;
 			} else if($role_id == 3) {
+				$RoleData['admin_role_circle_id'] = $circle_id;
 				$RoleData['admin_role_ssa_id'] = $ssa_id;
 			}
 			
@@ -381,7 +383,9 @@ class Admin_model extends CI_Model
 		$data['afe_email'] = $this->input->post('email');										
 		$data['afe_mobile'] = $this->input->post('mobile');										
 		$data['afe_pan_card'] = $this->input->post('pan_card');										
-		$data['afe_address '] = $this->input->post('address');											
+		$data['afe_address'] = $this->input->post('address');											
+		$data['afe_circle_id'] = $this->input->post('circle_id');											
+		$data['afe_ssa_id'] = $this->input->post('ssa_id');											
 		$data['afe_bank_name'] = $this->input->post('bank_name');									
 		$data['afe_bank_account_no'] = $this->input->post('bank_account_no');									
 		$data['afe_bank_ifsc_code'] = $this->input->post('bank_ifsc_code');										

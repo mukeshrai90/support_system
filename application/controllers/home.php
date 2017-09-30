@@ -21,6 +21,7 @@ class Home extends CI_Controller {
 			
 	public function login()
 	{
+		$redirect_url = BASE_URL.'leads/list';
 		if(!empty($_POST)) {	
 			$username = $this->input->post('username');
 			$password = md5($this->input->post('password'));
@@ -69,8 +70,6 @@ class Home extends CI_Controller {
 				);
 				$this->session->set_userdata('admin', $session_data);
 				
-				$redirect_url = BASE_URL.'dashboard';
-				
 				$response['status'] = true;
 				$response['message'] = 'Loggen In Successfully.';
 				$response['redirectTo'] = $redirect_url;
@@ -82,6 +81,12 @@ class Home extends CI_Controller {
 			
 			echo json_encode($response); die;
 		} else {						
+			
+			$logged_session = $this->session->userdata('admin');
+			if(!empty($logged_session)){
+				redirect($redirect_url);
+			}
+			
 			$data['pageTitle'] = 'Login';
 			$this->load->view('login',$data);
 		}

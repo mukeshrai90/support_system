@@ -47,6 +47,47 @@
 						<div class="hr-line-dashed"></div>
 						<div class="form-group">
 							<div class="col-md-6">
+								<label class="col-md-5 control-label">Circle</label>
+								<div class="col-md-7">
+									<select name="circle_id" id="circle_id" class="form-control">
+									<option value="">Select</option>									
+									<?php 
+										if(isset($circles)) {
+											foreach($circles as $rcd) {
+												$selected = '';
+												if($rcd['circle_id'] == $record['afe_circle_id']) {
+													$selected = 'selected';
+												}
+												echo '<option value="'.$rcd['circle_id'].'" '.$selected.'>'.$rcd['circle_name'].'</option>';
+											}
+										}
+									?>   									
+								</select>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<label class="col-md-5 control-label">SSA</label>
+								<div class="col-md-7">
+									<select name="ssa_id" id="ssa_id" class="form-control">
+									<option value="">Select</option>									
+									<?php 
+										if(isset($ssa)) {
+											foreach($ssa as $rcd) {
+												$selected = '';
+												if($rcd['ssa_id'] == $record['afe_ssa_id']) {
+													$selected = 'selected';
+												}
+												echo '<option value="'.$rcd['ssa_id'].'" '.$selected.'>'.$rcd['ssa_name'].'</option>';
+											}
+										}
+									?>   									
+								</select>
+								</div>
+							</div>
+						</div>
+						<div class="hr-line-dashed"></div>
+						<div class="form-group">
+							<div class="col-md-6">
 								<label class="col-md-5 control-label">Bank Account No</label>
 								<div class="col-md-7">
 									<input type="text" class="form-control" name="bank_account_no" id="bank_account_no"  placeholder="Bank Account No" value="<?php echo @$record['afe_bank_account_no']?>">
@@ -87,6 +128,33 @@
 
 <script>
 $(document).ready(function() {
+	
+	$(document).on('change','#circle_id',function(){
+		var circle_id = $(this).val();
+		$('#ssa_id').html('<option value="">Select</option>');
+		if($.trim(circle_id) != ''){
+		
+			showCustomLoader(true);
+			$.ajax({
+				url: BASE_URL+'user/getCirclesSSA',
+				type: 'POST',
+				data: {circle_id: circle_id},
+				dataType: 'JSON',
+				error: function(){
+					showCustomLoader(false);
+					customAlertBox('Unable to proocess your request right now.<br/> Please try again or some time later', 'e');
+				},
+				success: function(response){
+					showCustomLoader(false);		
+					if(response.status){
+						$('#ssa_id').html(response.html);
+					} else{
+						customAlertBox(response.message, 'e');
+					}
+				}
+			});
+		}
+	});
 	
 	$(document).on('click','#manage-form',function(){
 		if($("#manage_register_form").valid()){
@@ -141,6 +209,12 @@ $(document).ready(function() {
 			afe_address: {
 				required: true,	
 				validAddress:true,				
+			},
+			circle_id: {
+				required: true,					
+			},
+			ssa_id: {
+				required: true,					
 			},
 			bank_account_no: {
 				required: true,
