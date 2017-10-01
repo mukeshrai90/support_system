@@ -88,3 +88,5 @@ a.actions-a{margin-right: 12px;}
 .table-bordered .fa{font-size:20px;}
 .top-navigation .wrapper.wrapper-content {padding: 25px 40px !important;}
 .back_to_lst_dv{margin-top: 20px;text-align: right;margin-right: 3%;}
+.change_com_sts_spn,.cncl_chnge_sts_spn{color:#da251d;font-size: 11px;cursor:pointer;}
+.chnge_sts_slct{width:90%;}

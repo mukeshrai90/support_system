@@ -63,7 +63,76 @@
 var pageUrl = '<?php echo $pageUrl?>';
 
 $(document).ready(function(){	
+	$(document).on('click', '.change_com_sts_spn', function(){
+		var c = $(this).data('c');
+		var $this = $(this);
+		
+		if($this.siblings('.chnge_sts_slct').length){
+			$this.siblings('.chnge_sts_slct').show();
+			$this.before('<span class="cncl_chnge_sts_spn">Cancel</span>');
+			$this.hide();
+		} else {
+			showCustomLoader(true);		
+			$.ajax({
+				url: BASE_URL+'commissions/get/status',
+				type: "POST",
+				dataType:'json',
+				data: {c:c},
+				error: function(){
+					showCustomLoader(false);		
+					customAlertBox('Unable to proocess your request right now.<br/> Please try again or some time later', 'e');
+				},
+				success: function(response){
+					showCustomLoader(false);		
+					if(response.status){
+						$this.after(response.html);
+						$this.before('<span class="cncl_chnge_sts_spn">Cancel</span>');
+						$this.hide();
+					} else{
+						//customAlertBox(response.message, 'e');
+					}
+				}
+			});
+		}
+	});
 	
+	$(document).on('click', '.cncl_chnge_sts_spn', function(){
+		$(this).siblings('.change_com_sts_spn').show();
+		$(this).siblings('.chnge_sts_slct').hide();
+		$(this).remove();
+	});
+	
+	$(document).on('change', '.chnge_sts_slct', function(){
+		var s = $(this).val();
+		var c = $(this).data('c');
+		var $this = $(this);
+		var t = $(this).find('option:selected').text();
+		
+		if($.trim(s) != ''){
+			showCustomLoader(true);		
+			$.ajax({
+				url: BASE_URL+'commissions/change/status',
+				type: "POST",
+				dataType:'json',
+				data: {s:s, c:c},
+				error: function(){
+					showCustomLoader(false);		
+					customAlertBox('Unable to proocess your request right now.<br/> Please try again or some time later', 'e');
+				},
+				success: function(response){
+					showCustomLoader(false);		
+					if(response.status){
+						$this.siblings('.sts_spn').text(t);
+						$this.siblings('.change_com_sts_spn').show();
+						$this.siblings('.cncl_chnge_sts_spn').remove();
+						$this.hide();
+					} else{
+						customAlertBox(response.message, 'e');
+					}
+				}
+			});
+		}
+	});
 });
 
 </script>

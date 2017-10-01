@@ -131,17 +131,33 @@ $(document).ready(function(){
 							<?php 
 								if(in_array('commissions',$actions) || in_array('commissions',$actions) || 1) {
 							?>
-								<li class="<?php echo strstr($this->uri->segment(1),'commissions')== 'commissions' ? 'active' : ''?>">
+								<li class="<?php echo $this->uri->segment(1) == 'commissions' && $this->uri->segment(2) == 'afe' ? 'active' : ''?>">
 									<a aria-expanded="false" role="button" href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
 										<i class="fa fa-gears"></i> 
-										<span class="nav-label">Commissions</span>
+										<span class="nav-label">AFE Commission</span>
 										<span class="caret"></span>
 									</a>
 									<ul role="menu" class="dropdown-menu">
-										<li class="<?php echo strstr($this->uri->segment(2),'afe')== 'afe' ? 'active' : ''?>">
+										<?php 
+											if(!empty($_SESSION['admin']['current_role_id']) && $_SESSION['admin']['current_role_id'] == 2){
+										?>
+											<li class="<?php echo $this->uri->segment(2) == 'afe' && @$_GET['t'] == 'pending' ? 'active' : ''?>">
+												<a href="<?php echo BASE_URL.'commissions/afe/list?t=pending'?>">
+													<i class="fa fa-wrench"></i>&nbsp;&nbsp;
+													<span class="nav-label">Pending for Approval</span>
+												</a>
+											</li>
+										<?php } ?>
+										<li class="<?php echo $this->uri->segment(2) == 'afe' && @$_GET['month'] != 'current' && empty($_GET['t']) ? 'active' : ''?>">
 											<a href="<?php echo BASE_URL.'commissions/afe/list'?>">
 												<i class="fa fa-wrench"></i>&nbsp;&nbsp;
-												<span class="nav-label">AFE</span>
+												<span class="nav-label">Prevoius Months</span>
+											</a>
+										</li>
+										<li class="<?php echo $this->uri->segment(2) == 'afe' && @$_GET['month'] == 'current' ? 'active' : ''?>">
+											<a href="<?php echo BASE_URL.'commissions/afe/list?month=current'?>">
+												<i class="fa fa-wrench"></i>&nbsp;&nbsp;
+												<span class="nav-label">Current Month</span>
 											</a>
 										</li>
 									</ul>

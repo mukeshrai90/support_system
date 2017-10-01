@@ -16,25 +16,36 @@ class Commission extends CI_Controller {
 		$per_page = 20; 
         $page = @$_GET['per_page']? $_GET['per_page'] : 0;
 		
-		$month = date('m');
+		$last_month = date('m', strtotime('-27 days'));
+		$last_month_year = date('Y', strtotime('-27 days'));
+		
+		$month = $last_month;
 		if(!empty($_GET['month'])) {	
 			$month = $_GET['month'];
 		}
 		
-        $result = $this->admin_model->get_afe_commissions($per_page, $page, $month);		
+		$year = $last_month_year;
+		if(!empty($_GET['year'])) {	
+			$year = $_GET['year'];
+		}
+		
+		if(!empty($_GET['month']) && $_GET['month'] == 'current'){
+			$month = date('m');
+			$result = $this->admin_model->get_afe_commissions_monthly($per_page, $page, $month);
+		} else {
+			$result = $this->admin_model->get_afe_commissions($per_page, $page, $month, $year);
+		}
 		$data['records'] = @$result['results'];
 		
 		$total_rows = $result['count'];
 		
-		if(!empty($_GET['name'])){
-			$base_url = BASE_URL.'commissions/afe/list?'.$_SERVER['QUERY_STRING'];
-		} else {
-			$base_url = BASE_URL.'commissions/afe/list?page=true';
-		}
+		$base_url = BASE_URL.'commissions/afe/list?'.$_SERVER['QUERY_STRING'];
 		
         $data["links"] = create_links($per_page,$total_rows,$base_url);
 		
         $data["month"] = $month;
+        $data["year"] = $year;
+        $data["logged_in_role_id"] = $_SESSION['admin']['current_role_id'];
 		
 		if($this->input->is_ajax_request()) {
 			$data['result'] = $this->load->view('elements/afe-commission-list',$data,true);
@@ -74,5 +85,59 @@ class Commission extends CI_Controller {
 		$data['pageTitle'] = 'AFE Leads';
 		$data['content'] = 'commission/afe_leads';
 		$this->load->view('layout',$data);
+	}
+	
+	public function get_commissions_allowed_sts(){
+		$commission_id = $this->input->post('c');
+		$commission_id = DeCrypt($commission_id);
+		
+		$record = $this->admin_model->get_record('bs_afe_commissions', 'commission_id', $commission_id, 'commission_id,commission_status_id');
+		
+		$response = array('status' => false);
+		if(!empty($record)){
+			$allwd_sts_arr = $this->admin_model->get_commissions_allowed_sts($record['commission_status_id']);
+			if(!empty($allwd_sts_arr)){
+				$html = '<select class="chnge_sts_slct" data-c="'.EnCrypt($record['commission_id']).'">
+							<option value="">Select</option>';
+				foreach($allwd_sts_arr as $rcd){
+					$html .= '<option value="'.EnCrypt($rcd['status_id']).'">'.$rcd['status_name'].'</option>';
+				}
+				$html .= '</select>';
+				
+				$response['status'] = true;
+				$response['html'] = $html;
+			}
+		}
+		
+		echo json_encode($response); die;
+	}
+	
+	public function changet_commissions_sts(){
+		$commission_id = $this->input->post('c');
+		$sts_id = $this->input->post('s');
+		$commission_id = DeCrypt($commission_id);
+		$sts_id = DeCrypt($sts_id);
+		
+		$record = $this->admin_model->get_record('bs_afe_commissions', 'commission_id', $commission_id, 'commission_id,commission_status_id');
+		
+		if(!empty($record)){
+			$UpdateData = array();
+			$UpdateData['commission_status_id'] = $sts_id;
+			
+			$this->db->where('commission_id', $commission_id);
+			if($this->db->update('bs_afe_commissions', $UpdateData)){
+				$response['status'] = true;
+				$response['message'] = 'Status Changed Successfully.';
+				
+			} else {
+				$response['status'] = true;
+				$response['message'] = 'Unable to process your request right now. <br/> Please try again or some time later.';
+			}
+		} else {
+			$response['status'] = true;
+			$response['message'] = 'Unable to process your request right now. <br/> Please try again or some time later.';
+		}
+		
+		echo json_encode($response); die;
 	}
 }

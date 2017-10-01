@@ -1065,6 +1065,7 @@ class Admin_model extends CI_Model
 		$this->db->where('bs_lead_status.previous_status_id', $lead['user_status_id']);
 		$this->db->where('bs_lead_status.status_type', 'L');
 		$this->db->order_by('bs_lead_status.status_id', 'DESC');
+		$this->db->where('bs_lead_status.status_active', 1);
 		$results = $this->db->get("bs_lead_status")->result_array();
 		
 		return $results;
@@ -1078,17 +1079,59 @@ class Admin_model extends CI_Model
 		return $results;
 	}
 	
-	public function get_afe_commissions($limit, $start, $month){
-		$data = array(); $where = array(); $like = array(); 
+	public function get_afe_commissions($limit, $start, $month, $year){
+		$data = array();
 		
+		$where = array('commission_month' => $month, 'commission_year ' => $year); 
+		
+		$in_whr = array();
+		if(!empty($_GET['t']) && $_GET['t'] == 'pending') {	
+			$in_whr = array(2,4);
+		}
+		
+		if(!empty($in_whr)){
+			$this->db->where_in('commission_status_id', $in_whr);
+		}
 		$this->db->where($where);
-		$this->db->like($like); 
-		$this->db->from('bs_afe_users');
+		$this->db->from('bs_afe_commissions');
+		$this->db->join('bs_afe_commission_status', 'bs_afe_commission_status.status_id=bs_afe_commissions.applied_commission_id', 'INNER'); 
+		$this->db->join('bs_commission_master', 'bs_commission_master.id=bs_afe_commissions.commission_status_id', 'INNER'); 
+		$this->db->join('bs_afe_users', 'bs_afe_users.afe_id=bs_afe_commissions.commission_afe_id', 'INNER'); 
+		$this->db->order_by('bs_afe_commissions.afe_name','asc'); 
 		$data['count'] = $this->db->count_all_results();
 		
+		$this->db->select('bs_afe_commissions.*, bs_afe_users.afe_id, bs_afe_users.afe_name, bs_afe_users.afe_mobile, bs_afe_commission_status.status_name_long as current_status, bs_commission_master.rate as commission_rate');
+		$this->db->where($where);
+		if(!empty($in_whr)){
+			$this->db->where_in('commission_status_id', $in_whr);
+		}
+		$this->db->limit($limit, $start);
+		$this->db->join('bs_afe_commission_status', 'bs_afe_commission_status.status_id=bs_afe_commissions.commission_status_id', 'INNER'); 
+		$this->db->join('bs_commission_master', 'bs_commission_master.id=bs_afe_commissions.applied_commission_id', 'INNER'); 
+		$this->db->join('bs_afe_users', 'bs_afe_users.afe_id=bs_afe_commissions.commission_afe_id', 'INNER'); 
+		$this->db->order_by('bs_afe_users.afe_id','asc'); 
+		$commissions = $this->db->get("bs_afe_commissions")->result_array();		
+		
+		$data['results'] = $commissions;
+		return $data;
+	}
+	
+	public function get_afe_commissions_monthly($limit, $start, $month, $all=false){
+		$data = array(); $where = array('afe_status' => 1); $like = array(); 
+		
+		if(!$all) {
+			$this->db->where($where);
+			$this->db->like($like); 
+			$this->db->from('bs_afe_users');
+			$data['count'] = $this->db->count_all_results();
+		}
+		
+		$this->db->select('afe_id, afe_name');
 		$this->db->where($where);
 		$this->db->like($like); 
-		$this->db->limit($limit, $start);
+		if(!$all) {
+			$this->db->limit($limit, $start);
+		}
 		$this->db->order_by('bs_afe_users.afe_name','asc'); 
 		$afe_users = $this->db->get("bs_afe_users")->result_array();		
 		
@@ -1134,5 +1177,30 @@ class Admin_model extends CI_Model
 		$data['results'] = $leads;
 		
 		return $data;
+	}
+	
+	public function get_current_commission_rate($type, $month){
+		$this->db->select('id, rate');
+		$this->db->where('type', $type);
+		$this->db->where('MONTH(start_date)', $month);
+		//$this->db->where('MONTH(end_date)', $month);
+		$this->db->where('active', 1);
+		$this->db->order_by('id', 'desc'); 
+		$record = $this->db->get("bs_commission_master")->row_array();
+		
+		return $record;
+	}
+	
+	public function get_commissions_allowed_sts($current_sts_id){
+		$logged_in_role_id = $_SESSION['admin']['current_role_id'];
+		
+		$this->db->where("FIND_IN_SET('$current_sts_id', previous_status_id)");
+		$this->db->where("FIND_IN_SET('$logged_in_role_id', allowed_role_id)");
+		$this->db->where('bs_afe_commission_status.status_active', 1);
+		$this->db->where('bs_afe_commission_status.status_id !=', $current_sts_id);
+		$this->db->order_by('bs_afe_commission_status.status_id', 'ASC');
+		$results = $this->db->get("bs_afe_commission_status")->result_array();
+		
+		return $results;
 	}
 }	
