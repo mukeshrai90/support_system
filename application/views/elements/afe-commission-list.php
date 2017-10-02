@@ -4,11 +4,10 @@
 			<th>Name</th>
 			<th>Mobile</th>
 			<th>Total Leads</th>
-			<th>Total Leads Converted</th>
 			<th>Total Plans Amt</th>
 			<th>Commision Rate</th>
 			<th>Commision</th>
-			<th>Status</th>
+			<th style="text-align:center !important;">Status</th>
 			<th>Action</th>
 		</tr>
 	</thead>
@@ -20,8 +19,7 @@
 			<tr class="">				
 				<td><?php echo $rcd['afe_name']?></td>
 				<td><?php echo $rcd['afe_mobile']?></td>
-				<td><?php echo $rcd['total_leads']?></td>
-				<td><?php echo $rcd['total_leads']?></td>
+				<td><?php echo $rcd['commission_total_leads']?></td>
 				<td><?php echo $rcd['total_plans_amt']?></td>
 				<td><?php echo $rcd['commission_rate'].'%'?></td>
 				<td><?php echo $rcd['commission_amount'];?></td>
@@ -35,9 +33,13 @@
 					?>
 				</td>
 				<td class="tooltip-demo">
-					<a href="<?php echo BASE_URL.'commissions/afe/view/leads?month='.$month.'&year='.$year.'&afe='.EnCrypt($rcd['afe_id'])?>" title="View" class="actions-a" data-toggle="tooltip" data-placement="bottom">
-						<i class="fa fa-eye text-navy"></i>
-					</a>
+					<?php 
+						if($rcd['commission_total_leads'] > 0){
+					?>
+						<a href="<?php echo BASE_URL.'commissions/afe/view/leads?month='.$month.'&year='.$year.'&afe='.EnCrypt($rcd['afe_id'])?>" title="View" class="actions-a" data-toggle="tooltip" data-placement="bottom">
+							<i class="fa fa-eye text-navy"></i>
+						</a>
+					<?php } ?>
 				</td>
 			</tr>
 		<?php 

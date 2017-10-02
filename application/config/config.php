@@ -28,16 +28,12 @@ $protocol = stripos($_SERVER['SERVER_PROTOCOL'],'https') === true ? 'https://' :
 $config['base_url']	= $protocol.$_SERVER['HTTP_HOST'];
 $config['base_url']	= $protocol.$_SERVER['HTTP_HOST'].'/support_system';
 
-if(!function_exists('prx')){
-function prx($data)
-{
-	echo '<pre>';
-	print_r($data); die;
-}
-}
-
 defined('BASE_URL') or define('BASE_URL', $config['base_url'].'/');
 defined('ASSETS_URL') or define('ASSETS_URL',BASE_URL.'assets/');
+
+
+$months_arr_gl = array('01' => 'January', '02' => 'February', '03' => 'March', '04' => 'April', '05' => 'May', '06' => 'June', '07' => 'July', '08' => 'August', '09' => 'September', '10' => 'October', '11' => 'November', '12' => 'December');
+defined('MONTHS_ARR_GL') or define('MONTHS_ARR_GL', json_encode($months_arr_gl));
 
 /*
 |--------------------------------------------------------------------------
@@ -535,6 +531,14 @@ $config['rewrite_short_tags'] = FALSE;
 | Array:		array('10.0.1.200', '192.168.5.0/24')
 */
 $config['proxy_ips'] = '';
+
+if(!function_exists('prx')){
+	function prx($data)
+	{
+		echo '<pre>';
+		print_r($data); die;
+	}
+}
 
 defined('SECRET_KEY') or define('SECRET_KEY', '454ghg54GVMJGREDED55454454gfg34343');
 defined('SECRET_KEY') or define('SECRET_KEY', 'anmnmn355ATGRFRF909089');

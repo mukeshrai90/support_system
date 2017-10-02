@@ -1080,9 +1080,11 @@ class Admin_model extends CI_Model
 	}
 	
 	public function get_afe_commissions($limit, $start, $month, $year){
-		$data = array();
+		$data = array(); $where = array('commission_month' => $month, 'commission_year ' => $year); 
 		
-		$where = array('commission_month' => $month, 'commission_year ' => $year); 
+		if(!empty($_GET['afe'])) {	
+			$where = array_merge($where, array('bs_afe_users.afe_id' => DecRypt($_GET['afe'])));	
+		}
 		
 		$in_whr = array();
 		if(!empty($_GET['t']) && $_GET['t'] == 'pending') {	
@@ -1116,8 +1118,12 @@ class Admin_model extends CI_Model
 		return $data;
 	}
 	
-	public function get_afe_commissions_monthly($limit, $start, $month, $all=false){
+	public function get_afe_commissions_monthly($limit, $start, $month, $year, $all=false){
 		$data = array(); $where = array('afe_status' => 1); $like = array(); 
+		
+		if(!empty($_GET['afe'])) {	
+			$where = array_merge($where, array('bs_afe_users.afe_id' => DecRypt($_GET['afe'])));	
+		}
 		
 		if(!$all) {
 			$this->db->where($where);
@@ -1126,7 +1132,7 @@ class Admin_model extends CI_Model
 			$data['count'] = $this->db->count_all_results();
 		}
 		
-		$this->db->select('afe_id, afe_name');
+		$this->db->select('afe_id, afe_name, afe_mobile');
 		$this->db->where($where);
 		$this->db->like($like); 
 		if(!$all) {
@@ -1134,6 +1140,9 @@ class Admin_model extends CI_Model
 		}
 		$this->db->order_by('bs_afe_users.afe_name','asc'); 
 		$afe_users = $this->db->get("bs_afe_users")->result_array();		
+		
+		$cr_rt = $this->get_current_commission_rate(1, $month);
+		$commission_rate = $cr_rt['rate'];
 		
 		foreach($afe_users as $k=>$usr){
 			$afe_id = $usr['afe_id'];
@@ -1152,12 +1161,29 @@ class Admin_model extends CI_Model
 				$total_plans_amt = $total_plans_amt + $lead['plan_rental'];
 			}
 			
+			$commission_amount = $total_plans_amt*($commission_rate/100);
+			$commission_amount = number_format($commission_amount, 2);
+			
 			$afe_users[$k]['total_leads'] = $total_leads;
 			$afe_users[$k]['total_plans_amt'] = $total_plans_amt;
+			$afe_users[$k]['commission_rate'] = $commission_rate;
+			$afe_users[$k]['commission_amount'] = $commission_amount;
+			$afe_users[$k]['commission_total_leads'] = $this->get_afe_leads_count($afe_id, $month, $year);
 		}
 		
 		$data['results'] = $afe_users;
 		return $data;
+	}
+	
+	public function get_afe_leads_count($afe_id, $month, $year){
+			$this->db->where('user_afe_referer_id', $afe_id);
+			$this->db->where('MONTH(installation_date)', $month);
+			$this->db->where('YEAR(installation_date)', $year);
+			$this->db->where('user_lead_status_id >=', 4);
+			$this->db->from('bs_users');
+			$total_leads = $this->db->count_all_results();
+			
+			return $total_leads;
 	}
 	
 	public function get_afe_leads($afe_id, $month){
@@ -1165,7 +1191,7 @@ class Admin_model extends CI_Model
 		
 		$this->db->select('bs_users.*, bs_plans.plan_name, bs_plans.plan_rental, bs_lead_status.status_name as current_status');
 		$this->db->where('user_afe_referer_id', $afe_id);
-		//$this->db->where('user_lead_status_id', 1);
+		$this->db->where('user_lead_status_id >=', 4);
 		$this->db->where('MONTH(installation_date)', $month);
 		$this->db->order_by('bs_users.user_id','desc'); 
 		$this->db->join('bs_lead_status', 'bs_lead_status.status_id=bs_users.user_lead_status_id', 'INNER');
@@ -1202,5 +1228,14 @@ class Admin_model extends CI_Model
 		$results = $this->db->get("bs_afe_commission_status")->result_array();
 		
 		return $results;
+	}
+	
+	public function get_all_afes(){
+		$this->db->select('afe_id, afe_name, afe_mobile');
+		$this->db->where('afe_status', 1);
+		$this->db->order_by('bs_afe_users.afe_name','asc'); 
+		$afe_users = $this->db->get("bs_afe_users")->result_array();
+		
+		return $afe_users;
 	}
 }	

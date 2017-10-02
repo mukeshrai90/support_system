@@ -90,7 +90,7 @@ $(document).ready(function(){
 							?>
 								<li class="<?php echo strstr($this->uri->segment(1),'leads')== 'leads' ? 'active' : ''?>">
 									<a href="<?php echo BASE_URL.'leads/list'?>">
-										<i class="fa fa-reply-all"></i> 
+										<i class="fa fa-share-square-o"></i> 
 										<span class="nav-label">User Leads</span>
 									</a>
 								</li>
@@ -108,20 +108,20 @@ $(document).ready(function(){
 									<ul role="menu" class="dropdown-menu">
 										<li class="<?php echo strstr($this->uri->segment(2),'circles')== 'circles' ? 'active' : ''?>">
 											<a href="<?php echo BASE_URL.'cms/circles/list'?>">
-												<i class="fa fa-wrench"></i>&nbsp;&nbsp;
-												<span class="nav-label">Circles</span>
+												<i class="fa fa-map-marker"></i>&nbsp;
+												<span class="nav-label">Circle Master</span>
 											</a>
 										</li>
 										<li class="<?php echo strstr($this->uri->segment(2),'ssa')== 'ssa' ? 'active' : ''?>">
 											<a href="<?php echo BASE_URL.'cms/ssa/list'?>">
-												<i class="fa fa-link"></i>&nbsp;&nbsp;
-												<span class="nav-label">SSA</span>
+												<i class="fa fa-map-marker"></i>&nbsp;
+												<span class="nav-label">SSA Master</span>
 											</a>
 										</li>
 										<li class="<?php echo strstr($this->uri->segment(2),'plans')== 'plans' ? 'active' : ''?>">
 											<a href="<?php echo BASE_URL.'cms/plans/list'?>">
-												<i class="fa fa-rupee"></i>&nbsp;&nbsp;&nbsp;&nbsp;
-												<span class="nav-label">Plans</span>
+												<i class="fa fa-rupee"></i>&nbsp;&nbsp;
+												<span class="nav-label">Plans Master</span>
 											</a>
 										</li>
 									</ul>
@@ -133,7 +133,7 @@ $(document).ready(function(){
 							?>
 								<li class="<?php echo $this->uri->segment(1) == 'commissions' && $this->uri->segment(2) == 'afe' ? 'active' : ''?>">
 									<a aria-expanded="false" role="button" href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
-										<i class="fa fa-gears"></i> 
+										<i class="fa fa-money"></i> 
 										<span class="nav-label">AFE Commission</span>
 										<span class="caret"></span>
 									</a>
@@ -143,21 +143,21 @@ $(document).ready(function(){
 										?>
 											<li class="<?php echo $this->uri->segment(2) == 'afe' && @$_GET['t'] == 'pending' ? 'active' : ''?>">
 												<a href="<?php echo BASE_URL.'commissions/afe/list?t=pending'?>">
-													<i class="fa fa-wrench"></i>&nbsp;&nbsp;
+													<i class="fa fa-question-circle"></i>&nbsp;&nbsp;
 													<span class="nav-label">Pending for Approval</span>
 												</a>
 											</li>
 										<?php } ?>
-										<li class="<?php echo $this->uri->segment(2) == 'afe' && @$_GET['month'] != 'current' && empty($_GET['t']) ? 'active' : ''?>">
-											<a href="<?php echo BASE_URL.'commissions/afe/list'?>">
-												<i class="fa fa-wrench"></i>&nbsp;&nbsp;
-												<span class="nav-label">Prevoius Months</span>
+										<li class="<?php echo $this->uri->segment(2) == 'afe' && @$_GET['m'] == 'current' ? 'active' : ''?>">
+											<a href="<?php echo BASE_URL.'commissions/afe/list?m=current'?>">
+												<i class="fa fa-calendar-o"></i>&nbsp;&nbsp;
+												<span class="nav-label">Current Month</span>
 											</a>
 										</li>
-										<li class="<?php echo $this->uri->segment(2) == 'afe' && @$_GET['month'] == 'current' ? 'active' : ''?>">
-											<a href="<?php echo BASE_URL.'commissions/afe/list?month=current'?>">
-												<i class="fa fa-wrench"></i>&nbsp;&nbsp;
-												<span class="nav-label">Current Month</span>
+										<li class="<?php echo $this->uri->segment(2) == 'afe' && @$_GET['m'] != 'current' && empty($_GET['t']) ? 'active' : ''?>">
+											<a href="<?php echo BASE_URL.'commissions/afe/list'?>">
+												<i class="fa fa-calendar"></i>&nbsp;&nbsp;
+												<span class="nav-label">Prevoius Months</span>
 											</a>
 										</li>
 									</ul>

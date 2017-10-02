@@ -16,6 +16,8 @@ class Commission extends CI_Controller {
 		$per_page = 20; 
         $page = @$_GET['per_page']? $_GET['per_page'] : 0;
 		
+		$current_month = date('m');
+		$current_year = date('Y');
 		$last_month = date('m', strtotime('-27 days'));
 		$last_month_year = date('Y', strtotime('-27 days'));
 		
@@ -29,10 +31,14 @@ class Commission extends CI_Controller {
 			$year = $_GET['year'];
 		}
 		
-		if(!empty($_GET['month']) && $_GET['month'] == 'current'){
-			$month = date('m');
-			$result = $this->admin_model->get_afe_commissions_monthly($per_page, $page, $month);
+		$data["pageUrl"] = BASE_URL.'commissions/afe/list';
+		if(!empty($_GET['m']) && $_GET['m'] == 'current'){
+			$month = $current_month; $year = $current_year;
+			$result = $this->admin_model->get_afe_commissions_monthly($per_page, $page, $month, $year);
+			$data["pageUrl"] = $data["pageUrl"].'?m=current';
+			
 		} else {
+			$current_month = $last_month;
 			$result = $this->admin_model->get_afe_commissions($per_page, $page, $month, $year);
 		}
 		$data['records'] = @$result['results'];
@@ -43,14 +49,24 @@ class Commission extends CI_Controller {
 		
         $data["links"] = create_links($per_page,$total_rows,$base_url);
 		
+        $data["current_month"] = $current_month;
+        $data["current_year"] = $current_year;
+        $data["last_month"] = $last_month;
+        $data["last_month_year"] = $last_month_year;
         $data["month"] = $month;
         $data["year"] = $year;
         $data["logged_in_role_id"] = $_SESSION['admin']['current_role_id'];
+		
+		$months_arr_gl = json_decode(MONTHS_ARR_GL, TRUE);
+		$data['subPageTitle'] = ' | '.$months_arr_gl[$month]." - $year";
+		$data['months_arr_gl'] = $months_arr_gl;
 		
 		if($this->input->is_ajax_request()) {
 			$data['result'] = $this->load->view('elements/afe-commission-list',$data,true);
 			echo json_encode($data);die;
 		}
+		
+		$data["afe_users"] = $this->admin_model->get_all_afes();
 		
 		$data['pageTitle'] = 'Commissions';
 		$data['content'] = 'commission/afe_commissions';

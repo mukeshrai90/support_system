@@ -48,6 +48,7 @@ class Cron extends CI_Controller {
 						$tmp['total_plans_amt'] = $total_plans_amt;
 						$tmp['commission_status_id'] = 1;
 						$tmp['commission_generated_on'] = date('Y-m-d H:i:s');
+						$tmp['commission_total_leads'] = $this->admin_model->get_afe_leads_count($rcd['afe_id'], $last_month, $last_month_year);
 						
 						$InsertData[] = $tmp;
 					}

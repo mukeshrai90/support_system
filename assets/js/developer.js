@@ -128,7 +128,14 @@ function reloadSearch()
 		},
 		success : function(response){
 					showCustomLoader(false);
-					$('.table-responsive').html(response.result);
+					try {
+						if(response.subPageTitle != undefined){
+							$('.subPageTitle').html(response.subPageTitle);
+						} 
+						$('.table-responsive').html(response.result);
+					} catch(Error){ 
+						$('.table-responsive').html(response.result);
+					}
 				  }
 	});
 } 
