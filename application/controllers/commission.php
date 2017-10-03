@@ -31,15 +31,26 @@ class Commission extends CI_Controller {
 			$year = $_GET['year'];
 		}
 		
+		$LoggedInAdmin = $this->session->userdata('admin');
+		$current_role_id = $LoggedInAdmin['current_role_id'];
+		$and_whre = array();
+		if($current_role_id == 2){
+			$cbh_circle_id = $LoggedInAdmin[$current_role_id]['admin_role_circle_id'];
+			$and_whre = array("bs_afe_users.afe_circle_id" => $cbh_circle_id);
+		} else if($current_role_id == 3){
+			$fe_ssa_id = $LoggedInAdmin[$current_role_id]['admin_role_ssa_id'];
+			$and_whre = array("bs_afe_users.afe_ssa_id" => $fe_ssa_id);
+		}
+		
 		$data["pageUrl"] = BASE_URL.'commissions/afe/list';
 		if(!empty($_GET['m']) && $_GET['m'] == 'current'){
 			$month = $current_month; $year = $current_year;
-			$result = $this->admin_model->get_afe_commissions_monthly($per_page, $page, $month, $year);
+			$result = $this->admin_model->get_afe_commissions_monthly($per_page, $page, $month, $year, $and_whre);
 			$data["pageUrl"] = $data["pageUrl"].'?m=current';
 			
 		} else {
 			$current_month = $last_month;
-			$result = $this->admin_model->get_afe_commissions($per_page, $page, $month, $year);
+			$result = $this->admin_model->get_afe_commissions($per_page, $page, $month, $year, $and_whre);
 		}
 		$data['records'] = @$result['results'];
 		
@@ -81,8 +92,9 @@ class Commission extends CI_Controller {
 		
 		$afe_id = DeCrypt($_GET['afe']);
 		$month = $_GET['month'];
+		$year = $_GET['year'];
 		
-        $result = $this->admin_model->get_afe_leads($afe_id, $month);		
+        $result = $this->admin_model->get_afe_leads($afe_id, $month, $year);		
 		$data['records'] = @$result['results'];
 		
 		$total_rows = $result['count'];

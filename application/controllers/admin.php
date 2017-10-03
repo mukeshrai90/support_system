@@ -374,6 +374,18 @@ class Admin extends CI_Controller {
 		$this->load->view('layout',$data);
 	}
 	
+	public function afe_users_details($afe_id=NULL)
+	{
+		chk_access('afe_users', 1, true);
+		
+		$afe_id = DeCrypt($afe_id);
+		$data['record'] = $this->admin_model->get_afe_details($afe_id);
+		
+		$data['pageTitle'] = 'AFE Details';
+		$data['content'] = 'admin/afe_user_details';
+		$this->load->view('layout',$data);
+	}
+	
 	public function manage_afe($admin_id=NULL)
 	{				
 		if(!empty($_POST)) {					

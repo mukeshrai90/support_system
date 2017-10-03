@@ -183,17 +183,17 @@ class Admin_model extends CI_Model
 	{        
 		$data = array(); $where = array('bs_admins.admin_id >' => 0); $like = array(); 
 		
-		if(isset($_GET['status'])) {	
+		if(!empty($_GET['status'])) {	
 			$_GET['status'] = $_GET['status'] == 2 ? 0 : $_GET['status'];
-			$where = array_merge($where,array('bs_admins.admin_status' => $_GET['status']));			
+			$where = array_merge($where, array('bs_admins.admin_status' => $_GET['status']));			
 		}
 		
-		if(isset($_GET['name']) && !empty($_GET['name'])) {
-			$like = array_merge($like,array('bs_admins.admin_name' => $_GET['name']));
+		if(!empty($_GET['name'])) {
+			$like = array_merge($like, array('bs_admins.admin_name' => $_GET['name']));
 		}	
 
-		if(isset($_GET['role']) && !empty($_GET['role'])) {
-			$where = array_merge($where,array('bs_admin_roles.admin_role_id' => $_GET['role']));
+		if(!empty($_GET['role'])) {
+			$where = array_merge($where, array('bs_admin_roles.admin_role_id' => $_GET['role']));
 		}			
 					
 		$this->db->where($where);
@@ -1079,11 +1079,15 @@ class Admin_model extends CI_Model
 		return $results;
 	}
 	
-	public function get_afe_commissions($limit, $start, $month, $year){
+	public function get_afe_commissions($limit, $start, $month, $year, $and_whre=array()){
 		$data = array(); $where = array('commission_month' => $month, 'commission_year ' => $year); 
 		
+		if(!empty($and_whre)){
+			$where = array_merge($where, $and_whre);		
+		}
+		
 		if(!empty($_GET['afe'])) {	
-			$where = array_merge($where, array('bs_afe_users.afe_id' => DecRypt($_GET['afe'])));	
+			$where = array_merge($where, array('bs_afe_users.afe_id' => DeCrypt($_GET['afe'])));	
 		}
 		
 		$in_whr = array();
@@ -1118,11 +1122,15 @@ class Admin_model extends CI_Model
 		return $data;
 	}
 	
-	public function get_afe_commissions_monthly($limit, $start, $month, $year, $all=false){
-		$data = array(); $where = array('afe_status' => 1); $like = array(); 
+	public function get_afe_commissions_monthly($limit, $start, $month, $year, $and_whre=array(), $all=false){
+		$data = array(); $where = array('bs_afe_users.afe_status' => 1); $like = array();
+
+		if(!empty($and_whre)){
+			$where = array_merge($where, $and_whre);		
+		}		
 		
 		if(!empty($_GET['afe'])) {	
-			$where = array_merge($where, array('bs_afe_users.afe_id' => DecRypt($_GET['afe'])));	
+			$where = array_merge($where, array('bs_afe_users.afe_id' => DeCrypt($_GET['afe'])));	
 		}
 		
 		if(!$all) {
@@ -1141,7 +1149,7 @@ class Admin_model extends CI_Model
 		$this->db->order_by('bs_afe_users.afe_name','asc'); 
 		$afe_users = $this->db->get("bs_afe_users")->result_array();		
 		
-		$cr_rt = $this->get_current_commission_rate(1, $month);
+		$cr_rt = $this->get_current_commission_rate(1, $month, $year);
 		$commission_rate = $cr_rt['rate'];
 		
 		foreach($afe_users as $k=>$usr){
@@ -1151,6 +1159,7 @@ class Admin_model extends CI_Model
 			$this->db->where('user_afe_referer_id', $afe_id);
 			$this->db->where('user_lead_status_id', 1);
 			$this->db->where('MONTH(installation_date)', $month);
+			$this->db->where('YEAR(installation_date)', $year);
 			$this->db->order_by('bs_users.user_id','desc'); 
 			$this->db->join('bs_user_plans', 'bs_user_plans.user_id=bs_users.user_id', 'INNER'); 
 			$this->db->join('bs_plans', 'bs_plans.plan_id=bs_user_plans.user_plan_id', 'INNER'); 
@@ -1186,13 +1195,14 @@ class Admin_model extends CI_Model
 			return $total_leads;
 	}
 	
-	public function get_afe_leads($afe_id, $month){
+	public function get_afe_leads($afe_id, $month, $year){
 		$data = array();
 		
 		$this->db->select('bs_users.*, bs_plans.plan_name, bs_plans.plan_rental, bs_lead_status.status_name as current_status');
 		$this->db->where('user_afe_referer_id', $afe_id);
-		$this->db->where('user_lead_status_id >=', 4);
+		//$this->db->where('user_lead_status_id >=', 4);
 		$this->db->where('MONTH(installation_date)', $month);
+		$this->db->where('YEAR(installation_date)', $year);
 		$this->db->order_by('bs_users.user_id','desc'); 
 		$this->db->join('bs_lead_status', 'bs_lead_status.status_id=bs_users.user_lead_status_id', 'INNER');
 		$this->db->join('bs_user_plans', 'bs_user_plans.user_id=bs_users.user_id', 'INNER'); 
@@ -1205,10 +1215,24 @@ class Admin_model extends CI_Model
 		return $data;
 	}
 	
-	public function get_current_commission_rate($type, $month){
+	public function get_current_commission_rate($type, $month, $year){
 		$this->db->select('id, rate');
 		$this->db->where('type', $type);
 		$this->db->where('MONTH(start_date)', $month);
+		$this->db->where('YEAR(start_date)', $year);
+		//$this->db->where('MONTH(end_date)', $month);
+		$this->db->where('active', 1);
+		$this->db->order_by('id', 'desc'); 
+		$record = $this->db->get("bs_commission_master")->row_array();
+		
+		return $record;
+	}
+	
+	public function get_current_incentive_rate($type, $month, $year){
+		$this->db->select('id, rate');
+		$this->db->where('type', $type);
+		$this->db->where('MONTH(start_date)', $month);
+		$this->db->where('YEAR(start_date)', $year);
 		//$this->db->where('MONTH(end_date)', $month);
 		$this->db->where('active', 1);
 		$this->db->order_by('id', 'desc'); 
@@ -1237,5 +1261,89 @@ class Admin_model extends CI_Model
 		$afe_users = $this->db->get("bs_afe_users")->result_array();
 		
 		return $afe_users;
+	}
+	
+	public function get_afe_details($afe_id){
+		$this->db->select('bs_afe_users.*, bs_circles.circle_name, bs_ssa.ssa_name');
+		$this->db->where('bs_afe_users.afe_id', $afe_id);
+		$this->db->join('bs_circles', 'bs_circles.circle_id=bs_afe_users.afe_circle_id', 'INNER'); 
+		$this->db->join('bs_ssa', 'bs_ssa.ssa_id=bs_afe_users.afe_ssa_id', 'INNER'); 
+		$record = $this->db->get("bs_afe_users")->row_array();		
+		
+		return $record;
+	}
+	
+	public function get_fe_incentives_monthly($limit, $start, $month, $year, $fe_id){
+		$data = array(); $where = array('bs_admins.admin_status' => 1, 'bs_admin_roles.admin_role_id' => 3); $like = array();
+
+		if(!empty($and_whre)){
+			$where = array_merge($where, $and_whre);		
+		}		
+		
+		if(!empty($_GET['fe'])) {	
+			$where = array_merge($where, array('bs_admins.admin_id' => DeCrypt($_GET['fe'])));	
+		}
+		
+		$this->db->where($where);
+		$this->db->like($like); 
+		$this->db->from('bs_admins');
+		$this->db->join('bs_admin_roles', 'bs_admin_roles.admin_id=bs_admins.admin_id', 'INNER'); 
+		$data['count'] = $this->db->count_all_results();
+		
+		$this->db->select('bs_admins.admin_id, bs_admins.admin_name, bs_admins.admin_mobile');
+		$this->db->where($where);
+		$this->db->like($like); 
+		$this->db->limit($limit, $start);
+		$this->db->order_by('bs_admins.admin_id','asc');
+		$this->db->join('bs_admin_roles', 'bs_admin_roles.admin_id=bs_admins.admin_id', 'INNER'); 
+		$fe_users = $this->db->get("bs_admins")->result_array();		
+		
+		$cr_rt = $this->get_current_incentive_rate(1, $month, $year);
+		$incentive_rate = $cr_rt['rate'];
+		
+		foreach($fe_users as $j=>$rcd){
+			$ssa_id = $rcd['admin_role_ssa_id'];
+			
+			$this->db->select('afe_id, afe_name, afe_mobile');
+			$this->db->where('afe_ssa_id', $ssa_id);
+			$this->db->order_by('bs_afe_users.afe_name','asc'); 
+			$afe_users = $this->db->get("bs_afe_users")->result_array();	
+			
+			$total_plans_amt = 0; $incentive_total_leads = 0;
+			foreach($afe_users as $k=>$usr){
+				$afe_id = $usr['afe_id'];
+				
+				$this->db->select('bs_plans.plan_name, bs_plans.plan_rental');
+				$this->db->where('user_afe_referer_id', $afe_id);
+				$this->db->where('user_lead_status_id', 1);
+				$this->db->where('MONTH(installation_date)', $month);
+				$this->db->where('YEAR(installation_date)', $year);
+				$this->db->order_by('bs_users.user_id','desc'); 
+				$this->db->join('bs_user_plans', 'bs_user_plans.user_id=bs_users.user_id', 'INNER'); 
+				$this->db->join('bs_plans', 'bs_plans.plan_id=bs_user_plans.user_plan_id', 'INNER'); 
+				$leads = $this->db->get("bs_users")->result_array();	
+				
+				foreach($leads as $lead){
+					$total_plans_amt = $total_plans_amt + $lead['plan_rental'];
+				}
+				
+				$incentive_amount = $total_plans_amt*($incentive_rate/100);
+				$incentive_amount = number_format($incentive_amount, 2);
+				
+				$incentive_total_leads = $incentive_total_leads + ($this->get_afe_leads_count($afe_id, $month, $year));
+			}
+			
+			$fe_users[$j]['total_plans_amt'] = $total_plans_amt;
+			$fe_users[$j]['incentive_rate'] = $incentive_rate;
+			$fe_users[$j]['incentive_amount'] = $incentive_amount;
+			$fe_users[$j]['incentive_total_leads'] = $incentive_total_leads;
+		}
+		
+		$data['results'] = $fe_users;
+		return $data;
+	}
+	
+	public function get_fe_incentives($limit, $start, $fe_ssa_id, $month, $year){
+		
 	}
 }	

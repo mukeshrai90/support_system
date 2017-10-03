@@ -76,6 +76,7 @@ $route['admins/access/update'] = "admin/access_update";
 $route['afe-users/list'] = "admin/afe_users";
 $route['afe-users/add'] = "admin/manage_afe";
 $route['afe-users/edit/(:any)'] = "admin/manage_afe/$1";
+$route['afe-users/view/(:any)'] = "admin/afe_users_details/$1";
 
 $route['leads/list'] = "user/list_leads";
 $route['leads/view/(:any)'] = "user/view_lead/$1";
@@ -100,4 +101,7 @@ $route['commissions/afe/view/leads'] = "commission/get_afe_leads";
 $route['commissions/get/status'] = "commission/get_commissions_allowed_sts";
 $route['commissions/change/status'] = "commission/changet_commissions_sts";
 
-
+$route['incentives/fe/list'] = "incentive/fe_incentives";
+$route['incentives/fe/view/leads'] = "incentive/get_fe_leads";
+$route['incentives/cbh/list'] = "incentive/cbh_incentives";
+$route['incentives/cbh/view/leads'] = "incentive/get_cbh_leads";

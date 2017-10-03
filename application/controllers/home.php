@@ -51,6 +51,11 @@ class Home extends CI_Controller {
 				$roles = $this->admin_model->get_admin_roles($is_valid['admin_id']);
 				$current_role_id = $roles[0]['admin_role_id'];
 				
+				$sess_roles = array();
+				foreach($roles as $role){
+					$sess_roles[$role['admin_role_id']] = $role;
+				}
+				
 				$allowed_actions = get_all_allowed_actions($current_role_id, false, $is_valid['admin_id']);
 				
 				$actions = array();
@@ -65,7 +70,7 @@ class Home extends CI_Controller {
 					'email' => $is_valid['admin_email'],
 					'name' => $is_valid['admin_name'],
 					'current_role_id' => $current_role_id,
-					'roles' => $roles,
+					'roles' => $sess_roles,
 					'access' => $actions
 				);
 				$this->session->set_userdata('admin', $session_data);
