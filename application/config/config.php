@@ -35,6 +35,9 @@ defined('ASSETS_URL') or define('ASSETS_URL',BASE_URL.'assets/');
 $months_arr_gl = array('01' => 'January', '02' => 'February', '03' => 'March', '04' => 'April', '05' => 'May', '06' => 'June', '07' => 'July', '08' => 'August', '09' => 'September', '10' => 'October', '11' => 'November', '12' => 'December');
 defined('MONTHS_ARR_GL') or define('MONTHS_ARR_GL', json_encode($months_arr_gl));
 
+defined('FE_TARGET') or define('FE_TARGET' , 0);
+defined('CBH_TARGET') or define('CBH_TARGET' , 0);
+
 /*
 |--------------------------------------------------------------------------
 | Index File

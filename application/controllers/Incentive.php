@@ -34,12 +34,12 @@ class Incentive extends CI_Controller {
 		$data["pageUrl"] = BASE_URL.'incentives/fe/list';
 		if(!empty($_GET['m']) && $_GET['m'] == 'current'){
 			$month = $current_month; $year = $current_year;
-			$result = $this->admin_model->get_fe_incentives_monthly($per_page, $page, $month, $year);
+			$result = $this->admin_model->get_incentives_list_monthly($per_page, $page, $month, $year, 3);
 			$data["pageUrl"] = $data["pageUrl"].'?m=current';
 			
 		} else {
 			$current_month = $last_month;
-			$result = $this->admin_model->get_fe_incentives($per_page, $page, $month, $year);
+			$result = $this->admin_model->get_incentives_list($per_page, $page, $month, $year, 3);
 		}
 		$data['records'] = @$result['results'];
 		
@@ -66,11 +66,15 @@ class Incentive extends CI_Controller {
 			echo json_encode($data);die;
 		}
 		
-		$data["afe_users"] = $this->admin_model->get_all_fe();
+		$data["admins"] = $this->admin_model->get_all_admins_byRole(3);
 		
 		$data['pageTitle'] = 'FE Incentives';
-		$data['content'] = 'commission/fe-incentives';
+		$data['content'] = 'incentive/fe-incentives';
 		$this->load->view('layout',$data);
+	}
+	
+	public function get_fe_leads(){
+	
 	}
 	
 	public function cbh_incentives()
@@ -98,12 +102,12 @@ class Incentive extends CI_Controller {
 		$data["pageUrl"] = BASE_URL.'incentives/cbh/list';
 		if(!empty($_GET['m']) && $_GET['m'] == 'current'){
 			$month = $current_month; $year = $current_year;
-			$result = $this->admin_model->get_cbh_incentives_monthly($per_page, $page, $month, $year);
+			$result = $this->admin_model->get_incentives_list_monthly($per_page, $page, $month, $year, 2);
 			$data["pageUrl"] = $data["pageUrl"].'?m=current';
 			
 		} else {
 			$current_month = $last_month;
-			$result = $this->admin_model->get_cbh_incentives($per_page, $page, $month, $year);
+			$result = $this->admin_model->get_incentives_list($per_page, $page, $month, $year, 2);
 		}
 		$data['records'] = @$result['results'];
 		
@@ -130,10 +134,14 @@ class Incentive extends CI_Controller {
 			echo json_encode($data);die;
 		}
 		
-		$data["cbh_users"] = $this->admin_model->get_all_cbh();
+		$data["admins"] = $this->admin_model->get_all_admins_byRole(2);
 		
 		$data['pageTitle'] = 'CBH Incentives';
-		$data['content'] = 'commission/cbh-incentives';
+		$data['content'] = 'incentive/cbh-incentives';
 		$this->load->view('layout',$data);
+	}
+	
+	public function get_cbh_leads(){
+	
 	}
 }

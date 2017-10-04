@@ -97,38 +97,6 @@ $(document).ready(function(){
 							<?php } ?>
 							
 							<?php 
-								if(in_array('cms',$actions) || in_array('cms',$actions) || 1) {
-							?>
-								<li class="<?php echo strstr($this->uri->segment(1),'cms')== 'cms' ? 'active' : ''?>">
-									<a aria-expanded="false" role="button" href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
-										<i class="fa fa-gears"></i> 
-										<span class="nav-label">CMS</span>
-										<span class="caret"></span>
-									</a>
-									<ul role="menu" class="dropdown-menu">
-										<li class="<?php echo strstr($this->uri->segment(2),'circles')== 'circles' ? 'active' : ''?>">
-											<a href="<?php echo BASE_URL.'cms/circles/list'?>">
-												<i class="fa fa-map-marker"></i>&nbsp;
-												<span class="nav-label">Circle Master</span>
-											</a>
-										</li>
-										<li class="<?php echo strstr($this->uri->segment(2),'ssa')== 'ssa' ? 'active' : ''?>">
-											<a href="<?php echo BASE_URL.'cms/ssa/list'?>">
-												<i class="fa fa-map-marker"></i>&nbsp;
-												<span class="nav-label">SSA Master</span>
-											</a>
-										</li>
-										<li class="<?php echo strstr($this->uri->segment(2),'plans')== 'plans' ? 'active' : ''?>">
-											<a href="<?php echo BASE_URL.'cms/plans/list'?>">
-												<i class="fa fa-rupee"></i>&nbsp;&nbsp;
-												<span class="nav-label">Plans Master</span>
-											</a>
-										</li>
-									</ul>
-								</li>
-							<?php } ?>
-							
-							<?php 
 								if(in_array('commissions',$actions) || in_array('commissions',$actions) || 1) {
 							?>
 								<li class="<?php echo $this->uri->segment(1) == 'commissions' && $this->uri->segment(2) == 'afe' ? 'active' : ''?>">
@@ -158,6 +126,90 @@ $(document).ready(function(){
 											<a href="<?php echo BASE_URL.'commissions/afe/list'?>">
 												<i class="fa fa-calendar"></i>&nbsp;&nbsp;
 												<span class="nav-label">Prevoius Months</span>
+											</a>
+										</li>
+									</ul>
+								</li>
+							<?php } ?>
+							
+							<?php 
+								if(in_array('incentives',$actions) || in_array('incentives',$actions) || 1) {
+							?>
+								<li class="<?php echo $this->uri->segment(1) == 'incentives' && $this->uri->segment(2) == 'fe' ? 'active' : ''?>">
+									<a aria-expanded="false" role="button" href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
+										<i class="fa fa-money"></i> 
+										<span class="nav-label">FE Incentive</span>
+										<span class="caret"></span>
+									</a>
+									<ul role="menu" class="dropdown-menu">
+										<li class="<?php echo $this->uri->segment(2) == 'fe' && @$_GET['m'] == 'current' ? 'active' : ''?>">
+											<a href="<?php echo BASE_URL.'incentives/fe/list?m=current'?>">
+												<i class="fa fa-calendar-o"></i>&nbsp;&nbsp;
+												<span class="nav-label">Current Month</span>
+											</a>
+										</li>
+										<li class="<?php echo $this->uri->segment(2) == 'fe' && @$_GET['m'] != 'current' && empty($_GET['t']) ? 'active' : ''?>">
+											<a href="<?php echo BASE_URL.'incentives/fe/list'?>">
+												<i class="fa fa-calendar"></i>&nbsp;&nbsp;
+												<span class="nav-label">Prevoius Months</span>
+											</a>
+										</li>
+									</ul>
+								</li>
+							<?php } ?>
+							
+							<?php 
+								if(in_array('incentives',$actions) || in_array('incentives',$actions) || 1) {
+							?>
+								<li class="<?php echo $this->uri->segment(1) == 'incentives' && $this->uri->segment(2) == 'cbh' ? 'active' : ''?>">
+									<a aria-expanded="false" role="button" href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
+										<i class="fa fa-money"></i> 
+										<span class="nav-label">CBH Incentive</span>
+										<span class="caret"></span>
+									</a>
+									<ul role="menu" class="dropdown-menu">
+										<li class="<?php echo $this->uri->segment(2) == 'cbh' && @$_GET['m'] == 'current' ? 'active' : ''?>">
+											<a href="<?php echo BASE_URL.'incentives/cbh/list?m=current'?>">
+												<i class="fa fa-calendar-o"></i>&nbsp;&nbsp;
+												<span class="nav-label">Current Month</span>
+											</a>
+										</li>
+										<li class="<?php echo $this->uri->segment(2) == 'cbh' && @$_GET['m'] != 'current' && empty($_GET['t']) ? 'active' : ''?>">
+											<a href="<?php echo BASE_URL.'incentives/cbh/list'?>">
+												<i class="fa fa-calendar"></i>&nbsp;&nbsp;
+												<span class="nav-label">Prevoius Months</span>
+											</a>
+										</li>
+									</ul>
+								</li>
+							<?php } ?>
+							
+							<?php 
+								if(in_array('cms',$actions) || in_array('cms',$actions) || 1) {
+							?>
+								<li class="<?php echo strstr($this->uri->segment(1),'cms')== 'cms' ? 'active' : ''?>">
+									<a aria-expanded="false" role="button" href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
+										<i class="fa fa-gears"></i> 
+										<span class="nav-label">CMS</span>
+										<span class="caret"></span>
+									</a>
+									<ul role="menu" class="dropdown-menu">
+										<li class="<?php echo strstr($this->uri->segment(2),'circles')== 'circles' ? 'active' : ''?>">
+											<a href="<?php echo BASE_URL.'cms/circles/list'?>">
+												<i class="fa fa-map-marker"></i>&nbsp;
+												<span class="nav-label">Circle Master</span>
+											</a>
+										</li>
+										<li class="<?php echo strstr($this->uri->segment(2),'ssa')== 'ssa' ? 'active' : ''?>">
+											<a href="<?php echo BASE_URL.'cms/ssa/list'?>">
+												<i class="fa fa-map-marker"></i>&nbsp;
+												<span class="nav-label">SSA Master</span>
+											</a>
+										</li>
+										<li class="<?php echo strstr($this->uri->segment(2),'plans')== 'plans' ? 'active' : ''?>">
+											<a href="<?php echo BASE_URL.'cms/plans/list'?>">
+												<i class="fa fa-rupee"></i>&nbsp;&nbsp;
+												<span class="nav-label">Plans Master</span>
 											</a>
 										</li>
 									</ul>
