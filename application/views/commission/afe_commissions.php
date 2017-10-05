@@ -8,7 +8,14 @@
 			<div class="ibox float-e-margins">
 				<div class="ibox-title">
 					<h5>
-						AFE Commissions 
+						<?php 
+							if(isset($fromPage) && $fromPage == 'incentives') {
+								echo 'Incentives Leads';
+							} else {
+								echo 'AFE Commissions ';
+							}
+						?>
+						
 						<span class="subPageTitle">
 							<?=$subPageTitle?>
 						</span>
@@ -16,66 +23,68 @@
 				</div>
 				<div class="ibox-content">
 					<form id="search-form" action="javascript:;">
-						<div class="col-lg-12 search-area">
-							<div class="col-md-3 form-group">
-								<label class="control-label">AFE</label>
-								<select class="form-control" name="afe">
-									<option value="">Select</option>
-									<?php 
-										if(isset($afe_users)) {
-											foreach($afe_users as $rcd) {
-												$selected = '';
-												if($rcd['afe_id'] == @$_GET['afe']) {
-													$selected = 'selected';
-												}
-												echo '<option value="'.EnCrypt($rcd['afe_id']).'" '.$selected.'>'.$rcd['afe_name'].'('.$rcd['afe_mobile'].')</option>';
-											}
-										}
-									?>
-								</select>	
-							</div>
-							<?php 
-								if(empty($_GET['m'])){
-							?>
+						<?php if(!isset($fromPage)){ ?>
+							<div class="col-lg-12 search-area">
 								<div class="col-md-3 form-group">
-									<label class="control-label">Month</label>
-									<select class="form-control" name="month" id="mnth_slct">
+									<label class="control-label">AFE</label>
+									<select class="form-control" name="afe">
+										<option value="">Select</option>
 										<?php 
-											foreach($months_arr_gl as $k=>$m){
-												$selected = '';
-												if($month == $k){
-													$selected = 'selected';
-												}
-												
-												if($year == $current_year && $k > $current_month){
-													echo "<option value='$k' $selected class='hdn_optn'>$m</option>";
-												} else {
-													echo "<option value='$k' $selected>$m</option>";
+											if(isset($afe_users)) {
+												foreach($afe_users as $rcd) {
+													$selected = '';
+													if($rcd['afe_id'] == @DeCrypt($_GET['afe'])) {
+														$selected = 'selected';
+													}
+													echo '<option value="'.EnCrypt($rcd['afe_id']).'" '.$selected.'>'.$rcd['afe_name'].'('.$rcd['afe_mobile'].')</option>';
 												}
 											}
 										?>
 									</select>	
 								</div>
-								<div class="col-md-3 form-group">
-									<label class="control-label">Year</label>
-									<select class="form-control" name="year" id="yr_slct">
-										<?php 
-											for($i=$current_year; $i > $current_year-10; $i--){
-												$selected = '';
-												if($year == $i){
-													$selected = 'selected';
+								<?php 
+									if(empty($_GET['m'])){
+								?>
+									<div class="col-md-3 form-group">
+										<label class="control-label">Month</label>
+										<select class="form-control" name="month" id="mnth_slct">
+											<?php 
+												foreach($months_arr_gl as $k=>$m){
+													$selected = '';
+													if($month == $k){
+														$selected = 'selected';
+													}
+													
+													if($year == $current_year && $k > $current_month){
+														echo "<option value='$k' $selected class='hdn_optn'>$m</option>";
+													} else {
+														echo "<option value='$k' $selected>$m</option>";
+													}
 												}
-												echo "<option value='$i' $selected>$i</option>";
-											}
-										?>
-									</select>	
+											?>
+										</select>	
+									</div>
+									<div class="col-md-3 form-group">
+										<label class="control-label">Year</label>
+										<select class="form-control" name="year" id="yr_slct">
+											<?php 
+												for($i=$current_year; $i > $current_year-10; $i--){
+													$selected = '';
+													if($year == $i){
+														$selected = 'selected';
+													}
+													echo "<option value='$i' $selected>$i</option>";
+												}
+											?>
+										</select>	
+									</div>
+								<?php } ?>
+								<div class="col-md-12">
+									<button type="button" class="btn btn-sm btn-primary search-btn">Search!</button>
+									<button type="button" class="btn btn-sm btn-default refresh-all" data-url="<?php echo $pageUrl?>">Reset</button>
 								</div>
-							<?php } ?>
-							<div class="col-md-12">
-								<button type="button" class="btn btn-sm btn-primary search-btn">Search!</button>
-								<button type="button" class="btn btn-sm btn-default refresh-all" data-url="<?php echo $pageUrl?>">Reset</button>
-							</div>
-						</div>	
+							</div>	
+						<?php } ?>
 					</form>
 					<div class="table-responsive">
 						<?php $this->load->view('elements/afe-commission-list');?>

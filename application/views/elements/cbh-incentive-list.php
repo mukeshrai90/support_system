@@ -32,7 +32,7 @@
 					<?php 
 						if($rcd['incentive_total_leads'] > 0){
 					?>
-						<a href="<?php echo BASE_URL.'incentives/cbh/view/leads?month='.$month.'&year='.$year.'&fe='.EnCrypt($rcd['admin_id'])?>" title="View" class="actions-a" data-toggle="tooltip" data-placement="bottom">
+						<a href="<?php echo BASE_URL.'incentives/view/leads?month='.$month.'&year='.$year.'&admin='.EnCrypt($rcd['admin_id'])?>" title="View" class="actions-a" data-toggle="tooltip" data-placement="bottom">
 							<i class="fa fa-eye text-navy"></i>
 						</a>
 					<?php } ?>

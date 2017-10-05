@@ -73,10 +73,6 @@ class Incentive extends CI_Controller {
 		$this->load->view('layout',$data);
 	}
 	
-	public function get_fe_leads(){
-	
-	}
-	
 	public function cbh_incentives()
 	{
 		chk_access('incentives', 1, true);
@@ -141,7 +137,39 @@ class Incentive extends CI_Controller {
 		$this->load->view('layout',$data);
 	}
 	
-	public function get_cbh_leads(){
-	
+	public function get_incentive_leads(){
+		chk_access('incentives', 1, true);
+		
+		$per_page = 20; 
+        $page = @$_GET['per_page']? $_GET['per_page'] : 0;
+		
+		$admin_id = DeCrypt($_GET['admin']);
+		$month = $_GET['month'];
+		$year = $_GET['year'];
+		
+        $result = $this->admin_model->get_incentives_leads($per_page, $page, $admin_id, $month, $year);		
+		$data['records'] = @$result['results'];
+		
+		$total_rows = $result['count'];
+		
+		$base_url = BASE_URL.'incentives/view/leads?'.$_SERVER['QUERY_STRING'];
+		
+		$admin = $result['admin'];
+		$data["month"] = $month;
+		$data["year"] = $year;
+		
+        $data["links"] = create_links($per_page,$total_rows,$base_url);
+		
+		if($this->input->is_ajax_request()) {
+			$data['result'] = $this->load->view('elements/afe-commission-list',$data,true);
+			echo json_encode($data);die;
+		}
+		
+		$data['fromPage'] = 'incentives';
+		
+		$data['subPageTitle'] = " ({$admin['admin_name']} [{$admin['admin_username']}])";
+		$data['pageTitle'] = 'Leads';
+		$data['content'] = 'commission/afe_commissions';
+		$this->load->view('layout',$data);
 	}
 }

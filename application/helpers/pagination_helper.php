@@ -8,6 +8,8 @@ if(!function_exists('create_links'))
 		
 		$CI->load->library('pagination');
 		
+		$base_url = preg_replace('/(&per_page=\d)/i', '', $base_url);
+		
 		$config['per_page'] = $per_page; 
 		$config['page_query_string']= TRUE;			
 		$config['num_links'] = 20;

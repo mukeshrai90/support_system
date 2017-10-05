@@ -19,13 +19,13 @@
 						<div class="col-lg-12 search-area">
 							<div class="col-md-3 form-group">
 								<label class="control-label">FE</label>
-								<select class="form-control" name="user">
+								<select class="form-control" name="admin">
 									<option value="">Select</option>
 									<?php 
-										if(isset($fe_users)) {
-											foreach($fe_users as $rcd) {
+										if(isset($admins)) {
+											foreach($admins as $rcd) {
 												$selected = '';
-												if($rcd['admin_id'] == @$_GET['user']) {
+												if($rcd['admin_id'] == @DeCrypt($_GET['admin'])) {
 													$selected = 'selected';
 												}
 												echo '<option value="'.EnCrypt($rcd['admin_id']).'" '.$selected.'>'.$rcd['admin_name'].'</option>';

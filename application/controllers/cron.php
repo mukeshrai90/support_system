@@ -18,7 +18,7 @@ class Cron extends CI_Controller {
 		$CronLog['cron_name'] = 'generate_afe_commissions';
 		$CronLog['cron_start_time'] = date('Y-m-d H:i:s');
 		
-		$cr_rt = $this->admin_model->get_current_commission_rate(1, $last_month);
+		$cr_rt = $this->admin_model->get_current_commission_rate(1, $last_month, $last_month_year);
 		
 		$response = '';
 		if(!empty($cr_rt)) {
@@ -43,8 +43,8 @@ class Cron extends CI_Controller {
 						$tmp['commission_afe_id'] = $rcd['afe_id'];
 						$tmp['commission_month'] = $last_month;
 						$tmp['commission_year'] = $last_month_year;
-						$tmp['commission_amount'] =number_format($commission_amount, 2);
-						$tmp['total_plans_amt'] = number_format($total_plans_amt, 2);
+						$tmp['commission_amount'] = $commission_amount;
+						$tmp['total_plans_amt'] = $total_plans_amt;
 						$tmp['commission_status_id'] = 1;
 						$tmp['commission_generated_on'] = date('Y-m-d H:i:s');
 						$tmp['commission_total_leads'] = $this->admin_model->get_afe_leads_count($rcd['afe_id'], $last_month, $last_month_year);
@@ -96,7 +96,7 @@ class Cron extends CI_Controller {
 		$CronLog['cron_name'] = 'generate_fe_incentive';
 		$CronLog['cron_start_time'] = date('Y-m-d H:i:s');
 		
-		$cr_rt = $this->admin_model->get_current_incentive_rate(3, $last_month);
+		$cr_rt = $this->admin_model->get_current_incentive_rate(3, $last_month, $last_month_year);
 		
 		$response = '';
 		if(!empty($cr_rt)) {
@@ -119,13 +119,13 @@ class Cron extends CI_Controller {
 						
 						$tmp['incentive_role_id'] = 3;
 						$tmp['applied_incentive_id'] = $cr_rt['id'];
-						$tmp['incentive_admin_id'] = $rcd['afe_id'];
+						$tmp['incentive_admin_id'] = $rcd['admin_id'];
 						$tmp['incentive_month'] = $last_month;
 						$tmp['incentive_year'] = $last_month_year;
-						$tmp['incentive_amount'] =number_format($incentive_amount, 2);
-						$tmp['total_plans_amt'] = number_format($total_plans_amt, 2);
+						$tmp['incentive_amount'] = $incentive_amount;
+						$tmp['total_plans_amt'] = $total_plans_amt;
 						$tmp['incentive_status_id'] = 1;
-						$tmp['incentive_generated_on'] = date('Y-m-d H:i:s');
+						$tmp['incentive_generated_on'] = date('Y-m-d :i:s');
 						$tmp['incentive_total_leads'] = $this->admin_model->get_admin_leads_count($rcd['admin_id'], 3, $last_month, $last_month_year);
 						
 						$InsertData[] = $tmp;
@@ -137,6 +137,7 @@ class Cron extends CI_Controller {
 					$UpdateData = array();
 					$UpdateData['incentive_status_id'] = 0;
 					
+					$this->db->where('incentive_role_id', 3);
 					$this->db->where_in('incentive_admin_id', $admin_ids);
 					$this->db->where('incentive_month', $last_month);
 					$this->db->where('incentive_year', $last_month_year);
@@ -175,7 +176,7 @@ class Cron extends CI_Controller {
 		$CronLog['cron_name'] = 'generate_cbh_incentive';
 		$CronLog['cron_start_time'] = date('Y-m-d H:i:s');
 		
-		$cr_rt = $this->admin_model->get_current_incentive_rate(2, $last_month);
+		$cr_rt = $this->admin_model->get_current_incentive_rate(2, $last_month, $last_month_year);
 		
 		$response = '';
 		if(!empty($cr_rt)) {
@@ -198,11 +199,11 @@ class Cron extends CI_Controller {
 						
 						$tmp['incentive_role_id'] = 2;
 						$tmp['applied_incentive_id'] = $cr_rt['id'];
-						$tmp['incentive_admin_id'] = $rcd['afe_id'];
+						$tmp['incentive_admin_id'] = $rcd['admin_id'];
 						$tmp['incentive_month'] = $last_month;
 						$tmp['incentive_year'] = $last_month_year;
-						$tmp['incentive_amount'] =number_format($incentive_amount, 2);
-						$tmp['total_plans_amt'] = number_format($total_plans_amt, 2);
+						$tmp['incentive_amount'] = $incentive_amount;
+						$tmp['total_plans_amt'] = $total_plans_amt;
 						$tmp['incentive_status_id'] = 1;
 						$tmp['incentive_generated_on'] = date('Y-m-d H:i:s');
 						$tmp['incentive_total_leads'] = $this->admin_model->get_admin_leads_count($rcd['admin_id'], 2, $last_month, $last_month_year);
@@ -216,6 +217,7 @@ class Cron extends CI_Controller {
 					$UpdateData = array();
 					$UpdateData['incentive_status_id'] = 0;
 					
+					$this->db->where('incentive_role_id', 2);
 					$this->db->where_in('incentive_admin_id', $admin_ids);
 					$this->db->where('incentive_month', $last_month);
 					$this->db->where('incentive_year', $last_month_year);

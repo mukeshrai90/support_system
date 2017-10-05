@@ -8,6 +8,9 @@
 					<?php 
 						$pageUrl = BASE_URL.'commissions/afe/list';
 					?>
+					<span class="subPageTitle">
+						<?=$subPageTitle?>
+					</span>
 				</div>
 				<div class="ibox-content">
 					<form id="search-form" action="javascript:;">

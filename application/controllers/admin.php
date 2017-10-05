@@ -347,7 +347,7 @@ class Admin extends CI_Controller {
 	{		
 		chk_access('afe_users', 1, true);
 		
-		$per_page = 10; 
+		$per_page = 20; 
 		$page = @$_GET['per_page']? $_GET['per_page'] : 0;
 		
 		$result = $this->admin_model->get_afe_users($per_page, $page);

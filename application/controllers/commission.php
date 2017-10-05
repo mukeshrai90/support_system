@@ -110,6 +110,9 @@ class Commission extends CI_Controller {
 			echo json_encode($data);die;
 		}
 		
+		$afe = $this->admin_model->get_afe_details($afe_id);
+		
+		$data['subPageTitle'] = " ({$afe['afe_name']} [{$afe['afe_mobile']}])";
 		$data['pageTitle'] = 'AFE Leads';
 		$data['content'] = 'commission/afe_leads';
 		$this->load->view('layout',$data);
