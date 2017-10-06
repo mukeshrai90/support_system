@@ -70,7 +70,7 @@
 
 <script>
 var pageUrl = '<?php echo $pageUrl?>';
-
+var hideTopBckBtn = 'YES';
 $(document).ready(function(){	
 	
 });

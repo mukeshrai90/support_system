@@ -90,7 +90,7 @@
 
 <script>
 var pageUrl = '<?=$pageUrl?>';
-
+var hideTopBckBtn = 'YES';
 $(document).ready(function(){
 	$(document).on('click','.change-password-link',function(){
 		var user_id = $(this).attr('data-admin_id');

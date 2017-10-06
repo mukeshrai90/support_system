@@ -11,7 +11,7 @@ class Commission extends CI_Controller {
 	
 	public function afe_commissions()
 	{
-		chk_access('commissions', 1, true);
+		$loggedIn_data = chk_access('afe_commissions', 1, true);
 		
 		$per_page = 20; 
         $page = @$_GET['per_page']? $_GET['per_page'] : 0;
@@ -31,14 +31,14 @@ class Commission extends CI_Controller {
 			$year = $_GET['year'];
 		}
 		
-		$LoggedInAdmin = $this->session->userdata('admin');
-		$current_role_id = $LoggedInAdmin['current_role_id'];
+		$current_role_id = $loggedIn_data['current_role_id'];
+		
 		$and_whre = array();
 		if($current_role_id == 2){
-			$cbh_circle_id = $LoggedInAdmin[$current_role_id]['admin_role_circle_id'];
+			$cbh_circle_id = $loggedIn_data['roles'][$current_role_id]['admin_role_circle_id'];
 			$and_whre = array("bs_afe_users.afe_circle_id" => $cbh_circle_id);
 		} else if($current_role_id == 3){
-			$fe_ssa_id = $LoggedInAdmin[$current_role_id]['admin_role_ssa_id'];
+			$fe_ssa_id = $loggedIn_data['roles'][$current_role_id]['admin_role_ssa_id'];
 			$and_whre = array("bs_afe_users.afe_ssa_id" => $fe_ssa_id);
 		}
 		
@@ -66,8 +66,8 @@ class Commission extends CI_Controller {
         $data["last_month_year"] = $last_month_year;
         $data["month"] = $month;
         $data["year"] = $year;
-        $data["logged_in_role_id"] = $_SESSION['admin']['current_role_id'];
-		
+        $data["logged_in_role_id"] = $current_role_id;
+		//prx($data);
 		$months_arr_gl = json_decode(MONTHS_ARR_GL, TRUE);
 		$data['subPageTitle'] = ' | '.$months_arr_gl[$month]." - $year";
 		$data['months_arr_gl'] = $months_arr_gl;
@@ -85,7 +85,7 @@ class Commission extends CI_Controller {
 	}
 	
 	public function get_afe_leads(){
-		chk_access('commissions', 1, true);
+		chk_access('afe_commissions', 1, true);
 		
 		$per_page = 20; 
         $page = @$_GET['per_page']? $_GET['per_page'] : 0;
@@ -144,6 +144,8 @@ class Commission extends CI_Controller {
 	}
 	
 	public function changet_commissions_sts(){
+		chk_access('afe_commissions', 4, true);
+		
 		$commission_id = $this->input->post('c');
 		$sts_id = $this->input->post('s');
 		$commission_id = DeCrypt($commission_id);

@@ -89,7 +89,7 @@
 <script>
 var pageUrl = '<?php echo $pageUrl?>';
 var current_year = '<?=$current_year?>';
-
+var hideTopBckBtn = 'YES';
 $(document).ready(function(){	
 	$(document).on('change', '#yr_slct', function(){
 		var yr_slct = $(this).val();

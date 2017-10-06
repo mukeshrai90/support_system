@@ -17,9 +17,23 @@
 						?>
 						
 						<span class="subPageTitle">
-							<?=$subPageTitle?>
+							<i><?=$subPageTitle?></i>
 						</span>
-					</h5>	
+					</h5>
+					
+					<?php 
+						if(isset($fromPage) && $fromPage == 'incentives') {
+							$refrer = $this->agent->referrer();
+							$inctv_htprfr = $this->session->userdata('inctv_htprfr');
+							if(!empty($refrer) && empty($inctv_htprfr)){
+								$this->session->set_userdata('inctv_htprfr', $refrer);
+							}
+							
+							echo '<div class="ibox-tools">
+										<button type="button" class="btn btn-sm btn-danger refresh-all add-new-btn" data-url="'.$this->session->userdata('inctv_htprfr').'">Back to Incentives</button>
+								  </div>';
+						} 
+					?>
 				</div>
 				<div class="ibox-content">
 					<form id="search-form" action="javascript:;">
@@ -98,7 +112,7 @@
 <script>
 var pageUrl = '<?php echo $pageUrl?>';
 var current_year = '<?=$current_year?>';
-
+var hideTopBckBtn = 'YES';
 $(document).ready(function(){	
 	$(document).on('click', '.change_com_sts_spn', function(){
 		var c = $(this).data('c');

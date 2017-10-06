@@ -1,5 +1,11 @@
 $(document).ready(function () {
 	
+	try{
+		if(hideTopBckBtn != undefined){
+			$('.hideTopBckBtn').hide();
+		}
+	} catch(Error){}
+	
 	$.validator.addMethod('alphaSpace', function (value, element) {		
 		var matchText = /^[A-Za-z\s]+$/i;
 		return this.optional(element) || matchText.test(value);;

@@ -58,13 +58,16 @@ $(document).ready(function(){
 					<div class="navbar-collapse collapse" id="navbar">
 						<ul class="nav navbar-nav">
 							<?php 						
-								$role_id = $this->session->userdata('role_id');
-								$actions = $this->session->userdata('access');
+								$admin_data = $this->session->userdata('admin');
+								
+								$role_id = $admin_data['current_role_id'];
+								$actions = $admin_data['access'];
+								
 								$actions = array_keys($actions);						
 							?>
 							
 							<?php 
-								if(in_array('admins',$actions) || 1) {
+								if(in_array('admins', $actions)) {
 							?>
 								<li class="<?php echo strstr($this->uri->segment(1), 'admins') == 'admins' ? 'active' : ''?>">
 									<a href="<?php echo BASE_URL.'admins/list'?>">
@@ -75,7 +78,7 @@ $(document).ready(function(){
 							<?php } ?>
 							
 							<?php 
-								if(in_array('afe-users',$actions) || 1) {
+								if(in_array('afe_users', $actions)) {
 							?>
 								<li class="<?php echo strstr($this->uri->segment(1), 'afe-users')== 'afe-users' ? 'active' : ''?>">
 									<a href="<?php echo BASE_URL.'afe-users/list'?>">
@@ -86,7 +89,7 @@ $(document).ready(function(){
 							<?php } ?>
 							
 							<?php 
-								if(in_array('afe-users',$actions) || 1) {
+								if(in_array('leads', $actions)) {
 							?>
 								<li class="<?php echo strstr($this->uri->segment(1),'leads')== 'leads' ? 'active' : ''?>">
 									<a href="<?php echo BASE_URL.'leads/list'?>">
@@ -97,7 +100,7 @@ $(document).ready(function(){
 							<?php } ?>
 							
 							<?php 
-								if(in_array('commissions',$actions) || in_array('commissions',$actions) || 1) {
+								if(in_array('afe_commissions', $actions)) {
 							?>
 								<li class="<?php echo $this->uri->segment(1) == 'commissions' && $this->uri->segment(2) == 'afe' ? 'active' : ''?>">
 									<a aria-expanded="false" role="button" href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
@@ -133,7 +136,7 @@ $(document).ready(function(){
 							<?php } ?>
 							
 							<?php 
-								if(in_array('incentives',$actions) || in_array('incentives',$actions) || 1) {
+								if(in_array('fe_incentives', $actions)) {
 							?>
 								<li class="<?php echo $this->uri->segment(1) == 'incentives' && $this->uri->segment(2) == 'fe' ? 'active' : ''?>">
 									<a aria-expanded="false" role="button" href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
@@ -159,7 +162,7 @@ $(document).ready(function(){
 							<?php } ?>
 							
 							<?php 
-								if(in_array('incentives',$actions) || in_array('incentives',$actions) || 1) {
+								if(in_array('cbh_incentives', $actions)) {
 							?>
 								<li class="<?php echo $this->uri->segment(1) == 'incentives' && $this->uri->segment(2) == 'cbh' ? 'active' : ''?>">
 									<a aria-expanded="false" role="button" href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
@@ -185,7 +188,7 @@ $(document).ready(function(){
 							<?php } ?>
 							
 							<?php 
-								if(in_array('cms',$actions) || in_array('cms',$actions) || 1) {
+								if(in_array('cms', $actions)) {
 							?>
 								<li class="<?php echo strstr($this->uri->segment(1),'cms')== 'cms' ? 'active' : ''?>">
 									<a aria-expanded="false" role="button" href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
@@ -228,13 +231,16 @@ $(document).ready(function(){
 			</div>
 			<div class="row back_to_lst_dv">
 				<?php 
-					$refrer = $this->agent->referrer();
-					if(!empty($refrer)){
-						$this->session->set_userdata('http_referer', $refrer);
+					$current_url = current_url();
+					if(strstr($current_url, '/list') != '/list') {
+						$refrer = $this->agent->referrer();
+						if(!empty($refrer)){
+							$this->session->set_userdata('http_referer', $refrer);
+						}
+						
+						echo '<button type="button" class="btn btn-sm btn-warning refresh-all add-new-btn hideTopBckBtn" data-url="'.$this->session->userdata('http_referer').'">Back to Previous Page</button>';
 					}
-				?>
-				
-				<button type="button" class="btn btn-sm btn-warning refresh-all add-new-btn" data-url="<?php echo $this->session->userdata('http_referer');?>">Back to Previous Page</button>
+				?>				
 			</div>
 			<?php $this->load->view($content) ?>
 		
@@ -263,7 +269,7 @@ $(document).ready(function(){
 <script src="<?php echo ASSETS_URL?>js/inspinia.js"></script>
 <script src="<?php echo ASSETS_URL?>js/sweet-alert.min.js"></script>
 <script src="<?php echo ASSETS_URL?>js/plugins/validate/jquery.validate.min.js"></script>
-<script src="<?php echo ASSETS_URL?>js/developer.js?v=1.0"></script>
+<script src="<?php echo ASSETS_URL?>js/developer.js?v=1.1"></script>
 
 <link href="<?php echo ASSETS_URL?>css/plugins/toastr/toastr.min.css" rel="stylesheet">
 

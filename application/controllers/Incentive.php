@@ -11,7 +11,7 @@ class Incentive extends CI_Controller {
 	
 	public function fe_incentives()
 	{
-		chk_access('incentives', 1, true);
+		$loggedIn_data = chk_access('fe_incentives', 1, true);
 		
 		$per_page = 20; 
         $page = @$_GET['per_page']? $_GET['per_page'] : 0;
@@ -31,15 +31,26 @@ class Incentive extends CI_Controller {
 			$year = $_GET['year'];
 		}
 		
+		$current_role_id = $loggedIn_data['current_role_id'];
+		$admin_id = $loggedIn_data['admin_id'];
+		
+		$and_whre = array();
+		if($current_role_id == 3){
+			$and_whre = array('bs_admins.admin_id' => $admin_id);
+		} else if($current_role_id == 2){
+			$admin_role_circle_id = $loggedIn_data['roles'][$current_role_id]['admin_role_circle_id'];
+			$and_whre = array('bs_admin_roles.admin_role_circle_id' => $admin_role_circle_id);
+		}			
+		
 		$data["pageUrl"] = BASE_URL.'incentives/fe/list';
 		if(!empty($_GET['m']) && $_GET['m'] == 'current'){
 			$month = $current_month; $year = $current_year;
-			$result = $this->admin_model->get_incentives_list_monthly($per_page, $page, $month, $year, 3);
+			$result = $this->admin_model->get_incentives_list_monthly($per_page, $page, $month, $year, 3, false, $and_whre);
 			$data["pageUrl"] = $data["pageUrl"].'?m=current';
 			
 		} else {
 			$current_month = $last_month;
-			$result = $this->admin_model->get_incentives_list($per_page, $page, $month, $year, 3);
+			$result = $this->admin_model->get_incentives_list($per_page, $page, $month, $year, 3, $and_whre);
 		}
 		$data['records'] = @$result['results'];
 		
@@ -75,7 +86,7 @@ class Incentive extends CI_Controller {
 	
 	public function cbh_incentives()
 	{
-		chk_access('incentives', 1, true);
+		$admin_data = chk_access('cbh_incentives', 1, true);
 		
 		$per_page = 20; 
         $page = @$_GET['per_page']? $_GET['per_page'] : 0;
@@ -95,15 +106,23 @@ class Incentive extends CI_Controller {
 			$year = $_GET['year'];
 		}
 		
+		$current_role_id = $admin_data['current_role_id'];
+		$admin_id = $admin_data['admin_id'];
+		
+		$and_whre = array();
+		if($current_role_id == 2){
+			$and_whre = array('bs_admins.admin_id' => $admin_id);
+		}
+		
 		$data["pageUrl"] = BASE_URL.'incentives/cbh/list';
 		if(!empty($_GET['m']) && $_GET['m'] == 'current'){
 			$month = $current_month; $year = $current_year;
-			$result = $this->admin_model->get_incentives_list_monthly($per_page, $page, $month, $year, 2);
+			$result = $this->admin_model->get_incentives_list_monthly($per_page, $page, $month, $year, 2, false, $and_whre);
 			$data["pageUrl"] = $data["pageUrl"].'?m=current';
 			
 		} else {
 			$current_month = $last_month;
-			$result = $this->admin_model->get_incentives_list($per_page, $page, $month, $year, 2);
+			$result = $this->admin_model->get_incentives_list($per_page, $page, $month, $year, 2, $and_whre);
 		}
 		$data['records'] = @$result['results'];
 		

@@ -27,7 +27,7 @@
 					<?php 
 						echo '<span class="sts_spn">'.$rcd['current_status'].'</span>';
 						
-						if((in_array($rcd['commission_status_id'], array(1,2,3,5,6)) && $logged_in_role_id == 3 && @$_GET['month'] != 'current') || (in_array($rcd['commission_status_id'], array(2,4)) && $logged_in_role_id == 2 && !empty($_GET['t']) && $_GET['t'] == 'pending')) {
+						if($logged_in_role_id == 1 || (in_array($rcd['commission_status_id'], array(1,2,6,4)) && $logged_in_role_id == 3 && @$_GET['month'] != 'current') || (in_array($rcd['commission_status_id'], array(2)) && $logged_in_role_id == 2 && !empty($_GET['t']) && $_GET['t'] == 'pending') || (in_array($rcd['commission_status_id'], array(3)) && $logged_in_role_id == 7 && @$_GET['month'] != 'current')) {
 							echo '<br/><span class="change_com_sts_spn" data-c="'.EnCrypt($rcd['commission_id']).'">Change</span>';
 						}
 					?>

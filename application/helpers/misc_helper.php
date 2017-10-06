@@ -32,10 +32,13 @@ if(!function_exists('get_short_url')) {
 
 if(!function_exists('get_record')) {
 	
-	function get_record($table, $prim_key, $id) {		
+	function get_record($table, $prim_key, $id, $select=NULL) {		
 		$CI = & get_instance();
-		 			
-		$info = $CI->db->get_where($table,array($prim_key => $id))->row_array(); 
+		
+		if($select){
+			$this->db->select($select);
+		}
+		$info = $CI->db->get_where($table, array($prim_key => $id))->row_array(); 
 		return $info;
 	}
 }
@@ -47,9 +50,9 @@ if(!function_exists('get_all_allowed_actions')) {
 		
 		$CI->db->select('action, access');
 		$CI->db->group_by('action');
-		$info = $CI->db->get_where('bs_admin_access',array('role_id' => $role_id, 'status' => 1))->result_array(); 
+		$actions = $CI->db->get_where('bs_admin_access', array('role_id' => $role_id, 'status' => 0))->result_array(); 
 		
-		return $info;
+		return $actions;
 	}
 }
 

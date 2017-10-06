@@ -10,34 +10,23 @@ if(!function_exists('chk_access'))
 		
 		$admin_data = $CI->session->userdata('admin');
 		$admin_id = $admin_data['admin_id'];
+		
 		$admin = $CI->admin_model->get_admin($admin_id, 'admin_id');
 		
 		if(!empty($admin)){
-			if($role_check && 0){
+			if($role_check){
 				
-				$role_id = $user['role_id'];
-				$user_id = $user['id'];
-				
-				if($role_id == 1 && $user_id > 1 && $user['have_admin_access'] <= 0){
-					$access = $CI->db->get_where('ts_subadmin_access',array('admin_id' => $user_id,'action' => $action,'type' => $type,'access' => 1))->row_array(); 	
-					if(empty($access)) {
-						if($CI->input->is_ajax_request()) {
-							echo 'access-error';die;
-						}
-						
-						$CI->session->set_flashdata('error','Sorry! You don\'t have permission.');
-						redirect('dashboard');			
-					}
-				} else {
-					$records = $CI->db->get_where('ts_admin_access',array('role_id' => $role_id,'action' => $action))->row_array(); 	
+				if($admin_id == 1){
 					
+				} else {
+					$role_id = $admin_data['current_role_id'];				
+					$records = $CI->db->get_where('bs_admin_access', array('role_id' => $role_id, 'action' => $action, 'status' => 0))->row_array(); 	
+						
 					if(!empty($records)) {
 						$access = $records['access'];
-						$access = explode(',',$access);
+						$access = explode(',', $access);
 												
-						if(in_array($type, $access)){
-							
-						} else {
+						if(!in_array($type, $access)){
 							if($CI->input->is_ajax_request()){
 								echo 'access-error';die;
 							}
@@ -53,6 +42,9 @@ if(!function_exists('chk_access'))
 					}
 				}
 			}
+			
+			return $admin_data;
+			
 		} else {
 			if($CI->input->is_ajax_request()){
 				echo 'login-error';die;

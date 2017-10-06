@@ -1395,7 +1395,8 @@ class Admin_model extends CI_Model
 		$this->db->from('bs_incentives');
 		$this->db->join('bs_incentive_status', 'bs_incentive_status.status_id=bs_incentives.incentive_status_id', 'INNER');
 		$this->db->join('bs_incentive_master', 'bs_incentive_master.id=bs_incentives.applied_incentive_id', 'INNER'); 
-		$this->db->join('bs_admins', 'bs_admins.admin_id=bs_incentives.incentive_admin_id', 'INNER'); 
+		$this->db->join('bs_admins', 'bs_admins.admin_id=bs_incentives.incentive_admin_id', 'INNER');
+		$this->db->join('bs_admin_roles', 'bs_admin_roles.admin_id=bs_admins.admin_id', 'INNER'); 
 		$data['count'] = $this->db->count_all_results();
 		
 		$this->db->select('bs_incentives.*, bs_admins.admin_id, bs_admins.admin_name, bs_admins.admin_mobile, bs_incentive_status.status_name_long as current_status, bs_incentive_master.rate as incentive_rate');
@@ -1403,7 +1404,8 @@ class Admin_model extends CI_Model
 		$this->db->limit($limit, $start);
 		$this->db->join('bs_incentive_status', 'bs_incentive_status.status_id=bs_incentives.incentive_status_id', 'INNER'); 
 		$this->db->join('bs_incentive_master', 'bs_incentive_master.id=bs_incentives.applied_incentive_id', 'INNER'); 
-		$this->db->join('bs_admins', 'bs_admins.admin_id=bs_incentives.incentive_admin_id', 'INNER'); 
+		$this->db->join('bs_admins', 'bs_admins.admin_id=bs_incentives.incentive_admin_id', 'INNER');
+		$this->db->join('bs_admin_roles', 'bs_admin_roles.admin_id=bs_admins.admin_id', 'INNER'); 
 		$this->db->order_by('bs_admins.admin_name','asc'); 
 		$incentives = $this->db->get("bs_incentives")->result_array();		
 		
