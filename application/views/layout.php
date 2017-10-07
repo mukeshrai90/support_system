@@ -188,9 +188,29 @@ $(document).ready(function(){
 							<?php } ?>
 							
 							<?php 
+								if(in_array('reports', $actions)) {
+							?>
+								<li class="<?php echo $this->uri->segment(1) == 'reports' ? 'active' : ''?>">
+									<a aria-expanded="false" role="button" href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
+										<i class="fa fa-file-text-o"></i> 
+										<span class="nav-label">Reports</span>
+										<span class="caret"></span>
+									</a>
+									<ul role="menu" class="dropdown-menu">
+										<li class="<?php echo $this->uri->segment(1) == 'reports' && $this->uri->segment(2) == 'afe' ? 'active' : ''?>">
+											<a href="<?php echo BASE_URL.'reports/afe'?>">
+												<i class="fa fa-list-alt"></i>&nbsp;
+												<span class="nav-label">AFE Leads Report</span>
+											</a>
+										</li>
+									</ul>
+								</li>
+							<?php } ?>
+							
+							<?php 
 								if(in_array('cms', $actions)) {
 							?>
-								<li class="<?php echo strstr($this->uri->segment(1),'cms')== 'cms' ? 'active' : ''?>">
+								<li class="<?php echo $this->uri->segment(1) == 'cms' ? 'active' : ''?>">
 									<a aria-expanded="false" role="button" href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
 										<i class="fa fa-gears"></i> 
 										<span class="nav-label">CMS</span>
@@ -249,8 +269,7 @@ $(document).ready(function(){
 
 <?php 
 	$flashMessage = '';$flashType = '';
-	if($this->session->flashdata('success'))
-	{
+	if($this->session->flashdata('success')){
 		$flashType = 'success';
 		$flashMessage = $this->session->flashdata('success');
 	}
@@ -270,7 +289,9 @@ $(document).ready(function(){
 <script src="<?php echo ASSETS_URL?>js/sweet-alert.min.js"></script>
 <script src="<?php echo ASSETS_URL?>js/plugins/validate/jquery.validate.min.js"></script>
 <script src="<?php echo ASSETS_URL?>js/developer.js?v=1.1"></script>
+<script src="<?php echo ASSETS_URL?>js/jquery.datetimepicker.js"></script>
 
+<link href="<?php echo ASSETS_URL?>css/jquery.datetimepicker.css" rel="stylesheet">
 <link href="<?php echo ASSETS_URL?>css/plugins/toastr/toastr.min.css" rel="stylesheet">
 
 <style>

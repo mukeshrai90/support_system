@@ -31,16 +31,7 @@ class Incentive extends CI_Controller {
 			$year = $_GET['year'];
 		}
 		
-		$current_role_id = $loggedIn_data['current_role_id'];
-		$admin_id = $loggedIn_data['admin_id'];
-		
-		$and_whre = array();
-		if($current_role_id == 3){
-			$and_whre = array('bs_admins.admin_id' => $admin_id);
-		} else if($current_role_id == 2){
-			$admin_role_circle_id = $loggedIn_data['roles'][$current_role_id]['admin_role_circle_id'];
-			$and_whre = array('bs_admin_roles.admin_role_circle_id' => $admin_role_circle_id);
-		}			
+		$and_whre = get_loggedINCondtn('incentive', $loggedIn_data);		
 		
 		$data["pageUrl"] = BASE_URL.'incentives/fe/list';
 		if(!empty($_GET['m']) && $_GET['m'] == 'current'){
@@ -66,7 +57,7 @@ class Incentive extends CI_Controller {
         $data["last_month_year"] = $last_month_year;
         $data["month"] = $month;
         $data["year"] = $year;
-        $data["logged_in_role_id"] = $_SESSION['admin']['current_role_id'];
+        $data["logged_in_role_id"] = $loggedIn_data['current_role_id'];
 		
 		$months_arr_gl = json_decode(MONTHS_ARR_GL, TRUE);
 		$data['subPageTitle'] = ' | '.$months_arr_gl[$month]." - $year";
@@ -86,7 +77,7 @@ class Incentive extends CI_Controller {
 	
 	public function cbh_incentives()
 	{
-		$admin_data = chk_access('cbh_incentives', 1, true);
+		$loggedIn_data = chk_access('cbh_incentives', 1, true);
 		
 		$per_page = 20; 
         $page = @$_GET['per_page']? $_GET['per_page'] : 0;
@@ -106,13 +97,7 @@ class Incentive extends CI_Controller {
 			$year = $_GET['year'];
 		}
 		
-		$current_role_id = $admin_data['current_role_id'];
-		$admin_id = $admin_data['admin_id'];
-		
-		$and_whre = array();
-		if($current_role_id == 2){
-			$and_whre = array('bs_admins.admin_id' => $admin_id);
-		}
+		$and_whre = get_loggedINCondtn('incentive', $loggedIn_data);
 		
 		$data["pageUrl"] = BASE_URL.'incentives/cbh/list';
 		if(!empty($_GET['m']) && $_GET['m'] == 'current'){
@@ -138,7 +123,7 @@ class Incentive extends CI_Controller {
         $data["last_month_year"] = $last_month_year;
         $data["month"] = $month;
         $data["year"] = $year;
-        $data["logged_in_role_id"] = $_SESSION['admin']['current_role_id'];
+        $data["logged_in_role_id"] = $loggedIn_data['current_role_id'];
 		
 		$months_arr_gl = json_decode(MONTHS_ARR_GL, TRUE);
 		$data['subPageTitle'] = ' | '.$months_arr_gl[$month]." - $year";

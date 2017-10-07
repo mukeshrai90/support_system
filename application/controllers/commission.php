@@ -31,16 +31,7 @@ class Commission extends CI_Controller {
 			$year = $_GET['year'];
 		}
 		
-		$current_role_id = $loggedIn_data['current_role_id'];
-		
-		$and_whre = array();
-		if($current_role_id == 2){
-			$cbh_circle_id = $loggedIn_data['roles'][$current_role_id]['admin_role_circle_id'];
-			$and_whre = array("bs_afe_users.afe_circle_id" => $cbh_circle_id);
-		} else if($current_role_id == 3){
-			$fe_ssa_id = $loggedIn_data['roles'][$current_role_id]['admin_role_ssa_id'];
-			$and_whre = array("bs_afe_users.afe_ssa_id" => $fe_ssa_id);
-		}
+		$and_whre = get_loggedINCondtn('commission', $loggedIn_data);
 		
 		$data["pageUrl"] = BASE_URL.'commissions/afe/list';
 		if(!empty($_GET['m']) && $_GET['m'] == 'current'){
@@ -77,7 +68,7 @@ class Commission extends CI_Controller {
 			echo json_encode($data);die;
 		}
 		
-		$data["afe_users"] = $this->admin_model->get_all_afes();
+		$data["afe_users"] = $this->admin_model->get_all_afes($and_whre);
 		
 		$data['pageTitle'] = 'Commissions';
 		$data['content'] = 'commission/afe_commissions';
