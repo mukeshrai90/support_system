@@ -28,14 +28,15 @@ $protocol = stripos($_SERVER['SERVER_PROTOCOL'],'https') === true ? 'https://' :
 $config['base_url']	= $protocol.$_SERVER['HTTP_HOST'];
 $config['base_url']	= $protocol.$_SERVER['HTTP_HOST'].'/support_system';
 
-function prx($data)
-{
-	echo '<pre>';
-	print_r($data); die;
-}
+defined('BASE_URL') or define('BASE_URL', $config['base_url'].'/');
+defined('ASSETS_URL') or define('ASSETS_URL',BASE_URL.'assets/');
 
-define('BASE_URL', $config['base_url'].'/');
-define('ASSETS_URL',BASE_URL.'assets/');
+
+$months_arr_gl = array('01' => 'January', '02' => 'February', '03' => 'March', '04' => 'April', '05' => 'May', '06' => 'June', '07' => 'July', '08' => 'August', '09' => 'September', '10' => 'October', '11' => 'November', '12' => 'December');
+defined('MONTHS_ARR_GL') or define('MONTHS_ARR_GL', json_encode($months_arr_gl));
+
+defined('FE_TARGET') or define('FE_TARGET' , 0);
+defined('CBH_TARGET') or define('CBH_TARGET' , 0);
 
 /*
 |--------------------------------------------------------------------------
@@ -534,33 +535,45 @@ $config['rewrite_short_tags'] = FALSE;
 */
 $config['proxy_ips'] = '';
 
-define('SECRET_KEY', '454ghg54GVMJGREDED55454454gfg34343');
-define('SECRET_IV', 'anmnmn355ATGRFRF909089');
-
-function EnCrypt($string=NULL) {
-    
-	if(!empty($string)) {
-		$encrypt_method = "AES-256-CBC";
-		$key = hash('sha256', SECRET_KEY);
-		$iv = substr(hash('sha256', SECRET_IV), 0, 16);
-	 
-		$output = base64_encode(openssl_encrypt($string, $encrypt_method, $key, 0, $iv));
-	} else {
-		$output = '';
+if(!function_exists('prx')){
+	function prx($data)
+	{
+		echo '<pre>';
+		print_r($data); die;
 	}
- 
-    return $output;
 }
 
-function DeCrypt($string=NULL) {
-	if(!empty($string)) {
-		$encrypt_method = "AES-256-CBC";
-		$key = hash('sha256', SECRET_KEY);
-		$iv = substr(hash('sha256', SECRET_IV), 0, 16);
- 
-		$output = openssl_decrypt(base64_decode($string), $encrypt_method, $key, 0, $iv);
-	} else {
-		$output = '';
+defined('SECRET_KEY') or define('SECRET_KEY', '454ghg54GVMJGREDED55454454gfg34343');
+defined('SECRET_KEY') or define('SECRET_KEY', 'anmnmn355ATGRFRF909089');
+
+if(!function_exists('EnCrypt')){
+	function EnCrypt($string=NULL) {
+		
+		if(!empty($string)) {
+			$encrypt_method = "AES-256-CBC";
+			$key = hash('sha256', SECRET_KEY);
+			$iv = substr(hash('sha256', SECRET_IV), 0, 16);
+		 
+			$output = base64_encode(openssl_encrypt($string, $encrypt_method, $key, 0, $iv));
+		} else {
+			$output = '';
+		}
+	 
+		return $output;
 	}
-    return $output;
+}
+
+if(!function_exists('DeCrypt')){
+	function DeCrypt($string=NULL) {
+		if(!empty($string)) {
+			$encrypt_method = "AES-256-CBC";
+			$key = hash('sha256', SECRET_KEY);
+			$iv = substr(hash('sha256', SECRET_IV), 0, 16);
+	 
+			$output = openssl_decrypt(base64_decode($string), $encrypt_method, $key, 0, $iv);
+		} else {
+			$output = '';
+		}
+		return $output;
+	}
 }

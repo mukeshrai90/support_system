@@ -421,6 +421,7 @@ class User extends CI_Controller {
 	}
 	
 	public function manage_lead($lead_id=NULL){
+		
 		if(!empty($_POST)) {					
 			$result = $this->admin_model->manage_leads();			
 			
@@ -472,11 +473,20 @@ class User extends CI_Controller {
 	}
 	
 	public function view_lead($lead_id=NULL){
+		
+		chk_access('leads',1,true);
+		
 		$lead_id = DeCrypt($lead_id);
 		$data['record'] = $this->admin_model->get_LeadDetails($lead_id);
 		
 		$data['lead_logs'] = $this->admin_model->get_LeadLogs($lead_id);
 		
+		$data['lead_status'] = $this->admin_model->get_LeadsStatus($data['record']);
+		
+		$data['lead_files'] = $this->admin_model->get_LeadFiles($data['record']);
+		
+		$data['can_change_status'] = 1;
+		$data['can_see_logs'] = 1;
 		$data['pageTitle'] = 'View Lead Details';
 		$data['content'] = 'user/view-lead-details';
 		$this->load->view('layout',$data);
@@ -513,6 +523,107 @@ class User extends CI_Controller {
 		} else {
 			$response['status'] = false;	
 			$response['message'] = 'Unable to process your request right now. <br/> Please try again or some time later.';
+		}
+		
+		echo json_encode($response);die;	
+	}
+	
+	public function change_lead_status(){		
+		
+		chk_access('leads',4,true);
+		
+		$lead_id = $this->input->post('lead_id');
+		$lead_id = DeCrypt($lead_id);
+		$status_id = $this->input->post('status_id');
+		$description = $this->input->post('description');
+		$cpe_payment_status = $this->input->post('cpe_payment_status');
+		$bsnl_user_id = $this->input->post('bsnl_user_id');
+		$installation_date = $this->input->post('installation_date');
+		
+		$logged_admin = $this->session->userdata('admin');
+		$logged_admin_id = $logged_admin['admin_id']; 
+		
+		$response['status'] = false;
+		$response['message'] = 'Unable to process your request right now. <br/> Please try again or some time later.';
+		
+		
+		$file_uploaded = false; $file_type = 2; $file_log_description = 'CAF File Uploaded successfully';
+		if(isset($_FILES['upld_file']['name']) && !empty($_FILES['upld_file']['name'])){
+			$file_name = str_replace(' ','',$_FILES['upld_file']['name']);
+			$temp = explode('.',$file_name);					
+			$file_name = "File-$lead_id-".(time()*microtime());
+			$file_name = $file_name.'.'.end($temp);
+			$_FILES['upld_file']['name'] = $file_name;
+			
+			$this->load->library('upload'); 
+			$config['upload_path'] = './assets/uploads/leads/';
+			$config['allowed_types'] = 'pdf|xlsx|xls|doc|docx|jpg|png|jpeg';
+			$config['max_size'] = '10000';			
+			$this->upload->initialize($config);
+			
+			if($this->upload->do_upload('upld_file')){
+				$file_uploaded = true;
+				if($status_id == 3){
+					$file_type = 3;
+					$file_log_description = 'DNCS File Uploaded successfully';
+				} else if($status_id == 4){
+					$file_type = 4;
+					$file_log_description = 'Installation & Activation Pic File Uploaded successfully';
+				}
+			} 
+		}
+		
+		try{
+			$this->db->trans_begin();  // Transaction Start
+			
+			$LeadData = array('user_lead_status_id' => $status_id, 'user_updated_on' => date('Y-m-d H:i:s'));
+			
+			$and_sts_Desc = '';
+			if($status_id == 3){
+				$LeadData = array_merge($LeadData, array('user_cpe_payment_status' => $cpe_payment_status, 'user_bsnl_id' => $bsnl_user_id));
+				$and_sts_Desc = '<br/><b>CPE Payment Not Done</b>';
+				if($cpe_payment_status == 'Y'){
+					$and_sts_Desc = '<br/><b>CPE Payment Done</b>';
+				}
+			} else if($status_id == 4){
+				$LeadData = array_merge($LeadData, array('installation_date' => date('Y-m-d', strtotime($installation_date))));
+			}
+			
+			$this->db->where('user_id', $lead_id);
+			if($this->db->update('bs_users', $LeadData)) {
+				$CallInsertData = array();
+				$CallInsertData['call_user_id'] = $lead_id;
+				$CallInsertData['call_logged_admin_id'] = $logged_admin_id;
+				$CallInsertData['call_desc'] = $description.$and_sts_Desc;
+				$CallInsertData['call_status_id'] = $status_id;
+				$CallInsertData['call_time'] = date('Y-m-d H:i:s');
+				
+				$sts = $this->db->insert('bs_user_call_logs', $CallInsertData);
+				if($file_uploaded){
+					
+					$FileData = array('lead_id' => $lead_id, 'file_name' => $file_name, 'file_type' => $file_type, 'file_added_on' => date('Y-m-d H:i:s'));
+					$sts = $this->db->insert('bs_lead_files', $FileData);
+					
+					$CallInsertData['call_desc'] = $file_log_description;
+					$sts = $this->db->insert('bs_user_call_logs', $CallInsertData);
+				}
+				
+				if($sts) {
+					if($this->db->trans_status() === FALSE) {
+						throw new Exception('Unable to proocess your request right now.<br/> Please try again or some time later');								
+					} else {
+						$this->db->trans_commit(); // Transaction Commit
+						$response['status'] = true;
+						$response['message'] = 'Status has been changed successfully.';
+					}
+				} else {
+					throw new Exception('Unable to proocess your request right now.<br/> Please try again or some time later');	
+				}
+			}
+			
+		} catch(Exception $e) {
+			$this->db->trans_rollback(); // Transaction Rollback
+			$response['message'] = $e->getMessage();
 		}
 		
 		echo json_encode($response);die;	

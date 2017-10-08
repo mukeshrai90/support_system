@@ -58,13 +58,16 @@ $(document).ready(function(){
 					<div class="navbar-collapse collapse" id="navbar">
 						<ul class="nav navbar-nav">
 							<?php 						
-								$role_id = $this->session->userdata('role_id');
-								$actions = $this->session->userdata('access');
+								$admin_data = $this->session->userdata('admin');
+								
+								$role_id = $admin_data['current_role_id'];
+								$actions = $admin_data['access'];
+								
 								$actions = array_keys($actions);						
 							?>
 							
 							<?php 
-								if(in_array('admins',$actions) || 1) {
+								if(in_array('admins', $actions)) {
 							?>
 								<li class="<?php echo strstr($this->uri->segment(1), 'admins') == 'admins' ? 'active' : ''?>">
 									<a href="<?php echo BASE_URL.'admins/list'?>">
@@ -75,7 +78,7 @@ $(document).ready(function(){
 							<?php } ?>
 							
 							<?php 
-								if(in_array('afe-users',$actions) || 1) {
+								if(in_array('afe_users', $actions)) {
 							?>
 								<li class="<?php echo strstr($this->uri->segment(1), 'afe-users')== 'afe-users' ? 'active' : ''?>">
 									<a href="<?php echo BASE_URL.'afe-users/list'?>">
@@ -86,20 +89,128 @@ $(document).ready(function(){
 							<?php } ?>
 							
 							<?php 
-								if(in_array('afe-users',$actions) || 1) {
+								if(in_array('leads', $actions)) {
 							?>
 								<li class="<?php echo strstr($this->uri->segment(1),'leads')== 'leads' ? 'active' : ''?>">
 									<a href="<?php echo BASE_URL.'leads/list'?>">
-										<i class="fa fa-reply-all"></i> 
+										<i class="fa fa-share-square-o"></i> 
 										<span class="nav-label">User Leads</span>
 									</a>
 								</li>
 							<?php } ?>
 							
 							<?php 
-								if(in_array('cms',$actions) || in_array('cms',$actions) || 1) {
+								if(in_array('afe_commissions', $actions)) {
 							?>
-								<li class="<?php echo strstr($this->uri->segment(1),'cms')== 'cms' ? 'active' : ''?>">
+								<li class="<?php echo $this->uri->segment(1) == 'commissions' && $this->uri->segment(2) == 'afe' ? 'active' : ''?>">
+									<a aria-expanded="false" role="button" href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
+										<i class="fa fa-money"></i> 
+										<span class="nav-label">AFE Commission</span>
+										<span class="caret"></span>
+									</a>
+									<ul role="menu" class="dropdown-menu">
+										<?php 
+											if(!empty($_SESSION['admin']['current_role_id']) && $_SESSION['admin']['current_role_id'] == 2){
+										?>
+											<li class="<?php echo $this->uri->segment(2) == 'afe' && @$_GET['t'] == 'pending' ? 'active' : ''?>">
+												<a href="<?php echo BASE_URL.'commissions/afe/list?t=pending'?>">
+													<i class="fa fa-question-circle"></i>&nbsp;&nbsp;
+													<span class="nav-label">Pending for Approval</span>
+												</a>
+											</li>
+										<?php } ?>
+										<li class="<?php echo $this->uri->segment(2) == 'afe' && @$_GET['m'] == 'current' ? 'active' : ''?>">
+											<a href="<?php echo BASE_URL.'commissions/afe/list?m=current'?>">
+												<i class="fa fa-calendar-o"></i>&nbsp;&nbsp;
+												<span class="nav-label">Current Month</span>
+											</a>
+										</li>
+										<li class="<?php echo $this->uri->segment(2) == 'afe' && @$_GET['m'] != 'current' && empty($_GET['t']) ? 'active' : ''?>">
+											<a href="<?php echo BASE_URL.'commissions/afe/list'?>">
+												<i class="fa fa-calendar"></i>&nbsp;&nbsp;
+												<span class="nav-label">Prevoius Months</span>
+											</a>
+										</li>
+									</ul>
+								</li>
+							<?php } ?>
+							
+							<?php 
+								if(in_array('fe_incentives', $actions)) {
+							?>
+								<li class="<?php echo $this->uri->segment(1) == 'incentives' && $this->uri->segment(2) == 'fe' ? 'active' : ''?>">
+									<a aria-expanded="false" role="button" href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
+										<i class="fa fa-money"></i> 
+										<span class="nav-label">FE Incentive</span>
+										<span class="caret"></span>
+									</a>
+									<ul role="menu" class="dropdown-menu">
+										<li class="<?php echo $this->uri->segment(2) == 'fe' && @$_GET['m'] == 'current' ? 'active' : ''?>">
+											<a href="<?php echo BASE_URL.'incentives/fe/list?m=current'?>">
+												<i class="fa fa-calendar-o"></i>&nbsp;&nbsp;
+												<span class="nav-label">Current Month</span>
+											</a>
+										</li>
+										<li class="<?php echo $this->uri->segment(2) == 'fe' && @$_GET['m'] != 'current' && empty($_GET['t']) ? 'active' : ''?>">
+											<a href="<?php echo BASE_URL.'incentives/fe/list'?>">
+												<i class="fa fa-calendar"></i>&nbsp;&nbsp;
+												<span class="nav-label">Prevoius Months</span>
+											</a>
+										</li>
+									</ul>
+								</li>
+							<?php } ?>
+							
+							<?php 
+								if(in_array('cbh_incentives', $actions)) {
+							?>
+								<li class="<?php echo $this->uri->segment(1) == 'incentives' && $this->uri->segment(2) == 'cbh' ? 'active' : ''?>">
+									<a aria-expanded="false" role="button" href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
+										<i class="fa fa-money"></i> 
+										<span class="nav-label">CBH Incentive</span>
+										<span class="caret"></span>
+									</a>
+									<ul role="menu" class="dropdown-menu">
+										<li class="<?php echo $this->uri->segment(2) == 'cbh' && @$_GET['m'] == 'current' ? 'active' : ''?>">
+											<a href="<?php echo BASE_URL.'incentives/cbh/list?m=current'?>">
+												<i class="fa fa-calendar-o"></i>&nbsp;&nbsp;
+												<span class="nav-label">Current Month</span>
+											</a>
+										</li>
+										<li class="<?php echo $this->uri->segment(2) == 'cbh' && @$_GET['m'] != 'current' && empty($_GET['t']) ? 'active' : ''?>">
+											<a href="<?php echo BASE_URL.'incentives/cbh/list'?>">
+												<i class="fa fa-calendar"></i>&nbsp;&nbsp;
+												<span class="nav-label">Prevoius Months</span>
+											</a>
+										</li>
+									</ul>
+								</li>
+							<?php } ?>
+							
+							<?php 
+								if(in_array('reports', $actions)) {
+							?>
+								<li class="<?php echo $this->uri->segment(1) == 'reports' ? 'active' : ''?>">
+									<a aria-expanded="false" role="button" href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
+										<i class="fa fa-file-text-o"></i> 
+										<span class="nav-label">Reports</span>
+										<span class="caret"></span>
+									</a>
+									<ul role="menu" class="dropdown-menu">
+										<li class="<?php echo $this->uri->segment(1) == 'reports' && $this->uri->segment(2) == 'afe' ? 'active' : ''?>">
+											<a href="<?php echo BASE_URL.'reports/afe'?>">
+												<i class="fa fa-list-alt"></i>&nbsp;
+												<span class="nav-label">AFE Leads Report</span>
+											</a>
+										</li>
+									</ul>
+								</li>
+							<?php } ?>
+							
+							<?php 
+								if(in_array('cms', $actions)) {
+							?>
+								<li class="<?php echo $this->uri->segment(1) == 'cms' ? 'active' : ''?>">
 									<a aria-expanded="false" role="button" href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
 										<i class="fa fa-gears"></i> 
 										<span class="nav-label">CMS</span>
@@ -108,20 +219,20 @@ $(document).ready(function(){
 									<ul role="menu" class="dropdown-menu">
 										<li class="<?php echo strstr($this->uri->segment(2),'circles')== 'circles' ? 'active' : ''?>">
 											<a href="<?php echo BASE_URL.'cms/circles/list'?>">
-												<i class="fa fa-wrench"></i>&nbsp;&nbsp;
-												<span class="nav-label">Circles</span>
+												<i class="fa fa-map-marker"></i>&nbsp;
+												<span class="nav-label">Circle Master</span>
 											</a>
 										</li>
 										<li class="<?php echo strstr($this->uri->segment(2),'ssa')== 'ssa' ? 'active' : ''?>">
 											<a href="<?php echo BASE_URL.'cms/ssa/list'?>">
-												<i class="fa fa-link"></i>&nbsp;&nbsp;
-												<span class="nav-label">SSA</span>
+												<i class="fa fa-map-marker"></i>&nbsp;
+												<span class="nav-label">SSA Master</span>
 											</a>
 										</li>
 										<li class="<?php echo strstr($this->uri->segment(2),'plans')== 'plans' ? 'active' : ''?>">
 											<a href="<?php echo BASE_URL.'cms/plans/list'?>">
-												<i class="fa fa-rupee"></i>&nbsp;&nbsp;&nbsp;&nbsp;
-												<span class="nav-label">Plans</span>
+												<i class="fa fa-rupee"></i>&nbsp;&nbsp;
+												<span class="nav-label">Plans Master</span>
 											</a>
 										</li>
 									</ul>
@@ -138,7 +249,19 @@ $(document).ready(function(){
 					</div>
 				</nav>
 			</div>
-        
+			<div class="row back_to_lst_dv">
+				<?php 
+					$current_url = current_url();
+					if(strstr($current_url, '/list') != '/list') {
+						$refrer = $this->agent->referrer();
+						if(!empty($refrer)){
+							$this->session->set_userdata('http_referer', $refrer);
+						}
+						
+						echo '<button type="button" class="btn btn-sm btn-warning refresh-all add-new-btn hideTopBckBtn" data-url="'.$this->session->userdata('http_referer').'">Back to Previous Page</button>';
+					}
+				?>				
+			</div>
 			<?php $this->load->view($content) ?>
 		
 		</div>
@@ -146,8 +269,7 @@ $(document).ready(function(){
 
 <?php 
 	$flashMessage = '';$flashType = '';
-	if($this->session->flashdata('success'))
-	{
+	if($this->session->flashdata('success')){
 		$flashType = 'success';
 		$flashMessage = $this->session->flashdata('success');
 	}
@@ -166,8 +288,10 @@ $(document).ready(function(){
 <script src="<?php echo ASSETS_URL?>js/inspinia.js"></script>
 <script src="<?php echo ASSETS_URL?>js/sweet-alert.min.js"></script>
 <script src="<?php echo ASSETS_URL?>js/plugins/validate/jquery.validate.min.js"></script>
-<script src="<?php echo ASSETS_URL?>js/developer.js?v=1.0"></script>
+<script src="<?php echo ASSETS_URL?>js/developer.js?v=1.1"></script>
+<script src="<?php echo ASSETS_URL?>js/jquery.datetimepicker.js"></script>
 
+<link href="<?php echo ASSETS_URL?>css/jquery.datetimepicker.css" rel="stylesheet">
 <link href="<?php echo ASSETS_URL?>css/plugins/toastr/toastr.min.css" rel="stylesheet">
 
 <style>

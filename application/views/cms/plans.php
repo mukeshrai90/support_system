@@ -60,7 +60,7 @@
 
 <script>
 var pageUrl = '<?php echo $pageUrl?>';
-
+var hideTopBckBtn = 'YES';
 $(document).ready(function(){	
 	$(document).on('click','.change-status',function(){
         var status = $(this).attr('data-status');

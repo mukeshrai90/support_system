@@ -30,12 +30,45 @@ if(!function_exists('get_short_url')) {
 	
 }
 
+if(!function_exists('get_loggedINCondtn')) {
+	
+	function get_loggedINCondtn($type='commission', $loggedIn_data=array()) {		
+		$CI = & get_instance();
+		
+		$current_role_id = $loggedIn_data['current_role_id'];
+		$admin_id = $loggedIn_data['admin_id'];
+		
+		$and_whre = array();
+		if($type == 'commission'){
+			if($current_role_id == 2){
+				$cbh_circle_id = $loggedIn_data['roles'][$current_role_id]['admin_role_circle_id'];
+				$and_whre = array("bs_afe_users.afe_circle_id" => $cbh_circle_id);
+			} else if($current_role_id == 3){
+				$fe_ssa_id = $loggedIn_data['roles'][$current_role_id]['admin_role_ssa_id'];
+				$and_whre = array("bs_afe_users.afe_ssa_id" => $fe_ssa_id);
+			}
+		} else if($type == 'incentive'){
+			if($current_role_id == 3){
+				$and_whre = array('bs_admins.admin_id' => $admin_id);
+			} else if($current_role_id == 2){
+				$admin_role_circle_id = $loggedIn_data['roles'][$current_role_id]['admin_role_circle_id'];
+				$and_whre = array('bs_admin_roles.admin_role_circle_id' => $admin_role_circle_id);
+			}	
+		}
+		
+		return $and_whre;
+	}
+}
+		
 if(!function_exists('get_record')) {
 	
-	function get_record($table, $prim_key, $id) {		
+	function get_record($table, $prim_key, $id, $select=NULL) {		
 		$CI = & get_instance();
-		 			
-		$info = $CI->db->get_where($table,array($prim_key => $id))->row_array(); 
+		
+		if($select){
+			$this->db->select($select);
+		}
+		$info = $CI->db->get_where($table, array($prim_key => $id))->row_array(); 
 		return $info;
 	}
 }
@@ -47,9 +80,9 @@ if(!function_exists('get_all_allowed_actions')) {
 		
 		$CI->db->select('action, access');
 		$CI->db->group_by('action');
-		$info = $CI->db->get_where('bs_admin_access',array('role_id' => $role_id, 'status' => 1))->result_array(); 
+		$actions = $CI->db->get_where('bs_admin_access', array('role_id' => $role_id, 'status' => 0))->result_array(); 
 		
-		return $info;
+		return $actions;
 	}
 }
 

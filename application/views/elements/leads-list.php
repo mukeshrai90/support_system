@@ -23,9 +23,12 @@
 				<td><?php echo $rcd['circle_name']?></td>
 				<td><?php echo $rcd['plan_name']?></td>
 				<td class="tooltip-demo">
-					<a href="<?php echo BASE_URL.'leads/edit/'.EnCrypt($rcd['user_id'])?>" title="Edit" class="actions-a" data-toggle="tooltip" data-placement="bottom">
-						<i class="fa fa-pencil text-navy"></i>
-					</a>
+					
+					<?php if($rcd['user_lead_status_id'] < 4) { ?>
+						<a href="<?php echo BASE_URL.'leads/edit/'.EnCrypt($rcd['user_id'])?>" title="Edit" class="actions-a" data-toggle="tooltip" data-placement="bottom">
+							<i class="fa fa-pencil text-navy"></i>
+						</a>
+					<?php } ?>
 					
 					<a href="<?php echo BASE_URL.'leads/view/'.EnCrypt($rcd['user_id'])?>" title="View" class="actions-a" data-toggle="tooltip" data-placement="bottom">
 						<i class="fa fa-eye text-navy"></i>
@@ -34,9 +37,7 @@
 			</tr>
 		<?php 
 				}
-			}
-			else
-			{
+			} else {
 				echo '<tr>
 						<td colspan="8" align="center">No Records found</td>
 					</tr>';

@@ -21,6 +21,7 @@ class Home extends CI_Controller {
 			
 	public function login()
 	{
+		$redirect_url = BASE_URL.'leads/list';
 		if(!empty($_POST)) {	
 			$username = $this->input->post('username');
 			$password = md5($this->input->post('password'));
@@ -50,6 +51,11 @@ class Home extends CI_Controller {
 				$roles = $this->admin_model->get_admin_roles($is_valid['admin_id']);
 				$current_role_id = $roles[0]['admin_role_id'];
 				
+				$sess_roles = array();
+				foreach($roles as $role){
+					$sess_roles[$role['admin_role_id']] = $role;
+				}
+				
 				$allowed_actions = get_all_allowed_actions($current_role_id, false, $is_valid['admin_id']);
 				
 				$actions = array();
@@ -64,12 +70,10 @@ class Home extends CI_Controller {
 					'email' => $is_valid['admin_email'],
 					'name' => $is_valid['admin_name'],
 					'current_role_id' => $current_role_id,
-					'roles' => $roles,
+					'roles' => $sess_roles,
 					'access' => $actions
 				);
 				$this->session->set_userdata('admin', $session_data);
-				
-				$redirect_url = BASE_URL.'dashboard';
 				
 				$response['status'] = true;
 				$response['message'] = 'Loggen In Successfully.';
@@ -82,6 +86,12 @@ class Home extends CI_Controller {
 			
 			echo json_encode($response); die;
 		} else {						
+			
+			$logged_session = $this->session->userdata('admin');
+			if(!empty($logged_session)){
+				redirect($redirect_url);
+			}
+			
 			$data['pageTitle'] = 'Login';
 			$this->load->view('login',$data);
 		}

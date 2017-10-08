@@ -97,6 +97,8 @@ class Admin extends CI_Controller {
 				$data['record'] = $this->admin_model->get_record('bs_admins', 'admin_id', $admin_id);
 				$data['admin_roles'] = $this->admin_model->get_admin_roles($admin_id);
 				
+				$data['ssa'] = $this->admin_model->get_SSA($data['record']['user_circle_id']);
+				
 				if(isset($_SERVER['HTTP_REFERER'])){			
 					$referer = array('referer' => $_SERVER['HTTP_REFERER']);
 					$this->session->set_userdata($referer);			
@@ -104,7 +106,9 @@ class Admin extends CI_Controller {
 				
 			} else {
 				chk_access('admins', 2, true);
-			}			
+			}	
+
+			$data['circles'] = $this->admin_model->get_Circles();
 			
 			$data['roles'] = $this->admin_model->get_all_roles();
 			
@@ -343,7 +347,7 @@ class Admin extends CI_Controller {
 	{		
 		chk_access('afe_users', 1, true);
 		
-		$per_page = 10; 
+		$per_page = 20; 
 		$page = @$_GET['per_page']? $_GET['per_page'] : 0;
 		
 		$result = $this->admin_model->get_afe_users($per_page, $page);
@@ -370,6 +374,18 @@ class Admin extends CI_Controller {
 		$this->load->view('layout',$data);
 	}
 	
+	public function afe_users_details($afe_id=NULL)
+	{
+		chk_access('afe_users', 1, true);
+		
+		$afe_id = DeCrypt($afe_id);
+		$data['record'] = $this->admin_model->get_afe_details($afe_id);
+		
+		$data['pageTitle'] = 'AFE Details';
+		$data['content'] = 'admin/afe_user_details';
+		$this->load->view('layout',$data);
+	}
+	
 	public function manage_afe($admin_id=NULL)
 	{				
 		if(!empty($_POST)) {					
@@ -392,16 +408,19 @@ class Admin extends CI_Controller {
 								
 		} else {												
 			
-			if(trim($admin_id) != '') {
+			if(!empty($admin_id)) {
 				chk_access('afe_users', 3, true);
 				
-				$admin_id = DeCrypt($admin_id);
+				$admin_id = DeCrypt($admin_id);				
+				$data['record'] = $this->admin_model->get_record('bs_afe_users', 'afe_id', $admin_id);
 				
-				$data['record'] = $this->admin_model->get_record_md5('bs_afe_users', 'afe_id', $admin_id);
+				$data['ssa'] = $this->admin_model->get_SSA($data['record']['user_circle_id']);
 				
 			} else {
 				chk_access('afe_users', 2, true);
-			}			
+			}	
+
+			$data['circles'] = $this->admin_model->get_Circles();
 						
 			$data['pageTitle'] = 'Manage AFE Users';
 			$data['content'] = 'admin/manage-afe-users';

@@ -1,5 +1,11 @@
 $(document).ready(function () {
 	
+	try{
+		if(hideTopBckBtn != undefined){
+			$('.hideTopBckBtn').hide();
+		}
+	} catch(Error){}
+	
 	$.validator.addMethod('alphaSpace', function (value, element) {		
 		var matchText = /^[A-Za-z\s]+$/i;
 		return this.optional(element) || matchText.test(value);;
@@ -128,7 +134,14 @@ function reloadSearch()
 		},
 		success : function(response){
 					showCustomLoader(false);
-					$('.table-responsive').html(response.result);
+					try {
+						if(response.subPageTitle != undefined){
+							$('.subPageTitle').html(response.subPageTitle);
+						} 
+						$('.table-responsive').html(response.result);
+					} catch(Error){ 
+						$('.table-responsive').html(response.result);
+					}
 				  }
 	});
 } 
