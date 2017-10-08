@@ -31,9 +31,23 @@ class Commission extends CI_Controller {
 			$year = $_GET['year'];
 		}
 		
+		$data["pageUrl"] = BASE_URL.'commissions/afe/list';
+		$current_role_id = $loggedIn_data['current_role_id'];
+		
+		$sts_in_whr = array();
+		if(!empty($_GET['t']) && $_GET['t'] == 'pending') {	
+			if($current_role_id == 2){
+				$sts_in_whr = array(2);
+			} else if($current_role_id == 7){
+				$sts_in_whr = array(3);
+			}
+			
+			$data["pageUrl"] = $data["pageUrl"].'?t=pending';
+			$month = '';
+		}
+		
 		$and_whre = get_loggedINCondtn('commission', $loggedIn_data);
 		
-		$data["pageUrl"] = BASE_URL.'commissions/afe/list';
 		if(!empty($_GET['m']) && $_GET['m'] == 'current'){
 			$month = $current_month; $year = $current_year;
 			$result = $this->admin_model->get_afe_commissions_monthly($per_page, $page, $month, $year, $and_whre);
@@ -41,13 +55,13 @@ class Commission extends CI_Controller {
 			
 		} else {
 			$current_month = $last_month;
-			$result = $this->admin_model->get_afe_commissions($per_page, $page, $month, $year, $and_whre);
+			$result = $this->admin_model->get_afe_commissions($per_page, $page, $month, $year, $and_whre, $sts_in_whr);
 		}
 		$data['records'] = @$result['results'];
 		
 		$total_rows = $result['count'];
 		
-		$base_url = BASE_URL.'commissions/afe/list?'.$_SERVER['QUERY_STRING'];
+		$base_url = $data["pageUrl"].'?'.$_SERVER['QUERY_STRING'];
 		
         $data["links"] = create_links($per_page,$total_rows,$base_url);
 		

@@ -110,7 +110,7 @@ $(document).ready(function(){
 									</a>
 									<ul role="menu" class="dropdown-menu">
 										<?php 
-											if(!empty($_SESSION['admin']['current_role_id']) && $_SESSION['admin']['current_role_id'] == 2){
+											if(!empty($_SESSION['admin']['current_role_id']) && in_array($_SESSION['admin']['current_role_id'], array(2,7))){
 										?>
 											<li class="<?php echo $this->uri->segment(2) == 'afe' && @$_GET['t'] == 'pending' ? 'active' : ''?>">
 												<a href="<?php echo BASE_URL.'commissions/afe/list?t=pending'?>">
@@ -197,10 +197,10 @@ $(document).ready(function(){
 										<span class="caret"></span>
 									</a>
 									<ul role="menu" class="dropdown-menu">
-										<li class="<?php echo $this->uri->segment(1) == 'reports' && $this->uri->segment(2) == 'afe' ? 'active' : ''?>">
-											<a href="<?php echo BASE_URL.'reports/afe'?>">
+										<li class="<?php echo $this->uri->segment(1) == 'reports' && $this->uri->segment(2) == 'leads' ? 'active' : ''?>">
+											<a href="<?php echo BASE_URL.'reports/leads'?>">
 												<i class="fa fa-list-alt"></i>&nbsp;
-												<span class="nav-label">AFE Leads Report</span>
+												<span class="nav-label">Leads Report</span>
 											</a>
 										</li>
 									</ul>
@@ -252,7 +252,7 @@ $(document).ready(function(){
 			<div class="row back_to_lst_dv">
 				<?php 
 					$current_url = current_url();
-					if(strstr($current_url, '/list') != '/list') {
+					if(strstr($current_url, '/list') != '/list' && strstr($current_url, 'dashboard') != 'dashboard') {
 						$refrer = $this->agent->referrer();
 						if(!empty($refrer)){
 							$this->session->set_userdata('http_referer', $refrer);
@@ -288,7 +288,7 @@ $(document).ready(function(){
 <script src="<?php echo ASSETS_URL?>js/inspinia.js"></script>
 <script src="<?php echo ASSETS_URL?>js/sweet-alert.min.js"></script>
 <script src="<?php echo ASSETS_URL?>js/plugins/validate/jquery.validate.min.js"></script>
-<script src="<?php echo ASSETS_URL?>js/developer.js?v=1.1"></script>
+<script src="<?php echo ASSETS_URL?>js/developer.js?v=1.2"></script>
 <script src="<?php echo ASSETS_URL?>js/jquery.datetimepicker.js"></script>
 
 <link href="<?php echo ASSETS_URL?>css/jquery.datetimepicker.css" rel="stylesheet">

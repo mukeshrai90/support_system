@@ -110,6 +110,23 @@ $(document).ready(function () {
 					  }
 		});
 	});
+	
+	$(document).on('click','.print_page',function(e){
+		//e.preventDefault();
+		
+		var thisRel = $(this).attr('rel');
+		
+		var current_url = window.location.href;
+		var reg = /[\=\&]/;
+		if(reg.test(current_url)){
+			current_url = current_url + '&print=YES';
+		} else {
+			current_url = current_url + '?print=YES';
+		}
+		
+		$(this).attr('href', current_url);
+		//console.log(current_url);
+	});
 });
 
 function reloadSearch() 

@@ -27,7 +27,7 @@
 					<?php 
 						echo '<span class="sts_spn">'.$rcd['current_status'].'</span>';
 						
-						if($logged_in_role_id == 1 || (in_array($rcd['commission_status_id'], array(1,2,6,4)) && $logged_in_role_id == 3 && @$_GET['month'] != 'current') || (in_array($rcd['commission_status_id'], array(2)) && $logged_in_role_id == 2 && !empty($_GET['t']) && $_GET['t'] == 'pending') || (in_array($rcd['commission_status_id'], array(3)) && $logged_in_role_id == 7 && @$_GET['month'] != 'current')) {
+						if(($logged_in_role_id == 1 && $rcd['commission_status_id'] > 0) || (in_array($rcd['commission_status_id'], array(1,2,6,4)) && $logged_in_role_id == 3 && @$_GET['month'] != 'current') || (in_array($rcd['commission_status_id'], array(2)) && $logged_in_role_id == 2 && !empty($_GET['t']) && $_GET['t'] == 'pending') || (in_array($rcd['commission_status_id'], array(3)) && $logged_in_role_id == 7 && @$_GET['month'] != 'current')) {
 							echo '<br/><span class="change_com_sts_spn" data-c="'.EnCrypt($rcd['commission_id']).'">Change</span>';
 						}
 					?>

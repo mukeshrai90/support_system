@@ -75,6 +75,10 @@ class Home extends CI_Controller {
 				);
 				$this->session->set_userdata('admin', $session_data);
 				
+				if($current_role_id == 7){
+					$redirect_url = BASE_URL.'commissions/afe/list';
+				}
+				
 				$response['status'] = true;
 				$response['message'] = 'Loggen In Successfully.';
 				$response['redirectTo'] = $redirect_url;

@@ -57,7 +57,7 @@
 									</select>	
 								</div>
 								<?php 
-									if(empty($_GET['m'])){
+									if(empty($_GET['m']) && empty($_GET['t'])){
 								?>
 									<div class="col-md-3 form-group">
 										<label class="control-label">Month</label>

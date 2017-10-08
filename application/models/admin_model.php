@@ -1090,8 +1090,12 @@ class Admin_model extends CI_Model
 		return $results;
 	}
 	
-	public function get_afe_commissions($limit, $start, $month, $year, $and_whre=array()){
-		$data = array(); $where = array('commission_month' => $month, 'commission_year ' => $year, 'commission_status_id > ' => 0); 
+	public function get_afe_commissions($limit, $start, $month, $year, $and_whre=array(), $sts_in_whr=array()){
+		$data = array(); $where = array('commission_status_id > ' => 0); 
+		
+		if(!empty($month)){
+			$where = array_merge($where, array('commission_month' => $month, 'commission_year ' => $year));		
+		}
 		
 		if(!empty($and_whre)){
 			$where = array_merge($where, $and_whre);		
@@ -1101,13 +1105,9 @@ class Admin_model extends CI_Model
 			$where = array_merge($where, array('bs_afe_users.afe_id' => DeCrypt($_GET['afe'])));	
 		}
 		
-		$in_whr = array();
-		if(!empty($_GET['t']) && $_GET['t'] == 'pending') {	
-			$in_whr = array(2,4);
-		}
-		 
-		if(!empty($in_whr)){
-			$this->db->where_in('commission_status_id', $in_whr);
+		
+		if(!empty($sts_in_whr)){
+			$this->db->where_in('commission_status_id', $sts_in_whr);
 		}
 		$this->db->where($where);
 		$this->db->from('bs_afe_commissions');
@@ -1119,8 +1119,8 @@ class Admin_model extends CI_Model
 		
 		$this->db->select('bs_afe_commissions.*, bs_afe_users.afe_id, bs_afe_users.afe_name, bs_afe_users.afe_mobile, bs_afe_commission_status.status_name_long as current_status, bs_commission_master.rate as commission_rate');
 		$this->db->where($where);
-		if(!empty($in_whr)){
-			$this->db->where_in('commission_status_id', $in_whr);
+		if(!empty($sts_in_whr)){
+			$this->db->where_in('commission_status_id', $sts_in_whr);
 		}
 		$this->db->limit($limit, $start);
 		$this->db->join('bs_afe_commission_status', 'bs_afe_commission_status.status_id=bs_afe_commissions.commission_status_id', 'INNER'); 
@@ -1460,5 +1460,80 @@ class Admin_model extends CI_Model
 		$results['admin'] = $admin;
 		
 		return $results;
+	}
+	
+	public function get_leads($limit, $start, $and_whre){
+		$data = $where = array();
+		
+		if(!empty($_GET['afe'])){
+			$where = array_merge($where, array('bs_afe_users.afe_id' =>  DeCrypt($_GET['afe'])));
+		}
+		
+		if(!empty($_GET['from_date'])){
+			$where = array_merge($where, array('user_added_on >=' => date('Y-m-d', strtotime($_GET['from_date']))));
+		}
+		
+		if(!empty($_GET['to_date'])){
+			$where = array_merge($where, array('user_added_on <=' => date('Y-m-d', strtotime($_GET['to_date']))));
+		}
+		
+		if(!empty($_GET['month']) && !empty($_GET['year'])){
+			$where = array_merge($where, array('YEAR(user_added_on)' => $_GET['year'], 'YEAR(user_added_on)' => $_GET['year']));
+		}
+		
+		if(!empty($_GET['circle'])){
+			$where = array_merge($where, array('bs_users.user_circle_id' => $_GET['circle']));
+		}
+		
+		$this->db->select('bs_users.user_full_name, bs_users.user_mobile, bs_plans.plan_name, bs_plans.plan_rental, bs_lead_status.status_name as current_status, bs_afe_users.afe_name, bs_afe_users.afe_mobile, bs_circles.circle_name, bs_ssa.ssa_name');
+		$this->db->join('bs_lead_status', 'bs_lead_status.status_id=bs_users.user_lead_status_id', 'INNER');
+		$this->db->join('bs_user_plans', 'bs_user_plans.user_id=bs_users.user_id', 'INNER'); 
+		$this->db->join('bs_plans', 'bs_plans.plan_id=bs_user_plans.user_plan_id', 'INNER'); 
+		$this->db->join('bs_circles', 'bs_circles.circle_id=bs_users.user_circle_id', 'INNER'); 
+		$this->db->join('bs_ssa', 'bs_ssa.ssa_id=bs_users.user_ssa_id', 'INNER'); 
+		$this->db->join('bs_afe_users', 'bs_afe_users.afe_id=bs_users.user_afe_referer_id', 'INNER'); 
+		$this->db->order_by('bs_users.user_id','desc'); 
+		$this->db->where($where); 
+		
+		$leads = $this->db->get("bs_users")->result_array();
+		
+		$data['count'] = 0;
+		$data['results'] = $leads;
+		
+		return $data;
+	}
+	
+	public function get_leads_cnt($limit, $start, $and_whre){
+		$data = $where = array();
+		
+		if(!empty($_GET['from_date'])){
+			$where = array_merge($where, array('user_added_on >=' => date('Y-m-d', strtotime($_GET['from_date']))));
+		}
+		
+		if(!empty($_GET['to_date'])){
+			$where = array_merge($where, array('user_added_on <=' => date('Y-m-d', strtotime($_GET['to_date']))));
+		}
+		
+		if(!empty($_GET['month']) && !empty($_GET['year'])){
+			$where = array_merge($where, array('YEAR(user_added_on)' => $_GET['year'], 'YEAR(user_added_on)' => $_GET['year']));
+		}
+		
+		if(!empty($_GET['circle'])){
+			$where = array_merge($where, array('bs_afe_users.afe_circle_id' => $_GET['circle']));
+		}
+		
+		$this->db->select('bs_afe_users.afe_id, bs_afe_users.afe_name, bs_afe_users.afe_mobile, COUNT(bs_users.user_afe_referer_id) as total_leads, bs_circles.circle_name, bs_ssa.ssa_name');
+		$this->db->join('bs_circles', 'bs_circles.circle_id=bs_afe_users.afe_circle_id', 'INNER'); 
+		$this->db->join('bs_ssa', 'bs_ssa.ssa_id=bs_afe_users.afe_ssa_id', 'INNER'); 
+		$this->db->join('bs_users', 'bs_users.user_afe_referer_id=bs_afe_users.afe_id', 'LEFT'); 
+		$this->db->group_by('bs_afe_users.afe_id'); 
+		$this->db->order_by('bs_afe_users.afe_name','desc');
+		$this->db->where($where); 		
+		$leads = $this->db->get("bs_afe_users")->result_array();
+		
+		$data['count'] = 0;
+		$data['results'] = $leads;
+		
+		return $data;
 	}
 }	

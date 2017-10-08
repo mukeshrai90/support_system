@@ -8,10 +8,11 @@
     border-color: #1ab394;
     color: #ffffff;
 }
-.add-new-btn{
+a.add-new-btn{
 	//float: right;
     margin-top: -7px;
 	margin-right: 6px;
+	color: #fff;
 }
 #description_tbl{height:320px !important;}
 .loding-cursor{

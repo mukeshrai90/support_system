@@ -9,44 +9,32 @@ class Report extends CI_Controller {
 		$this->load->model('admin_model');	
 	}
 	
-	public function get_afe_reports()
+	public function get_leads_reports()
 	{
 		$loggedIn_data = chk_access('reports', 1, true);
 		
 		$per_page = 20; 
         $page = @$_GET['per_page']? $_GET['per_page'] : 0;
 		
-		$current_month = date('m');
-		$current_year = date('Y');
-		$last_month = date('m', strtotime('-27 days'));
-		$last_month_year = date('Y', strtotime('-27 days'));
-		
-		$month = $last_month;
 		if(!empty($_GET['month'])) {	
 			$month = $_GET['month'];
 		}
 		
-		$year = $last_month_year;
 		if(!empty($_GET['year'])) {	
 			$year = $_GET['year'];
 		}
 		
-		$data["pageUrl"] = BASE_URL.'incentives/fe/list';
-		if(!empty($_GET['m']) && $_GET['m'] == 'current'){
-			$month = $current_month; $year = $current_year;
-			$result = $this->admin_model->get_incentives_list_monthly($per_page, $page, $month, $year, 3, false, $and_whre);
-			$data["pageUrl"] = $data["pageUrl"].'?m=current';
-			
-		} else {
-			$current_month = $last_month;
-			$result = $this->admin_model->get_incentives_list($per_page, $page, $month, $year, 3, $and_whre);
+		if(!empty($_GET['report_type']) && $_GET['report_type'] == 'o_l'){
+			$result = $this->admin_model->get_leads($per_page, $page);
+			$element_name = 'elements/leads-report-list';
+		} else if(!empty($_GET['report_type']) && $_GET['report_type'] == 'l_c'){
+			$result = $this->admin_model->get_leads_cnt($per_page, $page);
+			$element_name = 'elements/leads-report-cnt-list';
 		}
+		
+		$data['count'] = @$result['count'];
 		$data['records'] = @$result['results'];
 		
-        $data["current_month"] = $current_month;
-        $data["current_year"] = $current_year;
-        $data["last_month"] = $last_month;
-        $data["last_month_year"] = $last_month_year;
         $data["month"] = $month;
         $data["year"] = $year;
         $data["logged_in_role_id"] = $loggedIn_data['current_role_id'];
@@ -55,16 +43,28 @@ class Report extends CI_Controller {
 		$data['subPageTitle'] = ' | '.$months_arr_gl[$month]." - $year";
 		$data['months_arr_gl'] = $months_arr_gl;
 		
+		$data['pageTitle'] = 'Leads Report';
+		$data['element_name'] = $element_name;
+		
+		if(!empty($_GET['print']) && $_GET['print'] == 'YES'){
+			$data['called_for_print'] = true;
+			$data['content'] = $element_name;
+			
+			$print_html = $this->load->view('print_layout', $data, true);
+			echo ($print_html);die;
+		}
+		
 		if($this->input->is_ajax_request()) {
-			$data['result'] = $this->load->view('elements/afe-reports-list',$data,true);
+			$data['result'] = $this->load->view($element_name ,$data, true);
 			echo json_encode($data);die;
 		}
 		
 		$and_whre = get_loggedINCondtn($loggedIn_data);
 		$data["afe_users"] = $this->admin_model->get_all_afes($and_whre);
 		
-		$data['pageTitle'] = 'AFE Leads Report';
-		$data['content'] = 'report/afe_reports';
+		$data['circles'] = $this->admin_model->get_Circles();
+		
+		$data['content'] = 'report/leads_reports';
 		$this->load->view('layout',$data);
 	}
 }
