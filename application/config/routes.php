@@ -103,6 +103,7 @@ $route['commissions/change/status'] = "commission/changet_commissions_sts";
 
 $route['incentives/fe/list'] = "incentive/fe_incentives";
 $route['incentives/cbh/list'] = "incentive/cbh_incentives";
+$route['incentives/cbh/view/leads'] = "incentive/get_cbh_incentive_leads";
 $route['incentives/view/leads'] = "incentive/get_incentive_leads";
 
 $route['reports/leads'] = "report/get_leads_reports";

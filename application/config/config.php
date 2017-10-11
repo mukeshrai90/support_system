@@ -36,7 +36,8 @@ $months_arr_gl = array('01' => 'January', '02' => 'February', '03' => 'March', '
 defined('MONTHS_ARR_GL') or define('MONTHS_ARR_GL', json_encode($months_arr_gl));
 
 defined('FE_TARGET') or define('FE_TARGET' , 0);
-defined('CBH_TARGET') or define('CBH_TARGET' , 0);
+defined('AFE_TARGET') or define('AFE_TARGET' , 0);
+defined('AFE_LEADS_TARGET') or define('AFE_LEADS_TARGET' , 0);
 
 /*
 |--------------------------------------------------------------------------

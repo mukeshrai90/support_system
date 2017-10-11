@@ -34,9 +34,9 @@
 				</td>
 				<td class="tooltip-demo">
 					<?php 
-						if($rcd['commission_total_leads'] > 0){
+						if($rcd['commission_total_leads'] > 0 && !isset($fromPage)){
 					?>
-						<a href="<?php echo BASE_URL.'commissions/afe/view/leads?month='.$month.'&year='.$year.'&afe='.EnCrypt($rcd['afe_id'])?>" title="View" class="actions-a" data-toggle="tooltip" data-placement="bottom">
+						<a href="<?php echo BASE_URL.'commissions/afe/view/leads?month='.$month.'&year='.$year.'&afe='.EnCrypt($rcd['afe_id']).'&inner=true'?>" title="View" class="actions-a inc_comm_detls_load_ajx" data-toggle="tooltip" data-placement="bottom">
 							<i class="fa fa-eye text-navy"></i>
 						</a>
 					<?php } ?>

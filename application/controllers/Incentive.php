@@ -7,6 +7,7 @@ class Incentive extends CI_Controller {
 		parent::__construct();		
 		$this->load->database();	
 		$this->load->model('admin_model');	
+		$this->months_arr_gl = json_decode(MONTHS_ARR_GL, TRUE);
 	}
 	
 	public function fe_incentives()
@@ -36,7 +37,7 @@ class Incentive extends CI_Controller {
 		$data["pageUrl"] = BASE_URL.'incentives/fe/list';
 		if(!empty($_GET['m']) && $_GET['m'] == 'current'){
 			$month = $current_month; $year = $current_year;
-			$result = $this->admin_model->get_incentives_list_monthly($per_page, $page, $month, $year, 3, false, $and_whre);
+			$result = $this->admin_model->get_fe_incentives_list_monthly($per_page, $page, $month, $year, 3, false, $and_whre);
 			$data["pageUrl"] = $data["pageUrl"].'?m=current';
 			
 		} else {
@@ -59,9 +60,8 @@ class Incentive extends CI_Controller {
         $data["year"] = $year;
         $data["logged_in_role_id"] = $loggedIn_data['current_role_id'];
 		
-		$months_arr_gl = json_decode(MONTHS_ARR_GL, TRUE);
-		$data['subPageTitle'] = ' | '.$months_arr_gl[$month]." - $year";
-		$data['months_arr_gl'] = $months_arr_gl;
+		$data['subPageTitle'] = ' | '.$this->months_arr_gl[$month]." - $year";
+		$data['months_arr_gl'] = $this->months_arr_gl;
 		
 		if($this->input->is_ajax_request()) {
 			$data['result'] = $this->load->view('elements/fe-incentives-list',$data,true);
@@ -69,6 +69,8 @@ class Incentive extends CI_Controller {
 		}
 		
 		$data["admins"] = $this->admin_model->get_all_admins_byRole(3);
+		
+		$this->session->unset_userdata('inctvcbh_htprfr');
 		
 		$data['pageTitle'] = 'FE Incentives';
 		$data['content'] = 'incentive/fe-incentives';
@@ -102,7 +104,7 @@ class Incentive extends CI_Controller {
 		$data["pageUrl"] = BASE_URL.'incentives/cbh/list';
 		if(!empty($_GET['m']) && $_GET['m'] == 'current'){
 			$month = $current_month; $year = $current_year;
-			$result = $this->admin_model->get_incentives_list_monthly($per_page, $page, $month, $year, 2, false, $and_whre);
+			$result = $this->admin_model->get_cbh_incentives_list_monthly($per_page, $page, $month, $year, 2, false, $and_whre);
 			$data["pageUrl"] = $data["pageUrl"].'?m=current';
 			
 		} else {
@@ -125,9 +127,8 @@ class Incentive extends CI_Controller {
         $data["year"] = $year;
         $data["logged_in_role_id"] = $loggedIn_data['current_role_id'];
 		
-		$months_arr_gl = json_decode(MONTHS_ARR_GL, TRUE);
-		$data['subPageTitle'] = ' | '.$months_arr_gl[$month]." - $year";
-		$data['months_arr_gl'] = $months_arr_gl;
+		$data['subPageTitle'] = ' | '.$this->months_arr_gl[$month]." - $year";
+		$data['months_arr_gl'] = $this->months_arr_gl;
 		
 		if($this->input->is_ajax_request()) {
 			$data['result'] = $this->load->view('elements/cbh-incentives-list',$data,true);
@@ -136,8 +137,50 @@ class Incentive extends CI_Controller {
 		
 		$data["admins"] = $this->admin_model->get_all_admins_byRole(2);
 		
+		$this->session->unset_userdata('inctvcbh_htprfr');
+		
 		$data['pageTitle'] = 'CBH Incentives';
 		$data['content'] = 'incentive/cbh-incentives';
+		$this->load->view('layout',$data);
+	}
+	
+	public function get_cbh_incentive_leads(){
+		chk_access('incentives', 1, true);
+		
+		$per_page = 20; 
+        $page = @$_GET['per_page']? $_GET['per_page'] : 0;
+		
+		$admin_id = DeCrypt($_GET['admin']);
+		$month = $_GET['month'];
+		$year = $_GET['year'];
+		
+        $result = $this->admin_model->get_cbh_incentive_leads($per_page, $page, $admin_id, $month, $year);		
+		$data['records'] = @$result['results'];
+		
+		$total_rows = $result['count'];
+		
+		$base_url = BASE_URL.'incentives/cbh/view/leads?'.$_SERVER['QUERY_STRING'];
+		
+		$admin = $result['admin'];
+		$data["month"] = $month;
+		$data["year"] = $year;
+		
+        $data["links"] = create_links($per_page,$total_rows,$base_url);
+		$data['subPageTitle'] = " <i>({$admin['admin_name']} [{$admin['admin_username']}]) &nbsp;&nbsp;&nbsp; |  &nbsp;&nbsp;&nbsp;".$this->months_arr_gl[$month]." - $year </i>";
+		$data['pageTitle'] = 'FE Lead Details for';
+		$data['fromPage'] = 'cbh_incentives';
+		
+		if($this->input->is_ajax_request()) {
+			$data['result'] = $this->load->view('elements/fe-incentive-list',$data,true);
+			
+			if(!empty($_GET['inner'])){
+				$data['pageTitleNew'] = $data['pageTitle'].' '.$data['subPageTitle'];
+				$data['result'] = $this->load->view('ajax_modal_list_layout', $data, true);
+			}
+			echo json_encode($data);die;
+		}
+		
+		$data['content'] = 'incentive/fe-incentives';
 		$this->load->view('layout',$data);
 	}
 	
@@ -163,16 +206,20 @@ class Incentive extends CI_Controller {
 		$data["year"] = $year;
 		
         $data["links"] = create_links($per_page,$total_rows,$base_url);
+		$data['subPageTitle'] = " <i>({$admin['admin_name']} [{$admin['admin_username']}]) &nbsp;&nbsp;&nbsp; |  &nbsp;&nbsp;&nbsp;".$this->months_arr_gl[$month]." - $year </i>";
+		$data['pageTitle'] = 'AFE Lead Details for';
+		$data['fromPage'] = 'incentives';
 		
 		if($this->input->is_ajax_request()) {
 			$data['result'] = $this->load->view('elements/afe-commission-list',$data,true);
+			
+			if(!empty($_GET['inner'])){
+				$data['pageTitleNew'] = $data['pageTitle'].' '.$data['subPageTitle'];
+				$data['result'] = $this->load->view('ajax_modal_list_layout', $data, true);
+			}
 			echo json_encode($data);die;
 		}
 		
-		$data['fromPage'] = 'incentives';
-		
-		$data['subPageTitle'] = " ({$admin['admin_name']} [{$admin['admin_username']}])";
-		$data['pageTitle'] = 'Leads';
 		$data['content'] = 'commission/afe_commissions';
 		$this->load->view('layout',$data);
 	}

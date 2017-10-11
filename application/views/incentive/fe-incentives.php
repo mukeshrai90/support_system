@@ -10,72 +10,87 @@
 					<h5>
 						FE Incentives 
 						<span class="subPageTitle">
-							<?=$subPageTitle?>
+							<i><?=$subPageTitle?></i>
 						</span>
 					</h5>	
+					<?php 
+						if(isset($fromPage) && $fromPage == 'cbh_incentives') {
+							$refrer = $this->agent->referrer();
+							$inctvcbh_htprfr = $this->session->userdata('inctvcbh_htprfr');
+							if(!empty($refrer) && empty($inctvcbh_htprfr)){
+								$this->session->set_userdata('inctvcbh_htprfr', $refrer);
+							}
+							
+							echo '<div class="ibox-tools">
+										<button type="button" class="btn btn-sm btn-danger refresh-all add-new-btn" data-url="'.$this->session->userdata('inctvcbh_htprfr').'">Back to Incentives</button>
+								  </div>';
+						} 
+					?>
 				</div>
 				<div class="ibox-content">
 					<form id="search-form" action="javascript:;">
-						<div class="col-lg-12 search-area">
-							<div class="col-md-3 form-group">
-								<label class="control-label">FE</label>
-								<select class="form-control" name="admin">
-									<option value="">Select</option>
-									<?php 
-										if(isset($admins)) {
-											foreach($admins as $rcd) {
-												$selected = '';
-												if($rcd['admin_id'] == @DeCrypt($_GET['admin'])) {
-													$selected = 'selected';
-												}
-												echo '<option value="'.EnCrypt($rcd['admin_id']).'" '.$selected.'>'.$rcd['admin_name'].'</option>';
-											}
-										}
-									?>
-								</select>	
-							</div>
-							<?php 
-								if(empty($_GET['m'])){
-							?>
+						<?php if(!isset($fromPage)){ ?>
+							<div class="col-lg-12 search-area">
 								<div class="col-md-3 form-group">
-									<label class="control-label">Month</label>
-									<select class="form-control" name="month" id="mnth_slct">
+									<label class="control-label">FE</label>
+									<select class="form-control" name="admin">
+										<option value="">Select</option>
 										<?php 
-											foreach($months_arr_gl as $k=>$m){
-												$selected = '';
-												if($month == $k){
-													$selected = 'selected';
-												}
-												
-												if($year == $current_year && $k > $current_month){
-													echo "<option value='$k' $selected class='hdn_optn'>$m</option>";
-												} else {
-													echo "<option value='$k' $selected>$m</option>";
+											if(isset($admins)) {
+												foreach($admins as $rcd) {
+													$selected = '';
+													if($rcd['admin_id'] == @DeCrypt($_GET['admin'])) {
+														$selected = 'selected';
+													}
+													echo '<option value="'.EnCrypt($rcd['admin_id']).'" '.$selected.'>'.$rcd['admin_name'].'</option>';
 												}
 											}
 										?>
 									</select>	
 								</div>
-								<div class="col-md-3 form-group">
-									<label class="control-label">Year</label>
-									<select class="form-control" name="year" id="yr_slct">
-										<?php 
-											for($i=$current_year; $i > $current_year-10; $i--){
-												$selected = '';
-												if($year == $i){
-													$selected = 'selected';
+								<?php 
+									if(empty($_GET['m'])){
+								?>
+									<div class="col-md-3 form-group">
+										<label class="control-label">Month</label>
+										<select class="form-control" name="month" id="mnth_slct">
+											<?php 
+												foreach($months_arr_gl as $k=>$m){
+													$selected = '';
+													if($month == $k){
+														$selected = 'selected';
+													}
+													
+													if($year == $current_year && $k > $current_month){
+														echo "<option value='$k' $selected class='hdn_optn'>$m</option>";
+													} else {
+														echo "<option value='$k' $selected>$m</option>";
+													}
 												}
-												echo "<option value='$i' $selected>$i</option>";
-											}
-										?>
-									</select>	
+											?>
+										</select>	
+									</div>
+									<div class="col-md-3 form-group">
+										<label class="control-label">Year</label>
+										<select class="form-control" name="year" id="yr_slct">
+											<?php 
+												for($i=$current_year; $i > $current_year-10; $i--){
+													$selected = '';
+													if($year == $i){
+														$selected = 'selected';
+													}
+													echo "<option value='$i' $selected>$i</option>";
+												}
+											?>
+										</select>	
+									</div>
+								<?php } ?>
+								<div class="col-md-12">
+									<button type="button" class="btn btn-sm btn-primary search-btn">Search!</button>
+									<button type="button" class="btn btn-sm btn-default refresh-all" data-url="<?php echo $pageUrl?>">Reset</button>
 								</div>
-							<?php } ?>
-							<div class="col-md-12">
-								<button type="button" class="btn btn-sm btn-primary search-btn">Search!</button>
-								<button type="button" class="btn btn-sm btn-default refresh-all" data-url="<?php echo $pageUrl?>">Reset</button>
-							</div>
-						</div>	
+							</div>	
+						<?php } ?>
 					</form>
 					<div class="table-responsive">
 						<?php $this->load->view('elements/fe-incentive-list');?>

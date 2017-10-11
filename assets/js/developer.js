@@ -111,6 +111,7 @@ $(document).ready(function () {
 		});
 	});
 	
+	
 	$(document).on('click','.print_page',function(e){
 		//e.preventDefault();
 		
@@ -126,6 +127,37 @@ $(document).ready(function () {
 		
 		$(this).attr('href', current_url);
 		//console.log(current_url);
+	});
+	
+	$(document).on('click','.inc_comm_detls_load_ajx',function(e){
+		e.preventDefault();
+		
+		var href = $(this).attr('href');
+		if(href != ''){
+			$('#myIncCommDtlsModal').modal('toggle');
+			var ldrHtml = '<div class="row" id="prod_loader_div" style="text-align:center;margin:28px 0px;">'+
+								'<div class="col-lg-12">'+
+									'<img alt="loading" src="'+ASSETS_URL+'img/ajax_loader1.gif"/>'+
+								'</div>'+
+							'</div>';
+							
+			$('#myIncCommDtlsModal').find('.modal-body').html(ldrHtml);
+			//return false;
+			$.ajax({
+				type : 'POST',
+				url : href,				
+				dataType : 'json',
+				error : function(){
+					customAlertBox('Unable to proocess your request right now.<br/> Please try again or some time later', 'e');
+					$('#myIncCommDtlsModal').find('.modal-body').html('');
+				},
+				success : function(response){
+					 $('#myIncCommDtlsModal').find('.modal-title').html(response.pageTitleNew);
+					 $('#myIncCommDtlsModal').find('.modal-body').html(response.result);
+				}
+			});
+			return false;
+		}
 	});
 });
 

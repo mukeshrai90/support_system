@@ -100,20 +100,15 @@ class Cron extends CI_Controller {
 		
 		$response = '';
 		if(!empty($cr_rt)) {
-			$result = $this->admin_model->get_incentives_list_monthly('', '', $last_month, $last_month_year, 3, true);
+			$result = $this->admin_model->get_fe_incentives_list_monthly('', '', $last_month, $last_month_year, 3, true);
 			$records = $result['results'];
 			
 			$InsertData = array(); $afe_ids = array();
 			if(!empty($records)) {
 				foreach($records as $rcd){
 					$tmp = array();
-					
-					$incentive_rate = $cr_rt['rate'];
-					$total_plans_amt = $rcd['total_plans_amt'];
+				
 					if($total_plans_amt > 0){
-						//$total_plans_amt = number_format($total_plans_amt, 2);
-						
-						$incentive_amount = $total_plans_amt*($incentive_rate/100);
 						
 						$admin_ids[] = $rcd['admin_id'];
 						
@@ -122,11 +117,11 @@ class Cron extends CI_Controller {
 						$tmp['incentive_admin_id'] = $rcd['admin_id'];
 						$tmp['incentive_month'] = $last_month;
 						$tmp['incentive_year'] = $last_month_year;
-						$tmp['incentive_amount'] = $incentive_amount;
-						$tmp['total_plans_amt'] = $total_plans_amt;
+						$tmp['incentive_amount'] = $rcd['incentive_amount'];
+						$tmp['total_plans_amt'] = $rcd['total_plans_amt'];
 						$tmp['incentive_status_id'] = 1;
 						$tmp['incentive_generated_on'] = date('Y-m-d :i:s');
-						$tmp['incentive_total_leads'] = $this->admin_model->get_admin_leads_count($rcd['admin_id'], 3, $last_month, $last_month_year);
+						$tmp['incentive_total_leads'] = $rcd['incentive_total_leads'];
 						
 						$InsertData[] = $tmp;
 					}
@@ -180,7 +175,7 @@ class Cron extends CI_Controller {
 		
 		$response = '';
 		if(!empty($cr_rt)) {
-			$result = $this->admin_model->get_incentives_list_monthly('', '', $last_month, $last_month_year, 2, true);
+			$result = $this->admin_model->get_cbh_incentives_list_monthly('', '', $last_month, $last_month_year, 2, true);
 			$records = $result['results'];
 			
 			$InsertData = array(); $afe_ids = array();
@@ -188,12 +183,7 @@ class Cron extends CI_Controller {
 				foreach($records as $rcd){
 					$tmp = array();
 					
-					$incentive_rate = $cr_rt['rate'];
-					$total_plans_amt = $rcd['total_plans_amt'];
 					if($total_plans_amt > 0){
-						//$total_plans_amt = number_format($total_plans_amt, 2);
-						
-						$incentive_amount = $total_plans_amt*($incentive_rate/100);
 						
 						$admin_ids[] = $rcd['admin_id'];
 						
@@ -202,11 +192,11 @@ class Cron extends CI_Controller {
 						$tmp['incentive_admin_id'] = $rcd['admin_id'];
 						$tmp['incentive_month'] = $last_month;
 						$tmp['incentive_year'] = $last_month_year;
-						$tmp['incentive_amount'] = $incentive_amount;
-						$tmp['total_plans_amt'] = $total_plans_amt;
+						$tmp['incentive_amount'] = $rcd['incentive_amount'];
+						$tmp['total_plans_amt'] = $rcd['total_plans_amt'];
 						$tmp['incentive_status_id'] = 1;
 						$tmp['incentive_generated_on'] = date('Y-m-d H:i:s');
-						$tmp['incentive_total_leads'] = $this->admin_model->get_admin_leads_count($rcd['admin_id'], 2, $last_month, $last_month_year);
+						$tmp['incentive_total_leads'] = $rcd['incentive_total_leads'];
 						
 						$InsertData[] = $tmp;
 					}

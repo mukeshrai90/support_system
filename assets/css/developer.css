@@ -91,3 +91,7 @@ a.actions-a{margin-right: 12px;}
 .back_to_lst_dv{margin-top: 20px;text-align: right;margin-right: 3%;}
 .change_com_sts_spn,.cncl_chnge_sts_spn{color:#da251d;font-size: 11px;cursor:pointer;}
 .chnge_sts_slct{width:90%;}
+#myIncCommDtlsModal div.modal-dialog{width:80% !important}
+#myIncCommDtlsModal .incCommDtlsBckBtn{float: right;margin-right: 15px;}
+#myIncCommDtlsModal h4.modal-title{float: left;}
+#myIncCommDtlsModal div.modal-header{overflow: hidden;}

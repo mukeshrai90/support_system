@@ -6,12 +6,12 @@
 
 <title><?php echo @$pageTitle?></title>
 
-<link rel="shortcut icon" type="image/png" href="<?php echo ASSETS_URL?>frontend/images/favicon.png"/>
+<link rel="shortcut icon" type="image/png" href="<?php echo ASSETS_URL?>img/favicon.png"/>
 <link href="<?php echo ASSETS_URL?>css/bootstrap.min.css" rel="stylesheet">
 <link href="<?php echo ASSETS_URL?>font-awesome/css/font-awesome.min.css" rel="stylesheet">   
 <link href="<?php echo ASSETS_URL?>css/animate.css" rel="stylesheet">
 <link href="<?php echo ASSETS_URL?>css/style.min.css" rel="stylesheet">
-<link href="<?php echo ASSETS_URL?>css/developer.css?v=1.0" rel="stylesheet">	
+<link href="<?php echo ASSETS_URL?>css/developer.css?v=1.1" rel="stylesheet">	
 <script src="<?php echo ASSETS_URL?>js/jquery-2.1.1.js"></script>
 <link href="<?php echo ASSETS_URL?>css/sweet-alert.css" rel="stylesheet">
 <script src="<?php echo ASSETS_URL?>js/sweet-alert.min.js"></script>
@@ -267,6 +267,21 @@ $(document).ready(function(){
 		</div>
     </div>
 
+<div id="myIncCommDtlsModal" class="modal fade" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title"></h4>
+				<!--<button class="btn btn-sm btn-primary m-t-n-xs incCommDtlsBckBtn" type="button"><strong>Back</strong></button>-->	
+			</div>
+			<div class="modal-body" style="padding: 2px;">						
+					
+			</div>
+		</div>
+	</div>
+</div>
+
 <?php 
 	$flashMessage = '';$flashType = '';
 	if($this->session->flashdata('success')){
@@ -288,7 +303,7 @@ $(document).ready(function(){
 <script src="<?php echo ASSETS_URL?>js/inspinia.js"></script>
 <script src="<?php echo ASSETS_URL?>js/sweet-alert.min.js"></script>
 <script src="<?php echo ASSETS_URL?>js/plugins/validate/jquery.validate.min.js"></script>
-<script src="<?php echo ASSETS_URL?>js/developer.js?v=1.2"></script>
+<script src="<?php echo ASSETS_URL?>js/developer.js?v=1.3"></script>
 <script src="<?php echo ASSETS_URL?>js/jquery.datetimepicker.js"></script>
 
 <link href="<?php echo ASSETS_URL?>css/jquery.datetimepicker.css" rel="stylesheet">

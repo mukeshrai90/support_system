@@ -10,7 +10,7 @@
 					<h5>
 						CBH Incentives 
 						<span class="subPageTitle">
-							<?=$subPageTitle?>
+							<i><?=$subPageTitle?></i>
 						</span>
 					</h5>	
 				</div>

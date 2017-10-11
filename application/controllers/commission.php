@@ -7,6 +7,7 @@ class Commission extends CI_Controller {
 		parent::__construct();		
 		$this->load->database();	
 		$this->load->model('admin_model');	
+		$this->months_arr_gl = json_decode(MONTHS_ARR_GL, TRUE);
 	}
 	
 	public function afe_commissions()
@@ -73,9 +74,9 @@ class Commission extends CI_Controller {
         $data["year"] = $year;
         $data["logged_in_role_id"] = $current_role_id;
 		//prx($data);
-		$months_arr_gl = json_decode(MONTHS_ARR_GL, TRUE);
-		$data['subPageTitle'] = ' | '.$months_arr_gl[$month]." - $year";
-		$data['months_arr_gl'] = $months_arr_gl;
+		
+		$data['subPageTitle'] = ' | '.$this->months_arr_gl[$month]." - $year";
+		$data['months_arr_gl'] = $this->months_arr_gl;
 		
 		if($this->input->is_ajax_request()) {
 			$data['result'] = $this->load->view('elements/afe-commission-list',$data,true);
@@ -83,6 +84,8 @@ class Commission extends CI_Controller {
 		}
 		
 		$data["afe_users"] = $this->admin_model->get_all_afes($and_whre);
+		
+		$this->session->unset_userdata('inctv_htprfr');
 		
 		$data['pageTitle'] = 'Commissions';
 		$data['content'] = 'commission/afe_commissions';
@@ -108,17 +111,22 @@ class Commission extends CI_Controller {
 		
 		$data["month"] = $month;
 		
+		$afe = $this->admin_model->get_afe_details($afe_id);
+		
         $data["links"] = create_links($per_page,$total_rows,$base_url);
+		$data['subPageTitle'] = " <i>({$afe['afe_name']} [{$afe['afe_mobile']}]) &nbsp;&nbsp;&nbsp; |  &nbsp;&nbsp;&nbsp;".$this->months_arr_gl[$month]." - $year </i>";
+		$data['pageTitle'] = 'Leads for';
 		
 		if($this->input->is_ajax_request()) {
 			$data['result'] = $this->load->view('elements/afe-leads-list',$data,true);
+			
+			if(!empty($_GET['inner'])){
+				$data['pageTitleNew'] = $data['pageTitle'].' '.$data['subPageTitle'];
+				$data['result'] = $this->load->view('ajax_modal_list_layout', $data, true);
+			}
 			echo json_encode($data);die;
 		}
 		
-		$afe = $this->admin_model->get_afe_details($afe_id);
-		
-		$data['subPageTitle'] = " ({$afe['afe_name']} [{$afe['afe_mobile']}])";
-		$data['pageTitle'] = 'AFE Leads';
 		$data['content'] = 'commission/afe_leads';
 		$this->load->view('layout',$data);
 	}
