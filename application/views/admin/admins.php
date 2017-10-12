@@ -1,8 +1,5 @@
 <style>
-.actions-a{
-	float: left;
-    margin-right: 15px;
-}
+div.search-area{width: 98%;margin-left: 13px;}
 </style>
 
 <div class="wrapper wrapper-content animated fadeInRight">	

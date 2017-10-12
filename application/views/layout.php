@@ -11,7 +11,7 @@
 <link href="<?php echo ASSETS_URL?>font-awesome/css/font-awesome.min.css" rel="stylesheet">   
 <link href="<?php echo ASSETS_URL?>css/animate.css" rel="stylesheet">
 <link href="<?php echo ASSETS_URL?>css/style.min.css" rel="stylesheet">
-<link href="<?php echo ASSETS_URL?>css/developer.css?v=1.1" rel="stylesheet">	
+<link href="<?php echo ASSETS_URL?>css/developer.css?v=1.2" rel="stylesheet">	
 <script src="<?php echo ASSETS_URL?>js/jquery-2.1.1.js"></script>
 <link href="<?php echo ASSETS_URL?>css/sweet-alert.css" rel="stylesheet">
 <script src="<?php echo ASSETS_URL?>js/sweet-alert.min.js"></script>
@@ -55,6 +55,22 @@ $(document).ready(function(){
 						</button>
 						<a href="javascript:;" class="navbar-brand">Support System</a>
 					</div>
+					<div class="navbar-collapse" id="">
+						<ul class="nav navbar-top-links navbar-right">
+							<li>
+								<a href="<?php echo BASE_URL.'profile/view'?>"><i class="fa fa-user"></i> Profile</a>
+							</li>
+							<li>
+								<a href="<?php echo BASE_URL.'home/logout'?>"><i class="fa fa-sign-out"></i> Log out</a>
+							</li>
+						</ul>
+						<div style="float:right;margin-right:45px;font-size:15px;color:red;">
+							Welcome: <?=$_SESSION['admin']['name']?><br/>
+							Last Login: <?=$_SESSION['admin']['last_login']?>
+						</div>
+					</div>
+				</nav>
+				<nav class="navbar navbar-static-top" role="navigation" style="border: 1px solid #ccc;">
 					<div class="navbar-collapse collapse" id="navbar">
 						<ul class="nav navbar-nav">
 							<?php 						
@@ -72,7 +88,7 @@ $(document).ready(function(){
 								<li class="<?php echo strstr($this->uri->segment(1), 'admins') == 'admins' ? 'active' : ''?>">
 									<a href="<?php echo BASE_URL.'admins/list'?>">
 										<i class="fa fa-user-md"></i> 
-										<span class="nav-label">Admins</span>
+										<span class="nav-label">Admin's</span>
 									</a>
 								</li>
 							<?php } ?>
@@ -83,7 +99,7 @@ $(document).ready(function(){
 								<li class="<?php echo strstr($this->uri->segment(1), 'afe-users')== 'afe-users' ? 'active' : ''?>">
 									<a href="<?php echo BASE_URL.'afe-users/list'?>">
 										<i class="fa fa-user"></i> 
-										<span class="nav-label">AFE User's</span>
+										<span class="nav-label">AFE's</span>
 									</a>
 								</li>
 							<?php } ?>
@@ -94,7 +110,7 @@ $(document).ready(function(){
 								<li class="<?php echo strstr($this->uri->segment(1),'leads')== 'leads' ? 'active' : ''?>">
 									<a href="<?php echo BASE_URL.'leads/list'?>">
 										<i class="fa fa-share-square-o"></i> 
-										<span class="nav-label">User Leads</span>
+										<span class="nav-label">Leads</span>
 									</a>
 								</li>
 							<?php } ?>
@@ -235,16 +251,15 @@ $(document).ready(function(){
 												<span class="nav-label">Plans Master</span>
 											</a>
 										</li>
+										<li class="<?php echo strstr($this->uri->segment(2),'commission')== 'commission' ? 'active' : ''?>">
+											<a href="<?php echo BASE_URL.'cms/commission/list'?>">
+												<i class="fa fa-rupee"></i>&nbsp;&nbsp;
+												<span class="nav-label">AFE Commision</span>
+											</a>
+										</li>
 									</ul>
 								</li>
 							<?php } ?>
-						</ul>
-						<ul class="nav navbar-top-links navbar-right">
-							<li>
-								<a href="<?php echo BASE_URL.'home/logout'?>">
-									<i class="fa fa-sign-out"></i> Log out
-								</a>
-							</li>
 						</ul>
 					</div>
 				</nav>

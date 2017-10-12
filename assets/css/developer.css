@@ -95,3 +95,10 @@ a.actions-a{margin-right: 12px;}
 #myIncCommDtlsModal .incCommDtlsBckBtn{float: right;margin-right: 15px;}
 #myIncCommDtlsModal h4.modal-title{float: left;}
 #myIncCommDtlsModal div.modal-header{overflow: hidden;}
+.ibox-tools{margin-top: -7px;}
+.navbar-right li a{min-height: 26px !important;padding: 3px 16px !important;}
+
+@media screen and (min-width: 1024px) {
+	#navbar{text-align:center;}
+	.navbar-nav{display: inline-block;float:none;}
+}

@@ -54,9 +54,10 @@ $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
 
 $route['login'] = "home/login";
-$route['profile/view'] = "home/admin_profile";
 $route['dashboard'] = "home/index";
 $route['auth/user/password/forgot'] = "welcome/forget_password";
+
+$route['profile/view'] = "admin/loggedAdmin_profile";
 
 $route['users/list'] = "home/users";
 $route['users/view/(:any)'] = "home/user_view/$1";
@@ -103,7 +104,7 @@ $route['commissions/change/status'] = "commission/changet_commissions_sts";
 
 $route['incentives/fe/list'] = "incentive/fe_incentives";
 $route['incentives/cbh/list'] = "incentive/cbh_incentives";
-$route['incentives/cbh/view/leads'] = "incentive/get_cbh_incentive_leads";
+$route['incentives/cbh/view/leadsincentives/cbh/view/leads'] = "incentive/get_cbh_incentive_leads";
 $route['incentives/view/leads'] = "incentive/get_incentive_leads";
 
 $route['reports/leads'] = "report/get_leads_reports";

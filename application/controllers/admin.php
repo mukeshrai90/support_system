@@ -223,11 +223,9 @@ class Admin extends CI_Controller {
 	
 	public function change_admin_password()
 	{
-		chk_access('admins', 3, true);
+		$logged_admin = chk_access('admins', 3, true);
 		
-		$logged_admin = $this->session->userdata('admin');
 		$logged_admin_id = $logged_admin['admin_id'];
-		
 		$admin_id = @$_POST['admin_id'];
 		$admin_id = DeCrypt($admin_id);
 		$password = @$_POST['password'];
@@ -341,6 +339,146 @@ class Admin extends CI_Controller {
 		}
 		
 		echo json_encode($response);die;
+	}
+	
+	public function update_loggedAdmin_password()
+	{
+		$logged_admin = chk_access('admins', 3, true);
+		
+		$logged_admin_id = $logged_admin['admin_id'];
+		
+		$OldPassword = $this->input->post('old-password');
+		$password = $this->input->post('password');
+		$cpassword = $this->input->post('cpassword');
+		
+		$admin = $this->admin_model->get_admin($logged_admin_id, 'admin_password');
+		
+		$response = array();
+		if(trim(md5($OldPassword)) == trim($admin['admin_password'])) {
+				
+			if(!empty($logged_admin_id) && !empty($password) && !empty($cpassword)) {
+				if(trim($password) == trim($cpassword)) {
+					$password = md5($password);
+					
+					try{
+						$this->db->trans_begin();  // Transaction Start
+					
+						$UpdateData = array('admin_password' => $password);
+						$this->db->where('admin_id', $logged_admin_id);
+						if($this->db->update('bs_admins', $UpdateData)) {
+							
+							$CallInsertData = array();
+							$CallInsertData['call_user_id'] = $logged_admin_id;
+							$CallInsertData['call_logged_admin_id'] = $logged_admin_id;
+							$CallInsertData['call_desc'] = 'Password has been changed';
+							$CallInsertData['call_type'] = 4;
+							$CallInsertData['call_time'] = date('Y-m-d H:i:s');
+							
+							if($this->db->insert('bs_admin_call_logs', $CallInsertData)) {
+								if($this->db->trans_status() === FALSE) {
+									throw new Exception('Unable to proocess your request right now.<br/> Please try again or some time later');								
+								} else {
+									$this->db->trans_commit(); // Transaction Commit
+									$response['status'] = true;
+									$response['message'] = 'Password Changed Successfully';
+								}
+							} else {
+								throw new Exception('Unable to proocess your request right now.<br/> Please try again or some time later');
+							}				
+						} else {
+							throw new Exception('Unable to proocess your request right now.<br/> Please try again or some time later');
+						}
+						
+					}  catch(Exception $e){
+						$this->db->trans_rollback(); // Transaction Rollback
+						$response['status'] = false;	
+						$response['message'] = $e->getMessage();
+					}	
+				} else {
+					$response['status'] = false;
+					$response['message'] = 'Unable to process your request. <br/> Please try again or some later';
+				}
+			} else {
+				$response['status'] = false;
+				$response['message'] = 'Unable to process your request. <br/> Please try again or some later';
+			}
+		} else {
+			$response['status'] = false;
+			$response['message'] = 'Please enter correct Old Password';
+		}
+		echo json_encode($response);die;
+	}
+	
+	public function update_loggedAdmin_profile(){
+		
+		$loggedInData = chk_access('admins', 4, true);
+		
+		if(!empty($_POST['name'])){
+			$admin_id = $loggedInData['admin_id'];
+			
+			$name = $this->input->post('name');
+			$email = $this->input->post('email');
+			$mobile = $this->input->post('mobile');
+			
+			$sts = $this->admin_model->check_admin_email($email, $admin_id);
+			if($sts == 'false'){
+				$response['status'] = false;	
+				$response['message'] = 'Email Already Exist.<br/>Please enter a valid email';
+				echo json_encode($response);die;	
+			}
+			
+			try{
+				$this->db->trans_begin();  // Transaction Start
+			
+				$UpdateArray = array('admin_name' => $name,'admin_email' => $email,'admin_mobile' => $mobile);
+				$this->db->where('admin_id' ,$admin_id);
+				if($this->db->update('bs_admins', $UpdateArray)) {
+					
+					$CallInsertData = array();
+					$CallInsertData['call_user_id'] = $admin_id;
+					$CallInsertData['call_logged_admin_id'] = $admin_id;
+					$CallInsertData['call_desc'] = 'Admin Profile Updated';
+					$CallInsertData['call_type'] = 2;
+					$CallInsertData['call_time'] = date('Y-m-d H:i:s');
+					
+					if($this->db->insert('bs_admin_call_logs', $CallInsertData)) {
+						if($this->db->trans_status() === FALSE) {
+							throw new Exception('Unable to proocess your request right now.<br/> Please try again or some time later');								
+						} else {
+							$this->db->trans_commit(); // Transaction Commit
+							$response['status'] = true;
+							$response['message'] = "Profile updated successfully.";
+						}
+					} else {
+						throw new Exception('Unable to proocess your request right now.<br/> Please try again or some time later');
+					}				
+				} else {
+					throw new Exception('Unable to proocess your request right now.<br/> Please try again or some time later');
+				}
+				
+			}  catch(Exception $e){
+				$this->db->trans_rollback(); // Transaction Rollback
+				$response['status'] = false;	
+				$response['message'] = $e->getMessage();
+			}
+			
+		} else {
+			$response['status'] = false;
+			$response['message'] = "Unable to process your request.<br/> Please try later";
+		}
+		
+		echo json_encode($response); die;
+	}
+	
+	public function loggedAdmin_profile()
+	{
+		$loggedInData = chk_access('admins');
+		
+		$AdminId = $loggedInData['admin_id'];
+		$data['user'] = $this->admin_model->get_admin($AdminId);
+		$data['pageTitle'] = 'Profile';
+		$data['content'] = 'admin/logged-admin-details';
+		$this->load->view('layout',$data);
 	}
 	
 	public function afe_users()

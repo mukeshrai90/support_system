@@ -50,6 +50,7 @@ class Home extends CI_Controller {
 				
 				$roles = $this->admin_model->get_admin_roles($is_valid['admin_id']);
 				$current_role_id = $roles[0]['admin_role_id'];
+				$current_role_name = $roles[0]['role_name'];
 				
 				$sess_roles = array();
 				foreach($roles as $role){
@@ -70,6 +71,8 @@ class Home extends CI_Controller {
 					'email' => $is_valid['admin_email'],
 					'name' => $is_valid['admin_name'],
 					'current_role_id' => $current_role_id,
+					'current_role_name' => $current_role_name,
+					'last_login' => date('d-M-Y H:i a', strtotime($is_valid['admin_last_login'])),
 					'roles' => $sess_roles,
 					'access' => $actions
 				);

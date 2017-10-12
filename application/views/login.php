@@ -21,9 +21,7 @@
 <body class="gray-bg">
     <div class="middle-box text-center loginscreen animated fadeInDown">
         <div>
-            <div>
-                <h1 class="logo-name">IN+</h1>
-            </div>
+            
             <h3>Welcome to Support System</h3>
             <p>Login in to enter the Panel.</p>
             <form class="m-t" role="form" action="javascript:;" id="login-form" autocomplete="off">
