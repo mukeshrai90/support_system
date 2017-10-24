@@ -27,7 +27,7 @@
 							<div class="col-lg-12 search-area">
 								<div class="row radio-holder">
 									<div class="col-md-12 form-group" style="margin-bottom: -20px;">
-										<div class="col-md-5 form-group">
+										<div class="col-md-8 form-group">
 											<div class="col-lg-1">
 												<input type="radio" class="form-control" name="report_type" value="o_l" <?php echo @$_GET['report_type'] == 'o_l' ? 'checked' : ""?>>							
 											</div>	
@@ -35,11 +35,11 @@
 										</div>
 									</div>
 									<div class="col-md-12 form-group">
-										<div class="col-md-5 form-group">
+										<div class="col-md-8 form-group">
 											<div class="col-lg-1">
 												<input type="radio" class="form-control" name="report_type" value="l_c"<?php echo @$_GET['report_type'] == 'l_c' ? 'checked': ""?>>							
 											</div>	
-											<label class="col-lg-5 control-label lbl-rd-b">Leads Count (AFE wise)</label>
+											<label class="col-lg-5 control-label lbl-rd-b">Leads Count (Sales Partner wise)</label>
 										</div>
 									</div>
 								</div>
@@ -53,8 +53,8 @@
 									<input type="text" placeholder="Select To Date" class="form-control datepickr" name="to_date" value="<?php echo @$_GET['to_date']?>">
 								</div>
 								<div class="col-md-3 form-group">
-								<label class="control-label">Circle</label>
-									<select class="form-control" name="circle">
+									<label class="control-label">Circle</label>
+									<select class="form-control" name="circle" id="circle_id">
 										<option value="">Select</option>
 										<?php 
 											if(isset($circles)) {
@@ -69,8 +69,25 @@
 										?>
 									</select>	
 								</div>
+								<div class="col-md-3 form-group">
+									<label class="control-label">SSA</label>
+									<select class="form-control" name="ssa" id="ssa_id">
+										<option value="">Select</option>
+										<?php 
+											if(isset($ssa)) {
+												foreach($ssa as $rcd) {
+													$selected = '';
+													if($rcd['ssa_id'] == @$_GET['ssa']) {
+														$selected = 'selected';
+													}
+													echo '<option value="'.$rcd['ssa_id'].'" '.$selected.'>'.$rcd['ssa_name'].'</option>';
+												}
+											}
+										?>
+									</select>	
+								</div>
 								<div class="col-md-3 form-group afe-dv">
-									<label class="control-label">AFE</label>
+									<label class="control-label">Sales Partner</label>
 									<select class="form-control" name="afe">
 										<option value="">Select</option>
 										<?php 
@@ -114,6 +131,33 @@ $(document).ready(function(){
 		validateOnBlur:false,
 		maxDate:'<?php echo date('Y-m-d');?>',
 		scrollInput:false
+	});
+	
+	$(document).on('change','#circle_id',function(){
+		var circle_id = $(this).val();
+		$('#ssa_id').html('<option value="">Select</option>');
+		if($.trim(circle_id) != ''){
+		
+			showCustomLoader(true);
+			$.ajax({
+				url: BASE_URL+'user/getCirclesSSA',
+				type: 'POST',
+				data: {circle_id: circle_id},
+				dataType: 'JSON',
+				error: function(){
+					showCustomLoader(false);
+					customAlertBox('Unable to proocess your request right now.<br/> Please try again or some time later', 'e');
+				},
+				success: function(response){
+					showCustomLoader(false);		
+					if(response.status){
+						$('#ssa_id').html(response.html);
+					} else{
+						customAlertBox(response.message, 'e');
+					}
+				}
+			});
+		}
 	});
 	
 	$(document).on('click','input:radio[name="report_type"]',function(){

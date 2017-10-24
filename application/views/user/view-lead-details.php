@@ -8,6 +8,10 @@
 				<div class="ibox-content no-padding">
 					<ul class="list-group">
 						<li class="list-group-item">
+							<b>BSNL ID : </b> 
+							<?php echo $record['user_bsnl_id'] ? $record['user_bsnl_id'] : 'Not Available Yet'?>
+						</li>
+						<li class="list-group-item">
 							<b>Name : </b> 
 							<?php echo $record['user_full_name']?>
 						</li>
@@ -26,6 +30,10 @@
 						<li class="list-group-item">
 							<b>Created : </b> 
 							<?php echo date('d-M-Y h:i a',strtotime($record['user_added_on']))?>
+						</li>
+						<li class="list-group-item">
+							<b>SDCA : </b> 
+							<?php echo $record['user_lead_sdca']?>
 						</li>
 					</ul>
 				</div>
@@ -52,9 +60,15 @@
 							<?php echo $record['plan_name']?>
 						</li>
 						<li class="list-group-item">
-							<b>AFE : </b> 
-							<?php echo $record['afe_name']?>
+							<b>Lead Source : </b> 
+							<?php echo $lead_sources[$record['user_lead_source']]?>
 						</li>
+						<?php if($record['user_lead_source'] == 2) {?>
+							<li class="list-group-item">
+								<b>Sales Partner : </b> 
+								<?php echo $record['afe_name']?>
+							</li>
+						<?php } ?>
 						<li class="list-group-item">
 							<b>Current Status : </b> 
 							<?php echo $record['current_status']?>
@@ -91,7 +105,7 @@
 									</select>
 								</div>
 							</div>	
-							<div class="form-group cpe_pmn_dv" style="display:none;">
+							<!--<div class="form-group cpe_pmn_dv" style="display:none;">
 								<label class="col-lg-3 control-label">Status</label>
 								<div class="col-lg-8">
 									<select class="form-control" name="cpe_payment_status" id="cpe_payment_status"> 
@@ -99,11 +113,27 @@
 										<option value="N">Payment Not Done</option>
 									</select>
 								</div>
+							</div>-->
+							<div class="form-group cpe_pmn_dv" style="display:none;">
+								<label class="col-lg-3 control-label">Amount</label>
+								<div class="col-lg-8">
+									<input type="text" placeholder="Amount" class="form-control only-number" maxlength="5" name="cpe_payment_amnt">
+								</div>
+							</div>
+							<div class="form-group cpe_pmn_dv" style="display:none;">
+								<label class="col-lg-3 control-label">Mode</label>
+								<div class="col-lg-8">
+									<select class="form-control" name="cpe_payment_mode" id="cpe_payment_mode"> 
+										<option value="Cash">Cash</option>
+										<option value="Easy PAY">Easy PAY</option>
+										<option value="Cheque">Cheque</option>
+									</select>
+								</div>
 							</div>
 							<div class="form-group cpe_pmn_dv" style="display:none;">
 								<label class="col-lg-3 control-label">BSNL ID</label>
 								<div class="col-lg-8">
-									<input type="text" placeholder="BSNL User ID" class="form-control" name="bsnl_user_id">
+									<input type="text" placeholder="BSNL User ID" class="form-control only-alphaNum" name="bsnl_user_id">
 								</div>
 							</div>
 							<div class="form-group instln_dv" style="display:none;">
@@ -319,7 +349,7 @@ jQuery(document).ready(function() {
 	});
 		
 	$("#update-status-form").validate({
-		ignore: '',
+		ignore: ':hidden',
 		onkeyup: false,
 		rules: {
 			lead_id: {
@@ -336,6 +366,13 @@ jQuery(document).ready(function() {
 				required: true,
 			},
 			cpe_payment_status: {
+				required: true,
+			},
+			cpe_payment_amnt: {
+				required: true,
+				maxlength:5
+			},
+			cpe_payment_mode: {
 				required: true,
 			},
 			bsnl_user_id: {

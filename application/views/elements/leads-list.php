@@ -2,9 +2,11 @@
 	<thead>
 		<tr>			
 			<th>Name</th>
+			<th>BSNL ID</th>
 			<th>Email</th>
 			<th>Mobile</th>
 			<th>Status</th>
+			<th>Source</th>
 			<th>Circle</th>
 			<th>Plan</th>
 			<th>Action</th>
@@ -17,9 +19,11 @@
 		?>
 			<tr class="">				
 				<td><?php echo $rcd['user_full_name']?></td>
+				<td><?php echo $rcd['user_bsnl_id'] ? $rcd['user_bsnl_id'] : 'Not Available Yet'?></td>
 				<td><?php echo $rcd['user_email']?></td>
 				<td><?php echo $rcd['user_mobile']?></td>
 				<td><?php echo $rcd['current_status']?></td>
+				<td><?php echo $lead_sources[$rcd['user_lead_source']]?></td>
 				<td><?php echo $rcd['circle_name']?></td>
 				<td><?php echo $rcd['plan_name']?></td>
 				<td class="tooltip-demo">

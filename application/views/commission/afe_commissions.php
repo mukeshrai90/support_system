@@ -12,7 +12,7 @@
 							if(isset($fromPage) && $fromPage == 'incentives') {
 								echo 'Incentives Leads';
 							} else {
-								echo 'AFE Commissions ';
+								echo 'Sales Partner Commissions ';
 							}
 						?>
 						
@@ -40,7 +40,7 @@
 						<?php if(!isset($fromPage)){ ?>
 							<div class="col-lg-12 search-area">
 								<div class="col-md-3 form-group">
-									<label class="control-label">AFE</label>
+									<label class="control-label">Sales Partner</label>
 									<select class="form-control" name="afe">
 										<option value="">Select</option>
 										<?php 

@@ -370,17 +370,12 @@ class Admin_model extends CI_Model
 		$this->db->where($where);
 		$this->db->like($like); 
 		$this->db->from('bs_afe_users');
-		$this->db->join('bs_circles', 'bs_circles.circle_id=bs_afe_users.afe_circle_id', 'INNER');  
-		$this->db->join('bs_ssa', 'bs_ssa.ssa_id=bs_afe_users.afe_ssa_id', 'INNER');
 		$data['count'] = $this->db->count_all_results();
 		
-		$this->db->select('bs_afe_users.*, bs_circles.circle_name, bs_ssa.ssa_name');
 		$this->db->where($where);
 		$this->db->like($like); 
 		$this->db->limit($limit, $start);
-		$this->db->order_by('bs_afe_users.afe_id','desc');
-		$this->db->join('bs_circles', 'bs_circles.circle_id=bs_afe_users.afe_circle_id', 'INNER');  
-		$this->db->join('bs_ssa', 'bs_ssa.ssa_id=bs_afe_users.afe_ssa_id', 'INNER');
+		$this->db->order_by('bs_afe_users.afe_id','desc'); 
 		$query = $this->db->get("bs_afe_users");		
 		$data['result'] = $query->result_array();
 		
@@ -503,10 +498,7 @@ class Admin_model extends CI_Model
 		$data['user_address'] = $this->input->post('address');										
 		$data['user_circle_id'] = $this->input->post('circle_id');											
 		$data['user_ssa_id'] = $this->input->post('ssa_id');
-		$data['user_lead_payment_done'] = $this->input->post('payment_status');
 		$data['user_afe_referer_id'] = $this->input->post('afe_id');
-		$data['user_lead_source'] = $this->input->post('lead_source');
-		$data['user_lead_sdca'] = $this->input->post('lead_sdca');
 		
 		$sts = $this->check_user_email($data['user_email'], $user_id);
 		if($sts == 'false'){
@@ -704,7 +696,7 @@ class Admin_model extends CI_Model
 			$user_id = 9999;
 		}
 		
-		$already = $this->db->get_where('bs_afe_users',array('afe_mobile' => $mobile, 'afe_id != ' => $user_id))->row_array();
+		$already = $this->db->get_where('bs_afe_users',array('afe_mobile' => $mobile, 'admin_id != ' => $user_id))->row_array();
 		if(!empty($already)) {
 			$sts = 'false';
 		} else {
@@ -1062,7 +1054,7 @@ class Admin_model extends CI_Model
 		$this->db->join('bs_circles', 'bs_circles.circle_id=bs_users.user_circle_id', 'INNER'); 
 		$this->db->join('bs_ssa', 'bs_ssa.ssa_id=bs_users.user_ssa_id', 'INNER'); 
 		$this->db->join('bs_plans', 'bs_plans.plan_id=bs_user_plans.user_plan_id', 'INNER'); 
-		$this->db->join('bs_afe_users', 'bs_afe_users.afe_id=bs_users.user_afe_referer_id', 'LEFT'); 
+		$this->db->join('bs_afe_users', 'bs_afe_users.afe_id=bs_users.user_afe_referer_id', 'INNER'); 
 		$this->db->join('bs_lead_status', 'bs_lead_status.status_id=bs_users.user_lead_status_id', 'INNER');
 		$query = $this->db->get("bs_users");	
 
@@ -1081,7 +1073,7 @@ class Admin_model extends CI_Model
 	}
 	
 	public function get_LeadsStatus($lead){
-		$this->db->where('bs_lead_status.previous_status_id', $lead['user_lead_status_id']);
+		$this->db->where('bs_lead_status.previous_status_id', $lead['user_status_id']);
 		$this->db->where('bs_lead_status.status_type', 'L');
 		$this->db->order_by('bs_lead_status.status_id', 'DESC');
 		$this->db->where('bs_lead_status.status_active', 1);
@@ -1573,11 +1565,11 @@ class Admin_model extends CI_Model
 		}
 		
 		if(!empty($_GET['from_date'])){
-			$where = array_merge($where, array('DATE(user_added_on) >=' => date('Y-m-d', strtotime($_GET['from_date']))));
+			$where = array_merge($where, array('user_added_on >=' => date('Y-m-d', strtotime($_GET['from_date']))));
 		}
 		
 		if(!empty($_GET['to_date'])){
-			$where = array_merge($where, array('DATE(user_added_on) <=' => date('Y-m-d', strtotime($_GET['to_date']))));
+			$where = array_merge($where, array('user_added_on <=' => date('Y-m-d', strtotime($_GET['to_date']))));
 		}
 		
 		if(!empty($_GET['month']) && !empty($_GET['year'])){
@@ -1588,17 +1580,13 @@ class Admin_model extends CI_Model
 			$where = array_merge($where, array('bs_users.user_circle_id' => $_GET['circle']));
 		}
 		
-		if(!empty($_GET['ssa'])){
-			$where = array_merge($where, array('bs_users.user_ssa_id' => $_GET['ssa']));
-		}
-		
-		$this->db->select('bs_users.user_full_name, bs_users.user_mobile, bs_users.user_lead_source, bs_plans.plan_name, bs_plans.plan_rental, bs_lead_status.status_name as current_status, bs_afe_users.afe_name, bs_afe_users.afe_mobile, bs_circles.circle_name, bs_ssa.ssa_name');
+		$this->db->select('bs_users.user_full_name, bs_users.user_mobile, bs_plans.plan_name, bs_plans.plan_rental, bs_lead_status.status_name as current_status, bs_afe_users.afe_name, bs_afe_users.afe_mobile, bs_circles.circle_name, bs_ssa.ssa_name');
 		$this->db->join('bs_lead_status', 'bs_lead_status.status_id=bs_users.user_lead_status_id', 'INNER');
 		$this->db->join('bs_user_plans', 'bs_user_plans.user_id=bs_users.user_id', 'INNER'); 
 		$this->db->join('bs_plans', 'bs_plans.plan_id=bs_user_plans.user_plan_id', 'INNER'); 
 		$this->db->join('bs_circles', 'bs_circles.circle_id=bs_users.user_circle_id', 'INNER'); 
 		$this->db->join('bs_ssa', 'bs_ssa.ssa_id=bs_users.user_ssa_id', 'INNER'); 
-		$this->db->join('bs_afe_users', 'bs_afe_users.afe_id=bs_users.user_afe_referer_id', 'LEFT'); 
+		$this->db->join('bs_afe_users', 'bs_afe_users.afe_id=bs_users.user_afe_referer_id', 'INNER'); 
 		$this->db->order_by('bs_users.user_id','desc'); 
 		$this->db->where($where); 
 		
@@ -1627,10 +1615,6 @@ class Admin_model extends CI_Model
 		
 		if(!empty($_GET['circle'])){
 			$where = array_merge($where, array('bs_afe_users.afe_circle_id' => $_GET['circle']));
-		}
-		
-		if(!empty($_GET['ssa'])){
-			$where = array_merge($where, array('bs_afe_users.afe_ssa_id' => $_GET['ssa']));
 		}
 		
 		$this->db->select('bs_afe_users.afe_id, bs_afe_users.afe_name, bs_afe_users.afe_mobile, COUNT(bs_users.user_afe_referer_id) as total_leads, bs_circles.circle_name, bs_ssa.ssa_name');

@@ -1,7 +1,9 @@
 <?php 
 error_reporting(0);
 class Report extends CI_Controller {
-
+	
+	var $lead_sources = array(1 => 'Self', 2 => 'Direct Sales');
+	
 	public function __construct()
 	{
 		parent::__construct();		
@@ -45,6 +47,7 @@ class Report extends CI_Controller {
 		
 		$data['pageTitle'] = 'Leads Report';
 		$data['element_name'] = $element_name;
+		$data['lead_sources'] = $this->lead_sources;
 		
 		if(!empty($_GET['print']) && $_GET['print'] == 'YES'){
 			$data['called_for_print'] = true;

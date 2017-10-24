@@ -1,7 +1,7 @@
 <table class="table table-bordered">
 	<thead>
 		<tr>			
-			<th>Name</th>
+			<th>Sales Partner</th>
 			<th>Mobile</th>
 			<th>Circle</th>
 			<th>SSA</th>

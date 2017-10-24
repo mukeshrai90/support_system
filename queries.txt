@@ -1,0 +1,6 @@
+/** 24Oct **/
+ALTER TABLE bs_users ADD user_lead_payment_done CHAR(1);
+ALTER TABLE bs_users ADD user_cpe_payment_amnt DOUBLE AFTER user_cpe_payment_status;
+ALTER TABLE bs_users ADD user_cpe_payment_mode VARCHAR(20) AFTER user_cpe_payment_amnt;
+ALTER TABLE bs_users ADD user_lead_source tinyint(1);
+ALTER TABLE bs_users ADD user_lead_sdca VARCHAR(100);

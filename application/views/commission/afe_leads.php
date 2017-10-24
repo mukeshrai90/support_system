@@ -5,7 +5,7 @@
 			<div class="ibox float-e-margins">
 				<div class="ibox-title">
 					<h5>
-						AFE Leads 
+						Sales Partner Leads 
 						<?php 
 							$pageUrl = BASE_URL.'commissions/afe/list';
 						?>

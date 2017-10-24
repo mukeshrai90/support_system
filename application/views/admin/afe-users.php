@@ -10,7 +10,7 @@
 		<div class="col-lg-12">
 			<div class="ibox float-e-margins">
 				<div class="ibox-title">
-					<h5>AFE's </h5>	
+					<h5>Sales Partner</h5>	
 					<?php 
 						$pageUrl = BASE_URL.'afe-users/list';
 					?>
@@ -24,10 +24,10 @@
 						<div class="col-lg-12 search-area">
 							<div class="col-md-3 form-group">
 								<label class="control-label">Status</label>
-								<select class="form-control" name="verified">
+								<select class="form-control" name="status">
 									<option value="">Select</option>
-									<option value="1" <?php echo @$_GET['verified'] == 1 ? 'selected' : ''?>>Active</option>
-									<option value="2" <?php echo @$_GET['verified'] === 2 ? 'selected' : ''?>>Inactive</option>									
+									<option value="1" <?php echo @$_GET['status'] == 1 ? 'selected' : ''?>>Active</option>
+									<option value="2" <?php echo @$_GET['status'] === 2 ? 'selected' : ''?>>Inactive</option>									
 								</select>	
 							</div>
 							<div class="col-md-3 form-group">
@@ -54,7 +54,49 @@
 var pageUrl = '<?php echo $pageUrl?>';
 var hideTopBckBtn = 'YES';
 $(document).ready(function(){	
-	
+	$(document).on('click','.change-status',function(){
+        var status = $(this).attr('data-status');
+		var admin_id = $(this).attr('data-userid');		
+		var btn = $(this);
+		
+		var url = BASE_URL+'admin/change_afe_status';
+		
+		swal({			
+		  title:'',
+		  text: "Are you sure you want change Status?",
+		  showCancelButton: true,
+		  confirmButtonColor: "#68AC35",
+		  confirmButtonText: "Yes change",
+		  closeOnConfirm: true
+		},
+		function(){		
+		    showCustomLoader(true);
+			$.ajax({
+				type : 'POST',
+				url : url,
+				data: {admin_id:admin_id, status:status},
+				dataType: 'JSON',
+				error : function(){
+					showCustomLoader(false);	
+					customAlertBox('Unable to proocess your request right now.<br/> Please try again or some time later', 'e');
+				},
+				success : function(response){
+					showCustomLoader(false);
+					if(response.status) {
+						customAlertBox(response.message);
+						
+						setTimeout(function(){
+							window.location.reload();
+						},200);
+						
+					} else {
+						customAlertBox(response.message, 'e');
+					}
+				}
+			});
+			return false;
+		});
+	});
 });
 
 </script>

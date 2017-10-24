@@ -34,20 +34,20 @@
 							if($admin['admin_status'] == 0) {
 								echo 
 								'<a href="javascript:;" class="change-status" title="Click to Approve" data-toggle="tooltip" data-placement="bottom" data-status="1" data-admin_id="'.EnCrypt($admin['admin_id']).'" data-field="status">
-									<i class="fa fa-star-o text-navy" style="color:#FF501E;"></i>
-								</a> &nbsp;&nbsp;&nbsp;(Inactive)';
+									<i class="fa fa-star-o text-navy" style="color:#FF501E;"></i> &nbsp;(Inactive)
+								</a> ';
 								
 							} else if($admin['admin_status'] == 1) {
 								echo 
 								'<a href="javascript:;" class="change-status" title="Click to Disable" data-toggle="tooltip" data-placement="bottom" data-status="2" data-admin_id="'.EnCrypt($admin['admin_id']).'" data-field="status">
-									<i class="fa fa-star text-navy"></i>
-								</a> &nbsp;&nbsp;&nbsp;(Active)';
+									<i class="fa fa-star text-navy"></i> &nbsp;(Active)
+								</a> ';
 								
 							} else if($admin['admin_status'] == 2) {
 								echo 
 								'<a href="javascript:;" class="change-status" title="Click to Enable" data-toggle="tooltip" data-placement="bottom" data-status="1" data-admin_id="'.EnCrypt($admin['admin_id']).'" data-field="status">
-									<i class="fa fa-star-o text-navy" style="color:#FF501E;"></i>
-								</a> &nbsp;&nbsp;&nbsp;(Disabled)';
+									<i class="fa fa-star-o text-navy" style="color:#FF501E;"></i> &nbsp;(Disabled)
+								</a> ';
 							}
 						}
 					?>

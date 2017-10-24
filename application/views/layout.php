@@ -99,7 +99,7 @@ $(document).ready(function(){
 								<li class="<?php echo strstr($this->uri->segment(1), 'afe-users')== 'afe-users' ? 'active' : ''?>">
 									<a href="<?php echo BASE_URL.'afe-users/list'?>">
 										<i class="fa fa-user"></i> 
-										<span class="nav-label">AFE's</span>
+										<span class="nav-label">Sales Partner</span>
 									</a>
 								</li>
 							<?php } ?>
@@ -121,7 +121,7 @@ $(document).ready(function(){
 								<li class="<?php echo $this->uri->segment(1) == 'commissions' && $this->uri->segment(2) == 'afe' ? 'active' : ''?>">
 									<a aria-expanded="false" role="button" href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
 										<i class="fa fa-money"></i> 
-										<span class="nav-label">AFE Commission</span>
+										<span class="nav-label">Commission</span>
 										<span class="caret"></span>
 									</a>
 									<ul role="menu" class="dropdown-menu">

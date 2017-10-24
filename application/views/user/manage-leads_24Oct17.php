@@ -98,7 +98,7 @@
 								</div>
 							</div>
 							<div class="col-md-6">
-								<label class="col-md-5 control-label">Advance Rental?</label>
+								<label class="col-md-5 control-label">Payment Done?</label>
 								<div class="col-md-7">
 									<select name="payment_status" id="payment_status" class="form-control">
 										<option value="">Select</option>									
@@ -129,30 +129,7 @@
 						<div class="hr-line-dashed"></div>
 						<div class="form-group">
 							<div class="col-md-6">
-								<label class="col-md-5 control-label">Lead Source</label>
-								<div class="col-md-7">
-									<select name="lead_source" id="lead_source" class="form-control">
-										<option value="">Select</option>
-										<?php 
-											foreach($lead_sources as $k=>$v) {
-												$selected = '';
-												if($k == $record['user_lead_source']) {
-													$selected = 'selected';
-												}
-												echo '<option value="'.$k.'" '.$selected.'>'.$v.'</option>';
-											}
-										?>									 									
-								   </select>
-								</div>
-							</div>
-							<?php 
-								$sales_prtnr_dv_sts = 'display:none;';
-								if($record['user_lead_source'] == 2){
-									$sales_prtnr_dv_sts = '';
-								}
-							?>
-							<div class="col-md-6" id="sales_prtnr_dv" style="<?=$sales_prtnr_dv_sts?>">
-								<label class="col-md-5 control-label">Sales Partner</label>
+								<label class="col-md-5 control-label">AFE</label>
 								<div class="col-md-7">
 									<select name="afe_id" id="afe_id" class="form-control">
 										<option value="">Select</option>									
@@ -168,15 +145,6 @@
 											}
 										?>   									
 								   </select>
-								</div>
-							</div>
-						</div>
-						<div class="hr-line-dashed"></div>
-						<div class="form-group">
-							<div class="col-md-6">
-								<label class="col-md-5 control-label">SDCA</label>
-								<div class="col-md-7">
-									<input type="text" class="form-control only-char-space" name="lead_sdca" id="	"  placeholder="Sub Divisional Charge Area" value="<?php echo @$record['user_lead_sdca']?>">
 								</div>
 							</div>
 						</div>
@@ -197,15 +165,6 @@
 
 <script>
 $(document).ready(function() {
-	$(document).on('change','#lead_source',function(){
-		var srce = $(this).val();
-		
-		$('#sales_prtnr_dv').hide();
-		if(srce == 2){
-			$('#sales_prtnr_dv').show();
-		}
-	});
-	
 	$(document).on('change','#circle_id',function(){
 		var circle_id = $(this).val();
 		$('#ssa_id').html('<option value="">Select</option>');
@@ -289,13 +248,6 @@ $(document).ready(function() {
 			},
 			afe_id: {
 				required: true,
-			},
-			lead_source: {
-				required: true,
-			},
-			lead_sdca: {
-				required: true,
-				alphaSpace:true,
 			},			
 		},
 		messages: {

@@ -1,7 +1,9 @@
 <?php 
 error_reporting(0);
 class User extends CI_Controller {
-
+	
+	var $lead_sources = array(1 => 'Self', 2 => 'Direct Sales');
+	
 	public function __construct()
 	{
 		parent::__construct();		
@@ -414,6 +416,7 @@ class User extends CI_Controller {
 		
 		$data['status_arr'] = $this->admin_model->get_all_leadsStatus();
 		$data['circles'] = $this->admin_model->get_Circles();
+		$data['lead_sources'] = $this->lead_sources;
 		
 		$data['pageTitle'] = 'Leads';
 		$data['content'] = 'user/leads';
@@ -465,6 +468,7 @@ class User extends CI_Controller {
 			$data['status_arr'] = $this->admin_model->get_all_leadsStatus();
 			$data['circles'] = $this->admin_model->get_Circles();
 			$data['plans'] = $this->admin_model->get_Plans();
+			$data['lead_sources'] = $this->lead_sources;
 			
 			$data['pageTitle'] = 'Manage Leads';
 			$data['content'] = 'user/manage-leads';
@@ -484,6 +488,8 @@ class User extends CI_Controller {
 		$data['lead_status'] = $this->admin_model->get_LeadsStatus($data['record']);
 		
 		$data['lead_files'] = $this->admin_model->get_LeadFiles($data['record']);
+		
+		$data['lead_sources'] = $this->lead_sources;
 		
 		$data['can_change_status'] = 1;
 		$data['can_see_logs'] = 1;
@@ -537,6 +543,8 @@ class User extends CI_Controller {
 		$status_id = $this->input->post('status_id');
 		$description = $this->input->post('description');
 		$cpe_payment_status = $this->input->post('cpe_payment_status');
+		$cpe_payment_amnt = $this->input->post('cpe_payment_amnt');
+		$cpe_payment_mode = $this->input->post('cpe_payment_mode');
 		$bsnl_user_id = $this->input->post('bsnl_user_id');
 		$installation_date = $this->input->post('installation_date');
 		
@@ -580,11 +588,10 @@ class User extends CI_Controller {
 			
 			$and_sts_Desc = '';
 			if($status_id == 3){
-				$LeadData = array_merge($LeadData, array('user_cpe_payment_status' => $cpe_payment_status, 'user_bsnl_id' => $bsnl_user_id));
-				$and_sts_Desc = '<br/><b>CPE Payment Not Done</b>';
-				if($cpe_payment_status == 'Y'){
-					$and_sts_Desc = '<br/><b>CPE Payment Done</b>';
-				}
+				$LeadData = array_merge($LeadData, array('user_cpe_payment_mode' => $cpe_payment_mode, 'user_cpe_payment_amnt' => $cpe_payment_amnt, 'user_bsnl_id' => $bsnl_user_id));
+				$and_sts_Desc = '<br/><b>Payment Amt: </b>'.$cpe_payment_amnt;
+				$and_sts_Desc .= '<br/><b>Payment Mode: </b>'.$cpe_payment_mode;
+				
 			} else if($status_id == 4){
 				$LeadData = array_merge($LeadData, array('installation_date' => date('Y-m-d', strtotime($installation_date))));
 			}

@@ -38,7 +38,7 @@
 						</div>
 						<div class="form-group">
 							<div class="col-md-6">
-								<label class="col-md-5 control-label">Address</label>
+								<label class="col-md-5 control-label">User Address</label>
 								<div class="col-md-7">
 									<textarea name="address" id="address" class="form-control" placeholder="Address Details Here"><?php echo @$record['afe_address']?></textarea>
 								</div>
@@ -85,7 +85,6 @@
 								</div>
 							</div>
 						</div>
-						<!--
 						<div class="hr-line-dashed"></div>
 						<div class="form-group">
 							<div class="col-md-6">
@@ -115,7 +114,6 @@
 								</div>
 							</div>
 						</div>
-						-->
 						<div class="form-group">
 							<div class="col-md-12" style="text-align:center;">
 								<button class="btn btn-sm btn-primary" type="button" id="manage-form">Submit</button>

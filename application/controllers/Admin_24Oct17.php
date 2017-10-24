@@ -507,7 +507,7 @@ class Admin extends CI_Controller {
 			echo json_encode($data);die;
 		}
 		
-		$data['pageTitle'] = 'Sales Partner';
+		$data['pageTitle'] = 'AFE Users';
 		$data['content'] = 'admin/afe-users';
 		$this->load->view('layout',$data);
 	}
@@ -519,7 +519,7 @@ class Admin extends CI_Controller {
 		$afe_id = DeCrypt($afe_id);
 		$data['record'] = $this->admin_model->get_afe_details($afe_id);
 		
-		$data['pageTitle'] = 'Sales Partner Details';
+		$data['pageTitle'] = 'AFE Details';
 		$data['content'] = 'admin/afe_user_details';
 		$this->load->view('layout',$data);
 	}
@@ -560,7 +560,7 @@ class Admin extends CI_Controller {
 
 			$data['circles'] = $this->admin_model->get_Circles();
 						
-			$data['pageTitle'] = 'Manage Sales Partner';
+			$data['pageTitle'] = 'Manage AFE Users';
 			$data['content'] = 'admin/manage-afe-users';
 			$this->load->view('layout',$data);
 		}
@@ -600,37 +600,5 @@ class Admin extends CI_Controller {
 		
 		$sts = $this->admin_model->check_afe_user_mobile($email, $user_id);
 		echo $sts;
-	}
-	
-	public function change_afe_status()
-	{
-		chk_access('afe_users', 4, true);
-		
-		$logged_admin = $this->session->userdata('admin');
-		$logged_admin_id = $logged_admin['admin_id'];
-				
-		$status = $this->input->post('status');
-		$afe_id = $this->input->post('admin_id');
-		$afe_id = DeCrypt($afe_id);
-		
-		$response = array();
-		if($status >= 0 && !empty($afe_id)) {			
-			
-			$UpdateData = array('afe_status' => $status);
-			$this->db->where('afe_id' ,$afe_id);
-			if($this->db->update('bs_afe_users', $UpdateData)) {
-				$response['status'] = true;
-				$response['message'] = 'Status Changed Successfully';
-				
-			} else {
-				$response['status'] = false;
-				$response['message'] = 'Unable to process your request. <br/> Please try again or some later';
-			}
-		} else {
-			$response['status'] = false;
-			$response['message'] = 'Unable to process your request. <br/> Please try again or some later';
-		}
-		
-		echo json_encode($response);die;
 	}
 }

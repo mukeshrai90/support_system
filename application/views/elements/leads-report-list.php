@@ -7,7 +7,7 @@
 			<th>Status</th>
 			<th>Circle</th>
 			<th>Plan</th>
-			<th>AFE</th>
+			<th>Source</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -23,7 +23,14 @@
 				<td><?php echo $rcd['current_status']?></td>
 				<td><?php echo $rcd['circle_name']?></td>
 				<td><?php echo $rcd['plan_name']?></td>
-				<td><?php echo $rcd['afe_name'].' ('.$rcd['afe_mobile'].')';?></td>
+				<td>
+					<?php 
+						echo $lead_sources[$rcd['user_lead_source']];
+						if(!empty($rcd['afe_name'])){
+							echo '<br/><b>'.$rcd['afe_name'].' ('.$rcd['afe_mobile'].')</b>';
+						}
+					?>
+				</td>
 			</tr>
 		<?php 
 				}
