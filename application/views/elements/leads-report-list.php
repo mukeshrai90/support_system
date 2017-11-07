@@ -6,6 +6,7 @@
 			<th>Mobile</th>
 			<th>Status</th>
 			<th>Circle</th>
+			<th>SSA</th>
 			<th>Plan</th>
 			<th>Source</th>
 		</tr>
@@ -22,6 +23,7 @@
 				<td><?php echo $rcd['user_mobile']?></td>
 				<td><?php echo $rcd['current_status']?></td>
 				<td><?php echo $rcd['circle_name']?></td>
+				<td><?php echo $rcd['ssa_name']?></td>
 				<td><?php echo $rcd['plan_name']?></td>
 				<td>
 					<?php 

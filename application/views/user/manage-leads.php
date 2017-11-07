@@ -107,7 +107,7 @@
 											if(isset($sts_arr)) {
 												foreach($sts_arr as $k=>$v) {
 													$selected = '';
-													if($record['payment_status'] == $k) {
+													if($record['user_lead_payment_done'] == $k) {
 														$selected = 'selected';
 													}
 													echo '<option value="'.$k.'" '.$selected.'>'.$v.'</option>';
@@ -122,7 +122,12 @@
 							<div class="col-md-6">
 								<label class="col-md-5 control-label">Application Form Image</label>
 								<div class="col-md-7">
-									<input type="file" class="form-control" name="app_forms_img" id="app_forms_img">
+									<input type="file" class="form-control upld_file" name="app_forms_img[]" id="app_forms_img" style="padding: 0px;" multiple>
+									<span style="color:red;font-size:10px;">Hold "[Ctrl]" for Multiples File
+									<br/>
+									<small style="color:red;width:100%;float:left;">Accepted Formats: PNG|JPG|JPEG|PDF</small>
+									<br/>
+									<small style="color:red;width:100%;float:left;">Max Size: 2MB</small>
 								</div>
 							</div>
 						</div>
@@ -235,13 +240,19 @@ $(document).ready(function() {
 	
 	$(document).on('click','#manage-form',function(){
 		if($("#manage_lead_form").valid()){
-		
+			
+			var formData = new FormData($("#manage_lead_form")[0]);
+			
 			showCustomLoader(true);
 			$.ajax({
 				url: BASE_URL+'leads/new-lead',
-				type: 'POST',
-				data: $('#manage_lead_form').serialize(),
-				dataType: 'JSON',
+				type: "POST",
+				dataType:'json',
+				data: formData,
+				async: false,				
+				cache: false,
+				contentType: false,
+				processData: false,
 				error: function(){
 					showCustomLoader(false);
 					customAlertBox('Unable to proocess your request right now.<br/> Please try again or some time later', 'e');
@@ -294,7 +305,7 @@ $(document).ready(function() {
 				required: true,
 			},
 			lead_sdca: {
-				required: true,
+				//required: true,
 				alphaSpace:true,
 			},			
 		},
@@ -330,6 +341,41 @@ $(document).ready(function() {
 		},
 		errorPlacement: function (error, element) {
 			error.appendTo($(element).closest('div'));
+		}
+	});
+	
+	$(document).on('change','.upld_file',function(){	
+		var files = $(this)[0].files;
+		
+		if(files.length > 0){
+			$.each(files, function(i, file){
+				
+				var imagePath = file.name;
+				var pathLength = imagePath.length;
+				var lastDot = imagePath.lastIndexOf(".");
+				var fileType = imagePath.substring(lastDot,pathLength);	
+				var fileType = fileType.toLowerCase();
+				var allowedTypes = ['.png','.jpg','.jpeg','.pdf'];							
+
+				if($.inArray(fileType,allowedTypes) == '-1') {			
+					$(this).val('');
+					swal('The uploaded file(s) type is not allowed.\nAllowed types : png,jpg,jpeg,pdf');
+					return false;
+				}
+				
+				var fileSize = file.size;
+				var sizeKB = fileSize/1024;
+				if(parseInt(sizeKB) > 1024) {
+					var sizeMB = sizeKB/1024;
+					var sizeStr = sizeMB.toFixed(2);
+					if(sizeStr > 2)
+					{
+						$(this).val('');
+						swal("Sorry! We can't accept files with size greater than 2MB.\nPlease upload file with size less than 2MB.");
+						return false;
+					}
+				}
+			});
 		}
 	});
 });  

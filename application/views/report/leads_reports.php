@@ -29,7 +29,7 @@
 									<div class="col-md-12 form-group" style="margin-bottom: -20px;">
 										<div class="col-md-8 form-group">
 											<div class="col-lg-1">
-												<input type="radio" class="form-control" name="report_type" value="o_l" <?php echo @$_GET['report_type'] == 'o_l' ? 'checked' : ""?>>							
+												<input type="radio" class="form-control" name="report_type" value="o_l" <?php echo @$_GET['report_type'] == 'o_l' ? 'checked' : ""?> style="width: 17px;">							
 											</div>	
 											<label class="col-lg-5 control-label lbl-rd-b">Leads</label>
 										</div>
@@ -37,7 +37,7 @@
 									<div class="col-md-12 form-group">
 										<div class="col-md-8 form-group">
 											<div class="col-lg-1">
-												<input type="radio" class="form-control" name="report_type" value="l_c"<?php echo @$_GET['report_type'] == 'l_c' ? 'checked': ""?>>							
+												<input type="radio" class="form-control" name="report_type" value="l_c"<?php echo @$_GET['report_type'] == 'l_c' ? 'checked': ""?> style="width: 17px;">							
 											</div>	
 											<label class="col-lg-5 control-label lbl-rd-b">Leads Count (Sales Partner wise)</label>
 										</div>
@@ -52,40 +52,46 @@
 									<label class="control-label">To Date</label>
 									<input type="text" placeholder="Select To Date" class="form-control datepickr" name="to_date" value="<?php echo @$_GET['to_date']?>">
 								</div>
-								<div class="col-md-3 form-group">
-									<label class="control-label">Circle</label>
-									<select class="form-control" name="circle" id="circle_id">
-										<option value="">Select</option>
-										<?php 
-											if(isset($circles)) {
-												foreach($circles as $rcd) {
-													$selected = '';
-													if($rcd['circle_id'] == @$_GET['circle']) {
-														$selected = 'selected';
+								
+								<?php if($logged_in_role_id == 1) {?>
+									<div class="col-md-3 form-group">
+										<label class="control-label">Circle</label>
+										<select class="form-control" name="circle" id="circle_id">
+											<option value="">Select</option>
+											<?php 
+												if(isset($circles)) {
+													foreach($circles as $rcd) {
+														$selected = '';
+														if($rcd['circle_id'] == @$_GET['circle']) {
+															$selected = 'selected';
+														}
+														echo '<option value="'.$rcd['circle_id'].'" '.$selected.'>'.$rcd['circle_name'].'</option>';
 													}
-													echo '<option value="'.$rcd['circle_id'].'" '.$selected.'>'.$rcd['circle_name'].'</option>';
 												}
-											}
-										?>
-									</select>	
-								</div>
-								<div class="col-md-3 form-group">
-									<label class="control-label">SSA</label>
-									<select class="form-control" name="ssa" id="ssa_id">
-										<option value="">Select</option>
-										<?php 
-											if(isset($ssa)) {
-												foreach($ssa as $rcd) {
-													$selected = '';
-													if($rcd['ssa_id'] == @$_GET['ssa']) {
-														$selected = 'selected';
+											?>
+										</select>	
+									</div>
+								<?php } ?>
+								
+								<?php if(in_array($logged_in_role_id, array(1,2))) {?>
+									<div class="col-md-3 form-group">
+										<label class="control-label">SSA</label>
+										<select class="form-control" name="ssa" id="ssa_id">
+											<option value="">Select</option>
+											<?php 
+												if(isset($ssa)) {
+													foreach($ssa as $rcd) {
+														$selected = '';
+														if($rcd['ssa_id'] == @$_GET['ssa']) {
+															$selected = 'selected';
+														}
+														echo '<option value="'.$rcd['ssa_id'].'" '.$selected.'>'.$rcd['ssa_name'].'</option>';
 													}
-													echo '<option value="'.$rcd['ssa_id'].'" '.$selected.'>'.$rcd['ssa_name'].'</option>';
 												}
-											}
-										?>
-									</select>	
-								</div>
+											?>
+										</select>	
+									</div>
+								<?php } ?>
 								<div class="col-md-3 form-group afe-dv">
 									<label class="control-label">Sales Partner</label>
 									<select class="form-control" name="afe">

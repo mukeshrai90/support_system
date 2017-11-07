@@ -2,7 +2,7 @@
 error_reporting(0);
 class Report extends CI_Controller {
 	
-	var $lead_sources = array(1 => 'Self', 2 => 'Direct Sales');
+	var $lead_sources = array(1 => 'Self/Direct Sales', 2 => 'Sales Partner');
 	
 	public function __construct()
 	{
@@ -26,6 +26,16 @@ class Report extends CI_Controller {
 			$year = $_GET['year'];
 		}
 		
+		$data["logged_in_role_id"] = $loggedIn_data['current_role_id'];
+		
+		if($data["logged_in_role_id"] == 2){
+			$circle_id = $loggedIn_data['roles'][$data["logged_in_role_id"]]['admin_role_circle_id'];
+			$_GET['circle'] = $circle_id;
+		} else if($data["logged_in_role_id"] == 3){
+			$ssa_id = $loggedIn_data['roles'][$data["logged_in_role_id"]]['admin_role_ssa_id'];
+			$_GET['ssa'] = $ssa_id;
+		}
+		
 		if(!empty($_GET['report_type']) && $_GET['report_type'] == 'o_l'){
 			$result = $this->admin_model->get_leads($per_page, $page);
 			$element_name = 'elements/leads-report-list';
@@ -39,7 +49,6 @@ class Report extends CI_Controller {
 		
         $data["month"] = $month;
         $data["year"] = $year;
-        $data["logged_in_role_id"] = $loggedIn_data['current_role_id'];
 		
 		$months_arr_gl = json_decode(MONTHS_ARR_GL, TRUE);
 		$data['subPageTitle'] = ' | '.$months_arr_gl[$month]." - $year";
@@ -62,10 +71,14 @@ class Report extends CI_Controller {
 			echo json_encode($data);die;
 		}
 		
-		$and_whre = get_loggedINCondtn($loggedIn_data);
+		$and_whre = get_loggedINCondtn('commission', $loggedIn_data);
 		$data["afe_users"] = $this->admin_model->get_all_afes($and_whre);
 		
 		$data['circles'] = $this->admin_model->get_Circles();
+		if($data["logged_in_role_id"] == 2){
+			$circle_id = $loggedIn_data['roles'][$data["logged_in_role_id"]]['admin_role_circle_id'];
+			$data['ssa'] = $this->admin_model->get_SSA($circle_id);
+		}
 		
 		$data['content'] = 'report/leads_reports';
 		$this->load->view('layout',$data);

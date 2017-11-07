@@ -7,6 +7,7 @@
 		<tr>
 			<th>Name</th>			
 			<th>Roles</th>
+			<th>Circle/SSA</th>
 			<th>Username</th>
 			<th>Email</th>
 			<th>Contact</th>
@@ -23,6 +24,17 @@
 			<tr class="">
 				<td><?php echo $admin['admin_name']?></td>				
 				<td><?php echo $admin['roles']?></td>
+				<td>
+					<?php 
+						if($admin['admin_role_id'] == 2 && !empty($admin['circle_name'])){
+							echo $admin['circle_name'];
+						} else if($admin['admin_role_id'] == 3 && !empty($admin['ssa_name'])){
+							echo $admin['ssa_name'];
+						} else {
+							echo 'N/A';
+						}
+					?>
+				</td>
 				<td><?php echo $admin['admin_username']?></td>
 				<td><?php echo $admin['admin_email'] ? $admin['admin_email'] : 'Not Available'?></td>
 				<td><?php echo $admin['admin_mobile'] ? $admin['admin_mobile'] : 'Not Available'?></td>
@@ -52,7 +64,7 @@
 						}
 					?>
 				</td>							
-				<td><?php echo date('d-M-Y',strtotime($admin['admin_last_login']))?></td>
+				<td><?php echo $admin['admin_last_login'] == '0000-00-00 00:00:00' ? 'No Login Yet' : date('d-M-Y',strtotime($admin['admin_last_login']))?></td>
 				<td class="tooltip-demo">
 					<a href="javascript:;" title="Change Password" class="actions-a change-password-link" data-toggle="tooltip" data-placement="bottom" data-admin_id="<?php echo EnCrypt($admin['admin_id'])?>">
 						<i class="fa fa-lock text-navy"></i>

@@ -13,6 +13,11 @@
 							<i><?=$subPageTitle?></i>
 						</span>
 					</h5>	
+					<div class="ibox-tools">
+						<button type="button" class="btn btn-sm btn-danger refresh-all add-new-btn" data-url="<?php echo BASE_URL.'incentives/cbh/list?m=current'?>">Current Month</button>
+						
+						<button type="button" class="btn btn-sm btn-danger refresh-all add-new-btn" data-url="<?php echo BASE_URL.'incentives/cbh/list'?>">Previous Months</button>
+				   </div>
 				</div>
 				<div class="ibox-content">
 					<form id="search-form" action="javascript:;">

@@ -2,6 +2,8 @@
 
 class Admin_model extends CI_Model
 {
+	var $leadStatsIdToCons = 4;
+	
 	public function __construct()
 	{
 		$this->load->database();
@@ -192,7 +194,7 @@ class Admin_model extends CI_Model
 	
 	public function get_all_admins($limit, $start) 
 	{        
-		$data = array(); $where = array('bs_admins.admin_id >' => 0); $like = array(); 
+		$data = array(); $where = array('bs_admins.admin_id >' => 1); $like = array(); 
 		
 		if(!empty($_GET['status'])) {	
 			$_GET['status'] = $_GET['status'] == 2 ? 0 : $_GET['status'];
@@ -211,16 +213,20 @@ class Admin_model extends CI_Model
 		$this->db->like($like); 
 		$this->db->join('bs_admin_roles', 'bs_admin_roles.admin_id=bs_admins.admin_id', 'INNER');
 		$this->db->join('bs_roles', 'bs_roles.role_id=bs_admin_roles.admin_role_id', 'INNER');
+		$this->db->join('bs_circles', 'bs_circles.circle_id=bs_admin_roles.admin_role_circle_id', 'LEFT');  
+		$this->db->join('bs_ssa', 'bs_ssa.ssa_id=bs_admin_roles.admin_role_ssa_id', 'LEFT');
 		$this->db->from('bs_admins');
 		$data['count'] = $this->db->count_all_results();
 		
-		$this->db->select('bs_admins.*, group_concat(bs_roles.role_name) as roles');
+		$this->db->select('bs_admins.*, group_concat(bs_roles.role_name) as roles ,bs_admin_roles.admin_role_id, bs_circles.circle_name, bs_ssa.ssa_name');
 		$this->db->where($where);
 		$this->db->like($like); 
 		$this->db->order_by('bs_admins.admin_id','desc'); 
 		$this->db->join('bs_admin_roles', 'bs_admin_roles.admin_id=bs_admins.admin_id', 'INNER');
 		$this->db->join('bs_roles', 'bs_roles.role_id=bs_admin_roles.admin_role_id', 'INNER');
-		$this->db->group_by('admin_role_id');
+		$this->db->join('bs_circles', 'bs_circles.circle_id=bs_admin_roles.admin_role_circle_id', 'LEFT');  
+		$this->db->join('bs_ssa', 'bs_ssa.ssa_id=bs_admin_roles.admin_role_ssa_id', 'LEFT');
+		$this->db->group_by('bs_admin_roles.admin_id');
 		$query = $this->db->get("bs_admins");	
 		$data['result'] = $query->result_array();
 
@@ -260,7 +266,7 @@ class Admin_model extends CI_Model
 			$response['message'] = 'Username Already Exist.<br/>Please enter a valid username';
 			echo json_encode($response);die;	
 		}
-										
+		
 		$result = array('status' => false);
 		try{
 			$this->db->trans_begin();  // Transaction Start
@@ -313,6 +319,15 @@ class Admin_model extends CI_Model
 				$RoleData['admin_role_ssa_id'] = $ssa_id;
 			}
 			
+			$sts = $this->check_admin_role_existense($RoleData);
+			if($sts[0]){
+				$response['status'] = false;	
+				$response['message'] = $sts[1].' Admin Already Exist for specified location.';
+				
+				$this->db->trans_rollback(); // Transaction Rollback
+				echo json_encode($response);die;	
+			}
+			
 			if(empty($admin_role_id)){
 				$RoleData['admin_role_added_on'] = date('Y-m-d H:i:s');		
 				if(!$this->db->insert('bs_admin_roles', $RoleData)){
@@ -352,6 +367,27 @@ class Admin_model extends CI_Model
 		}
 		
 		return $result;
+	}
+	
+	public function check_admin_role_existense($RoleData=array()){
+		$role_name = '';
+		if(in_array($RoleData['admin_role_id'], array(2,3))){
+			$cond = array('admin_id != ' => $RoleData['admin_id']);
+			
+			if($RoleData['admin_role_id'] == 2){
+				$role_name = 'CBH';
+				$cond = array_merge($cond, array('admin_role_circle_id' => $RoleData['admin_role_circle_id']));
+			} else if($RoleData['admin_role_id'] == 3){
+				$role_name = 'FE';
+				$cond = array_merge($cond, array('admin_role_ssa_id' => $RoleData['admin_role_ssa_id']));
+			}
+			
+			$exist_arr = $this->db->get_where('bs_admin_roles', $cond)->row_array();
+			if(!empty($exist_arr)){
+				return array(true, $role_name);
+			}
+		}
+		return array(false, $role_name);
 	}
 	
 	public function get_afe_users($limit, $start) {        
@@ -466,7 +502,11 @@ class Admin_model extends CI_Model
 			$this->db->where('admin_id', $admin_id);
 		}
 		$this->db->where(array('admin_role_status' => 1));
+		$this->db->select('bs_admin_roles.*, bs_roles.role_name, bs_circles.circle_name, bs_ssa.ssa_name');
 		$this->db->join('bs_roles', 'bs_roles.role_id=bs_admin_roles.admin_role_id', 'INNER');
+		$this->db->join('bs_circles', 'bs_circles.circle_id=bs_admin_roles.admin_role_circle_id', 'LEFT');  
+		$this->db->join('bs_ssa', 'bs_ssa.ssa_id=bs_admin_roles.admin_role_ssa_id', 'LEFT');
+		$this->db->order_by('bs_admin_roles.id','desc'); 
 		$query = $this->db->get("bs_admin_roles");		
 		$roles = $query->result_array();
 		
@@ -491,8 +531,50 @@ class Admin_model extends CI_Model
 		$user = $this->get_LeadDetails($user_id);
 		if(!empty($user_id) && empty($user)){
 			$response['status'] = false;	
-			$response['message'] = 'Unable to process your request right now. <br/> Please try again or some time later.';
+			$response['message'] = 'Unable to process your request right now. <br/> Please try again or some time later [1]';
 			echo json_encode($response);die;	
+		}
+		
+		$FileData = array(); 
+		if(isset($_FILES['app_forms_img']['name'][0]) && !empty($_FILES['app_forms_img']['name'][0])){
+			
+			$this->load->library('upload'); 
+			
+			$files = $_FILES;
+			$cpt = count($_FILES['app_forms_img']['name']);
+			
+			$files_name = array(); $one_file_uploaded = false;
+			for($i = 0; $i < $cpt; $i++){
+				
+				$_FILES['userfile']['name']= $files['app_forms_img']['name'][$i];
+				$_FILES['userfile']['type']= $files['app_forms_img']['type'][$i];
+				$_FILES['userfile']['tmp_name']= $files['app_forms_img']['tmp_name'][$i];
+				$_FILES['userfile']['error']= $files['app_forms_img']['error'][$i];
+				$_FILES['userfile']['size']= $files['app_forms_img']['size'][$i]; 
+				
+				$file_name = str_replace(' ','',$_FILES['userfile']['name']);
+				$temp = explode('.',$file_name);					
+				$file_name = "File-$lead_id-".(time()*microtime());
+				$file_name = $file_name.'.'.end($temp);
+				$_FILES['userfile']['name'] = $file_name;
+				
+				$this->upload->initialize($this->set_upload_options());
+				
+				if($this->upload->do_upload('userfile')){					
+					$files_name[] = $file_name;
+					$one_file_uploaded = true;
+				} else {
+					//prx($this->upload->display_errors());
+				}
+			}
+			
+			if(!$one_file_uploaded) {
+				$response['status'] = false;	
+				$response['message'] = 'We are facing some issues while uploading file. <br/>Please try later.';
+				echo json_encode($response);die;	
+			}
+			
+			$FileData = array('file_name' => implode('*-*', $files_name), 'file_type' => 1, 'file_added_on' => date('Y-m-d H:i:s'));	
 		}
 		
 		$data = array();
@@ -552,6 +634,13 @@ class Admin_model extends CI_Model
 				$call_description = 'Lead Updated Successfully';
 			}
 			
+			if($one_file_uploaded){
+				$FileData['lead_id'] = $user_id;
+				if(!$this->db->insert('bs_lead_files', $FileData)){
+					throw new Exception('Unable to proocess your request right now.<br/> Please try again or some time later [2]');	
+				}
+			}
+			
 			$PlanData = array();
 			$PlanData['user_id'] = $user_id;
 			$PlanData['user_plan_id'] = $plan_id;
@@ -560,7 +649,7 @@ class Admin_model extends CI_Model
 			if(empty($user)){
 				$PlanData['user_plan_started_on'] = date('Y-m-d H:i:s');		
 				if(!$this->db->insert('bs_user_plans', $PlanData)){
-					throw new Exception('Unable to proocess your request right now.<br/> Please try again or some time later');	
+					throw new Exception('Unable to proocess your request right now.<br/> Please try again or some time later [3]');	
 				}
 			} else {
 				
@@ -568,7 +657,7 @@ class Admin_model extends CI_Model
 				
 				$this->db->where('user_id', $user_id);
 				if(!$this->db->update('bs_user_plans', $PlanData)){
-					throw new Exception('Unable to proocess your request right now.<br/> Please try again or some time later');
+					throw new Exception('Unable to proocess your request right now.<br/> Please try again or some time later [4]');
 				}
 				
 				if($user['user_plan_id'] != $plan_id) {
@@ -586,7 +675,7 @@ class Admin_model extends CI_Model
 			
 			if($this->db->insert('bs_user_call_logs', $CallInsertData)) {
 				if($this->db->trans_status() === FALSE) {
-					throw new Exception('Unable to proocess your request right now.<br/> Please try again or some time later');								
+					throw new Exception('Unable to proocess your request right now.<br/> Please try again or some time later [5]');								
 				} else {
 					$this->db->trans_commit(); // Transaction Commit
 					$result['status'] = true;
@@ -620,17 +709,19 @@ class Admin_model extends CI_Model
 		$this->db->like($like); 
 		$this->db->from('bs_users');
 		$this->db->join('bs_circles', 'bs_circles.circle_id=bs_users.user_circle_id', 'INNER'); 
+		$this->db->join('bs_ssa', 'bs_ssa.ssa_id=bs_users.user_ssa_id', 'INNER');  
 		$this->db->join('bs_lead_status', 'bs_lead_status.status_id=bs_users.user_lead_status_id', 'INNER'); 
 		$this->db->join('bs_user_plans', 'bs_user_plans.user_id=bs_users.user_id', 'INNER'); 
 		$this->db->join('bs_plans', 'bs_plans.plan_id=bs_user_plans.user_plan_id', 'INNER'); 
 		$data['count'] = $this->db->count_all_results();
 		
-		$this->db->select('bs_users.*, bs_lead_status.status_name as current_status, bs_plans.plan_name, bs_circles.circle_name');
+		$this->db->select('bs_users.*, bs_lead_status.status_name as current_status, bs_plans.plan_name, bs_circles.circle_name, bs_ssa.ssa_name');
 		$this->db->where($where);
 		$this->db->like($like); 
 		$this->db->limit($limit, $start);
 		$this->db->order_by('bs_users.user_id','desc'); 
 		$this->db->join('bs_circles', 'bs_circles.circle_id=bs_users.user_circle_id', 'INNER');  
+		$this->db->join('bs_ssa', 'bs_ssa.ssa_id=bs_users.user_ssa_id', 'INNER');  
 		$this->db->join('bs_lead_status', 'bs_lead_status.status_id=bs_users.user_lead_status_id', 'INNER'); 
 		$this->db->join('bs_user_plans', 'bs_user_plans.user_id=bs_users.user_id', 'INNER'); 
 		$this->db->join('bs_plans', 'bs_plans.plan_id=bs_user_plans.user_plan_id', 'INNER'); 
@@ -1163,7 +1254,7 @@ class Admin_model extends CI_Model
 			$data['count'] = $this->db->count_all_results();
 		}
 		
-		$this->db->select('afe_id, afe_name, afe_mobile');
+		$this->db->select('afe_id, afe_name, afe_mobile, afe_circle_id');
 		$this->db->where($where);
 		$this->db->like($like); 
 		if(!$all) {
@@ -1172,15 +1263,15 @@ class Admin_model extends CI_Model
 		$this->db->order_by('bs_afe_users.afe_name','asc'); 
 		$afe_users = $this->db->get("bs_afe_users")->result_array();		
 		
-		$cr_rt = $this->get_current_commission_rate(1, $month, $year);
-		$commission_rate = $cr_rt['rate'];
-		
 		foreach($afe_users as $k=>$usr){
 			$afe_id = $usr['afe_id'];
 			
+			$cr_rt = $this->get_current_commission_rate(1, $month, $year, $usr['afe_circle_id']);
+			$commission_rate = $cr_rt['rate'];
+			
 			$this->db->select('bs_plans.plan_name, bs_plans.plan_rental');
 			$this->db->where('user_afe_referer_id', $afe_id);
-			$this->db->where('user_lead_status_id', 1);
+			$this->db->where('user_lead_status_id', $this->leadStatsIdToCons);
 			$this->db->where('MONTH(installation_date)', $month);
 			$this->db->where('YEAR(installation_date)', $year);
 			$this->db->order_by('bs_users.user_id','desc'); 
@@ -1198,6 +1289,7 @@ class Admin_model extends CI_Model
 			
 			$afe_users[$k]['total_leads'] = $total_leads;
 			$afe_users[$k]['total_plans_amt'] = $total_plans_amt;
+			$afe_users[$k]['applied_commission_id'] = $cr_rt['id'];
 			$afe_users[$k]['commission_rate'] = $commission_rate;
 			$afe_users[$k]['commission_amount'] = $commission_amount;
 			$afe_users[$k]['commission_total_leads'] = $this->get_afe_leads_count($afe_id, $month, $year);
@@ -1242,9 +1334,10 @@ class Admin_model extends CI_Model
 		return $data;
 	}
 	
-	public function get_current_commission_rate($type, $month, $year){
+	public function get_current_commission_rate($type, $month, $year, $circle_id){
 		$this->db->select('id, rate');
-		$this->db->where('type', $type);
+		$this->db->where('circle_id', $circle_id);
+		$this->db->where('type', 1);
 		$this->db->where('MONTH(start_date)', $month);
 		$this->db->where('YEAR(start_date)', $year);
 		//$this->db->where('MONTH(end_date)', $month);
@@ -1252,11 +1345,15 @@ class Admin_model extends CI_Model
 		$this->db->order_by('id', 'desc'); 
 		$record = $this->db->get("bs_commission_master")->row_array();
 		
+		if(empty($record)){
+			$this->db->where('id', 1);
+			$record = $this->db->get("bs_commission_master")->row_array();
+		}
+		
 		return $record;
 	}
 	
 	public function get_current_incentive_rate($type, $month, $year){
-		$type =1;
 		$this->db->select('id, rate');
 		$this->db->where('type', $type);
 		$this->db->where('MONTH(start_date)', $month);
@@ -1265,6 +1362,11 @@ class Admin_model extends CI_Model
 		$this->db->where('active', 1);
 		$this->db->order_by('id', 'desc'); 
 		$record = $this->db->get("bs_incentive_master")->row_array();
+		
+		if(empty($record)){
+			$this->db->where('id', 1);
+			$record = $this->db->get("bs_incentive_master")->row_array();
+		}
 		
 		return $record;
 	}
@@ -1350,7 +1452,7 @@ class Admin_model extends CI_Model
 				
 				$this->db->select('bs_plans.plan_name, bs_plans.plan_rental');
 				$this->db->where('user_afe_referer_id', $afe_id);
-				$this->db->where('user_lead_status_id', 1);
+				$this->db->where('user_lead_status_id', $this->leadStatsIdToCons);
 				$this->db->where('MONTH(installation_date)', $month);
 				$this->db->where('YEAR(installation_date)', $year);
 				$this->db->order_by('bs_users.user_id','desc'); 
@@ -1439,7 +1541,7 @@ class Admin_model extends CI_Model
 					
 					$this->db->select('bs_plans.plan_name, bs_plans.plan_rental');
 					$this->db->where('user_afe_referer_id', $afe_id);
-					$this->db->where('user_lead_status_id', 1);
+					$this->db->where('user_lead_status_id', $this->leadStatsIdToCons);
 					$this->db->where('MONTH(installation_date)', $month);
 					$this->db->where('YEAR(installation_date)', $year);
 					$this->db->order_by('bs_users.user_id','desc'); 
@@ -1565,7 +1667,7 @@ class Admin_model extends CI_Model
 		return $results;
 	}
 	
-	public function get_leads($limit, $start, $and_whre){
+	public function get_leads($limit, $start, $and_whre=NULL){
 		$data = $where = array();
 		
 		if(!empty($_GET['afe'])){
@@ -1610,7 +1712,7 @@ class Admin_model extends CI_Model
 		return $data;
 	}
 	
-	public function get_leads_cnt($limit, $start, $and_whre){
+	public function get_leads_cnt($limit, $start, $and_whre=NULL){
 		$data = $where = array();
 		
 		if(!empty($_GET['from_date'])){
@@ -1646,5 +1748,98 @@ class Admin_model extends CI_Model
 		$data['results'] = $leads;
 		
 		return $data;
+	}
+	
+	private function set_upload_options() {   
+		
+		$config = array();
+		$config['upload_path'] = './assets/uploads/leads/';
+		$config['allowed_types'] = 'pdf|jpg|png|jpeg';
+		$config['max_size'] = '2048';			
+
+		return $config;
+	}
+	
+	public function get_bsnl_commissions($type, $limit, $start, $month, $year, $and_whre=array(), $sts_in_whr=array()){
+		$data = array(); $where = array('comm_status_id > ' => 0, 'comm_type ' => $type); 
+		
+		if(!empty($month)){
+			$where = array_merge($where, array('comm_month' => $month, 'comm_year ' => $year));		
+		}
+		
+		if(!empty($and_whre)){
+			$where = array_merge($where, $and_whre);		
+		}
+		
+		if(!empty($_GET['circle'])){
+			$circle_id = DeCrypt($_GET['circle']);
+			$where = array_merge($where, array('comm_circle_id' => $circle_id));	
+		}
+		
+		if(!empty($sts_in_whr)){
+			$this->db->where_in('comm_status_id', $sts_in_whr);
+		}
+		$this->db->where($where);
+		$this->db->from('bs_bsnl_commissions');
+		$this->db->join('bs_commission_master', 'bs_commission_master.id=bs_bsnl_commissions.comm_applied_commision_id', 'INNER'); 
+		$this->db->join('bs_circles', 'bs_circles.circle_id=bs_bsnl_commissions.comm_circle_id', 'INNER'); 
+		$this->db->join('bs_ssa', 'bs_ssa.ssa_id=bs_bsnl_commissions.comm_ssa_id', 'INNER');  
+		$data['count'] = $this->db->count_all_results();
+		
+		$this->db->select('bs_bsnl_commissions.*, bs_circles.circle_name, bs_ssa.ssa_name, bs_commission_master.rate as commission_rate');
+		$this->db->where($where);
+		if(!empty($sts_in_whr)){
+			$this->db->where_in('comm_status_id', $sts_in_whr);
+		}
+		$this->db->limit($limit, $start);
+		$this->db->join('bs_commission_master', 'bs_commission_master.id=bs_bsnl_commissions.comm_applied_commision_id', 'INNER'); 
+		$this->db->join('bs_circles', 'bs_circles.circle_id=bs_bsnl_commissions.comm_circle_id', 'INNER'); 
+		$this->db->join('bs_ssa', 'bs_ssa.ssa_id=bs_bsnl_commissions.comm_ssa_id', 'INNER');   
+		$this->db->order_by('bs_circles.circle_name','asc'); 
+		$commissions = $this->db->get("bs_bsnl_commissions")->result_array();		
+		
+		$data['results'] = $commissions;
+		return $data;
+	}
+	
+	public function get_current_bsnl_commission_rate($month, $year, $circle_id){
+		$this->db->select('id, rate');
+		//$this->db->where('circle_id', $circle_id);
+		$this->db->where('type', 2);
+		$this->db->where('MONTH(start_date)', $month);
+		$this->db->where('YEAR(start_date)', $year);
+		//$this->db->where('MONTH(end_date)', $month);
+		$this->db->where('active', 1);
+		$this->db->order_by('id', 'desc'); 
+		$record = $this->db->get("bs_commission_master")->row_array();
+		
+		if(empty($record)){
+			$this->db->where('id', 2);
+			$record = $this->db->get("bs_commission_master")->row_array();
+		}
+		
+		return $record;
+	}
+	
+	public function get_all_commision_leads($month, $year, $circle_id=NULL, $ssa_id=NULL){
+		$where = array('user_active' => 1, 'user_status_id >= ' => 3);
+		if(!empty($circle_id)){
+			$where = array_merge($where, array('user_circle_id' => $circle_id));	
+		}
+		if(!empty($ssa_id)){
+			$where = array_merge($where, array('user_ssa_id' => $ssa_id));	
+		}
+				
+		$this->db->select('bs_users.*, bs_plans.plan_id, bs_plans.plan_rental');
+		$this->db->where($where);
+		$this->db->where("installation_date IS NOT NULL AND installation_date != '0000-00-00'");
+		$this->db->where('MONTH(installation_date) < ', $month);
+		$this->db->where('YEAR(installation_date) <=', $year);
+		$this->db->order_by('bs_users.user_id','desc'); 
+		$this->db->join('bs_user_plans', 'bs_user_plans.user_id=bs_users.user_id', 'INNER'); 
+		$this->db->join('bs_plans', 'bs_plans.plan_id=bs_user_plans.user_plan_id', 'INNER'); 
+		$results = $this->db->get("bs_users")->result_array();	
+		
+		return $results;
 	}
 }	

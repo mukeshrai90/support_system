@@ -25,6 +25,11 @@ $(document).ready(function () {
     	return this.optional(element) || value.length == param;
     },("Please enter exactly {0} characters"));
 	
+	$.validator.addMethod("validAmount", function(value, element, param){
+    	var matchText = /^[0-9\.]+$/i;
+		return this.optional(element) || matchText.test(value);;
+    },("Please enter valid amount"));
+	
 	$(document).on('click','.search-btn',function(){
         reloadSearch();
 	});
@@ -60,6 +65,17 @@ $(document).ready(function () {
 	$(document).on('input','.only-number',function(){ 		
 		var $this = $(this);
 		var regexp = /[^0-9]/g;
+		var value = $this.val();
+		
+		if(value != '' && regexp.test(value)){			
+			$this.val(value.replace(regexp,'')); 
+		}
+		return false;
+	});
+	
+	$(document).on('input','.only-float',function(){ 		
+		var $this = $(this);
+		var regexp = /[^0-9\.]/g;
 		var value = $this.val();
 		
 		if(value != '' && regexp.test(value)){			
@@ -137,7 +153,7 @@ $(document).ready(function () {
 			$('#myIncCommDtlsModal').modal('toggle');
 			var ldrHtml = '<div class="row" id="prod_loader_div" style="text-align:center;margin:28px 0px;">'+
 								'<div class="col-lg-12">'+
-									'<img alt="loading" src="'+ASSETS_URL+'img/ajax_loader1.gif"/>'+
+									'<img alt="loading" src="'+ASSETS_URL+'img/ajax_loader11.gif"/>'+
 								'</div>'+
 							'</div>';
 							

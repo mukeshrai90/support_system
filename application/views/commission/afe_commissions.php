@@ -34,6 +34,17 @@
 								  </div>';
 						} 
 					?>
+					<div class="ibox-tools">
+						<?php 
+							if(!empty($_SESSION['admin']['current_role_id']) && in_array($_SESSION['admin']['current_role_id'], array(2,7))){
+						?>
+							<button type="button" class="btn btn-sm btn-danger refresh-all add-new-btn" data-url="<?php echo BASE_URL.'commissions/afe/list?t=pending'?>">Pending For Approval</button>
+						<?php } ?>
+						
+						<button type="button" class="btn btn-sm btn-danger refresh-all add-new-btn" data-url="<?php echo BASE_URL.'commissions/afe/list?m=current'?>">Current Month</button>
+						
+						<button type="button" class="btn btn-sm btn-danger refresh-all add-new-btn" data-url="<?php echo BASE_URL.'commissions/afe/list'?>">Previous Months</button>
+				   </div>
 				</div>
 				<div class="ibox-content">
 					<form id="search-form" action="javascript:;">

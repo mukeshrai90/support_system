@@ -9,34 +9,34 @@
 					<ul class="list-group">
 						<li class="list-group-item">
 							<b>Name : </b> 
-							<?php echo $user['name']?>
+							<?php echo $user['admin_name']?>
 						</li>
 						<li class="list-group-item ">
 							<b>Username : </b> 
-							<?php echo $user['username']?>
+							<?php echo $user['admin_username']?>
 						</li>
 						<li class="list-group-item">
 							<b>Email : </b> 
-							<?php echo $user['email'] != '' ? $user['email'] : 'Not Available'?>
+							<?php echo $user['admin_email'] != '' ? $user['admin_email'] : 'Not Available'?>
 						</li>
 						<li class="list-group-item">
 							<b>Contact : </b> 
-							<?php echo $user['contact'] != '' ? $user['contact'] : 'Not Available'?>
+							<?php echo $user['admin_mobile'] != '' ? $user['admin_mobile'] : 'Not Available'?>
 						</li>						
 						<li class="list-group-item tooltip-demo">
 							<b>Status : </b>
 							<?php 
-								if($user['status'] == 0)
+								if($user['admin_status'] == 0)
 								{
 									echo 
-									'<a href="javascript:;" class="change-status" title="Pending" data-toggle="tooltip" data-placement="bottom" data-status="1" data-userid="'.$user['id'].'" data-field="status">
+									'<a href="javascript:;" class="change-status" title="Pending" data-toggle="tooltip" data-placement="bottom">
 										<i class="fa fa-star-o text-navy" style="color:#FF501E;"></i>
 									</a> &nbsp;&nbsp;&nbsp;(Inactive)';
 								}
-								else if($user['status'] == 1)
+								else if($user['admin_status'] == 1)
 								{
 									echo 
-									'<a href="javascript:;" class="change-status" title="Approved" data-toggle="tooltip" data-placement="bottom" data-status="0" data-userid="'.$user['id'].'" data-field="status">
+									'<a href="javascript:;" class="change-status" title="Approved" data-toggle="tooltip" data-placement="bottom">
 										<i class="fa fa-star text-navy"></i>
 									</a> &nbsp;&nbsp;&nbsp;(Active)';
 								}								
@@ -45,10 +45,10 @@
 						<li class="list-group-item">
 							<b>Last Login : </b> 
 							<?php 
-								if(trim($user['last_login']) == '0000-00-00 00:00:00')
+								if(trim($user['admin_last_login']) == '0000-00-00 00:00:00')
 									echo 'No Login Yet';									
 								else
-									echo date('M-d-Y h:i a',strtotime($user['last_login']));
+									echo date('M-d-Y h:i a',strtotime($user['admin_last_login']));
 							?>
 						</li>			
 					</ul>
@@ -56,8 +56,35 @@
 			</div>
         </div>
 		
+		<div class="col-lg-5">
+			<div class="ibox float-e-margins">
+				<div class="ibox-title">
+					<h5>Role Details</h5>
+				</div>
+				<div class="ibox-content no-padding">
+					<ul class="list-group">
+						<?php 
+							foreach($role_details as $role){
+						?>
+							<li class="list-group-item">
+								<b>Role: </b> 
+								<?php 
+									echo $role['role_name'];
+									if($role['admin_role_id'] == 2 && !empty($role['circle_name'])){
+										echo ' [Circle: '.$role['circle_name'].']';
+									} else if($role['admin_role_id'] == 3 && !empty($role['ssa_name'])){
+										echo ' [SSA: '.$role['ssa_name'].']';
+									}
+								?>
+							</li>
+						<?php } ?>
+					</ul>
+				</div>
+			</div>
+        </div>
+		
 		<?php 
-			if($user['role_id'] == 2)
+			if($user['role_id'] == 2 && 0)
 			{
 		?>
 		<div class="col-lg-10">

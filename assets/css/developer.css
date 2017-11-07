@@ -31,9 +31,9 @@ a.add-new-btn{
 #loading_overlay .loading_message {
 	color: #333333;
 	font-weight: 700;
-	left: 50%;   
+	left: 43%;   
 	position: absolute;
-	top: 50%;
+	top: 36%;
 }
 #loading_overlay .loading_message img {
 	margin: 7px auto;

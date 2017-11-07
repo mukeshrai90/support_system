@@ -11,7 +11,7 @@
 <link href="<?php echo ASSETS_URL?>font-awesome/css/font-awesome.min.css" rel="stylesheet">   
 <link href="<?php echo ASSETS_URL?>css/animate.css" rel="stylesheet">
 <link href="<?php echo ASSETS_URL?>css/style.min.css" rel="stylesheet">
-<link href="<?php echo ASSETS_URL?>css/developer.css?v=1.2" rel="stylesheet">	
+<link href="<?php echo ASSETS_URL?>css/developer.css?v=1.3" rel="stylesheet">	
 <script src="<?php echo ASSETS_URL?>js/jquery-2.1.1.js"></script>
 <link href="<?php echo ASSETS_URL?>css/sweet-alert.css" rel="stylesheet">
 <script src="<?php echo ASSETS_URL?>js/sweet-alert.min.js"></script>
@@ -116,89 +116,63 @@ $(document).ready(function(){
 							<?php } ?>
 							
 							<?php 
-								if(in_array('afe_commissions', $actions)) {
+								if(in_array('afe_commissions', $actions) || in_array('bsnl_commissions', $actions)) {
 							?>
-								<li class="<?php echo $this->uri->segment(1) == 'commissions' && $this->uri->segment(2) == 'afe' ? 'active' : ''?>">
+								<li class="<?php echo $this->uri->segment(1) == 'commissions' ? 'active' : ''?>">
 									<a aria-expanded="false" role="button" href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
-										<i class="fa fa-money"></i> 
-										<span class="nav-label">Commission</span>
+										<i class="fa fa-gears"></i> 
+										<span class="nav-label">Commisions</span>
 										<span class="caret"></span>
 									</a>
 									<ul role="menu" class="dropdown-menu">
+										<li class="<?php echo strstr($this->uri->segment(2),'afe')== 'afe' ? 'active' : ''?>">
+											<a href="<?php echo BASE_URL.'commissions/afe/list?m=current'?>">
+												<i class="fa fa-map-marker"></i>&nbsp;
+												<span class="nav-label">Sales Partner</span>
+											</a>
+										</li>
+										
 										<?php 
-											if(!empty($_SESSION['admin']['current_role_id']) && in_array($_SESSION['admin']['current_role_id'], array(2,7))){
+											if(in_array('bsnl_commissions', $actions)) {
 										?>
-											<li class="<?php echo $this->uri->segment(2) == 'afe' && @$_GET['t'] == 'pending' ? 'active' : ''?>">
-												<a href="<?php echo BASE_URL.'commissions/afe/list?t=pending'?>">
-													<i class="fa fa-question-circle"></i>&nbsp;&nbsp;
-													<span class="nav-label">Pending for Approval</span>
+											<li class="<?php echo strstr($this->uri->segment(2),'bsnl')== 'bsnl' ? 'active' : ''?>">
+												<a href="<?php echo BASE_URL.'commissions/bsnl/list'?>">
+													<i class="fa fa-map-marker"></i>&nbsp;
+													<span class="nav-label">BSNL</span>
 												</a>
 											</li>
 										<?php } ?>
-										<li class="<?php echo $this->uri->segment(2) == 'afe' && @$_GET['m'] == 'current' ? 'active' : ''?>">
-											<a href="<?php echo BASE_URL.'commissions/afe/list?m=current'?>">
-												<i class="fa fa-calendar-o"></i>&nbsp;&nbsp;
-												<span class="nav-label">Current Month</span>
-											</a>
-										</li>
-										<li class="<?php echo $this->uri->segment(2) == 'afe' && @$_GET['m'] != 'current' && empty($_GET['t']) ? 'active' : ''?>">
-											<a href="<?php echo BASE_URL.'commissions/afe/list'?>">
-												<i class="fa fa-calendar"></i>&nbsp;&nbsp;
-												<span class="nav-label">Prevoius Months</span>
-											</a>
-										</li>
 									</ul>
 								</li>
 							<?php } ?>
 							
 							<?php 
-								if(in_array('fe_incentives', $actions)) {
+								if(in_array('fe_incentives', $actions) || in_array('cbh_incentives', $actions)) {
 							?>
-								<li class="<?php echo $this->uri->segment(1) == 'incentives' && $this->uri->segment(2) == 'fe' ? 'active' : ''?>">
+								<li class="<?php echo $this->uri->segment(1) == 'incentives' ? 'active' : ''?>">
 									<a aria-expanded="false" role="button" href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
-										<i class="fa fa-money"></i> 
-										<span class="nav-label">FE Incentive</span>
+										<i class="fa fa-gears"></i> 
+										<span class="nav-label">Incentives</span>
 										<span class="caret"></span>
 									</a>
 									<ul role="menu" class="dropdown-menu">
-										<li class="<?php echo $this->uri->segment(2) == 'fe' && @$_GET['m'] == 'current' ? 'active' : ''?>">
+										<li class="<?php echo strstr($this->uri->segment(2),'fe')== 'fe' ? 'active' : ''?>">
 											<a href="<?php echo BASE_URL.'incentives/fe/list?m=current'?>">
-												<i class="fa fa-calendar-o"></i>&nbsp;&nbsp;
-												<span class="nav-label">Current Month</span>
+												<i class="fa fa-map-marker"></i>&nbsp;
+												<span class="nav-label">FE Incentive</span>
 											</a>
 										</li>
-										<li class="<?php echo $this->uri->segment(2) == 'fe' && @$_GET['m'] != 'current' && empty($_GET['t']) ? 'active' : ''?>">
-											<a href="<?php echo BASE_URL.'incentives/fe/list'?>">
-												<i class="fa fa-calendar"></i>&nbsp;&nbsp;
-												<span class="nav-label">Prevoius Months</span>
-											</a>
-										</li>
-									</ul>
-								</li>
-							<?php } ?>
-							
-							<?php 
-								if(in_array('cbh_incentives', $actions)) {
-							?>
-								<li class="<?php echo $this->uri->segment(1) == 'incentives' && $this->uri->segment(2) == 'cbh' ? 'active' : ''?>">
-									<a aria-expanded="false" role="button" href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
-										<i class="fa fa-money"></i> 
-										<span class="nav-label">CBH Incentive</span>
-										<span class="caret"></span>
-									</a>
-									<ul role="menu" class="dropdown-menu">
-										<li class="<?php echo $this->uri->segment(2) == 'cbh' && @$_GET['m'] == 'current' ? 'active' : ''?>">
-											<a href="<?php echo BASE_URL.'incentives/cbh/list?m=current'?>">
-												<i class="fa fa-calendar-o"></i>&nbsp;&nbsp;
-												<span class="nav-label">Current Month</span>
-											</a>
-										</li>
-										<li class="<?php echo $this->uri->segment(2) == 'cbh' && @$_GET['m'] != 'current' && empty($_GET['t']) ? 'active' : ''?>">
-											<a href="<?php echo BASE_URL.'incentives/cbh/list'?>">
-												<i class="fa fa-calendar"></i>&nbsp;&nbsp;
-												<span class="nav-label">Prevoius Months</span>
-											</a>
-										</li>
+										
+										<?php 
+											if(in_array('bsnl_commissions', $actions)) {
+										?>
+											<li class="<?php echo strstr($this->uri->segment(2),'cbh')== 'cbh' ? 'active' : ''?>">
+												<a href="<?php echo BASE_URL.'incentives/cbh/list?m=current'?>">
+													<i class="fa fa-map-marker"></i>&nbsp;
+													<span class="nav-label">CBH Incentive</span>
+												</a>
+											</li>
+										<?php } ?>
 									</ul>
 								</li>
 							<?php } ?>
@@ -254,7 +228,13 @@ $(document).ready(function(){
 										<li class="<?php echo strstr($this->uri->segment(2),'commission')== 'commission' ? 'active' : ''?>">
 											<a href="<?php echo BASE_URL.'cms/commission/list'?>">
 												<i class="fa fa-rupee"></i>&nbsp;&nbsp;
-												<span class="nav-label">AFE Commision</span>
+												<span class="nav-label">Sales Partner Commision</span>
+											</a>
+										</li>
+										<li class="<?php echo strstr($this->uri->segment(2),'incentive')== 'incentive' ? 'active' : ''?>">
+											<a href="<?php echo BASE_URL.'cms/incentive/list'?>">
+												<i class="fa fa-rupee"></i>&nbsp;&nbsp;
+												<span class="nav-label">CBH/FE Incentive</span>
 											</a>
 										</li>
 									</ul>
@@ -318,7 +298,7 @@ $(document).ready(function(){
 <script src="<?php echo ASSETS_URL?>js/inspinia.js"></script>
 <script src="<?php echo ASSETS_URL?>js/sweet-alert.min.js"></script>
 <script src="<?php echo ASSETS_URL?>js/plugins/validate/jquery.validate.min.js"></script>
-<script src="<?php echo ASSETS_URL?>js/developer.js?v=1.3"></script>
+<script src="<?php echo ASSETS_URL?>js/developer.js?v=1.4"></script>
 <script src="<?php echo ASSETS_URL?>js/jquery.datetimepicker.js"></script>
 
 <link href="<?php echo ASSETS_URL?>css/jquery.datetimepicker.css" rel="stylesheet">
@@ -330,7 +310,7 @@ $(document).ready(function(){
 	
 <script>
 $(document).ready(function(){
-	$('body').append('<div id="loading_overlay" style="display: none;"><div class="loading_message round_bottom"><img alt="loading" src="'+ASSETS_URL+'frontend/img/ajax_loader.gif"></div>');
+	$('body').append('<div id="loading_overlay" style="display: none;"><div class="loading_message round_bottom"><img alt="loading" src="'+ASSETS_URL+'img/ajax_loader1.gif"></div>');
 	
 	var flashMessage = "<?php echo $flashMessage?>";
 	var flashType = "<?php echo $flashType?>";

@@ -2,7 +2,7 @@
 error_reporting(0);
 class User extends CI_Controller {
 	
-	var $lead_sources = array(1 => 'Self', 2 => 'Direct Sales');
+	var $lead_sources = array(1 => 'Self/Direct Sales', 2 => 'Sales Partner');
 	
 	public function __construct()
 	{
@@ -552,33 +552,55 @@ class User extends CI_Controller {
 		$logged_admin_id = $logged_admin['admin_id']; 
 		
 		$response['status'] = false;
-		$response['message'] = 'Unable to process your request right now. <br/> Please try again or some time later.';
+		$response['message'] = 'Unable to process your request right now. <br/> Please try again or some time later. [1]';
 		
+		if(in_array($status_id, array(2)) && empty($_FILES['upld_file']['name'][0])) {
+			$response['status'] = false;	
+			$response['message'] = 'Please upload files.';
+			echo json_encode($response);die;	
+		}
 		
 		$file_uploaded = false; $file_type = 2; $file_log_description = 'CAF File Uploaded successfully';
-		if(isset($_FILES['upld_file']['name']) && !empty($_FILES['upld_file']['name'])){
-			$file_name = str_replace(' ','',$_FILES['upld_file']['name']);
-			$temp = explode('.',$file_name);					
-			$file_name = "File-$lead_id-".(time()*microtime());
-			$file_name = $file_name.'.'.end($temp);
-			$_FILES['upld_file']['name'] = $file_name;
+		if(isset($_FILES['upld_file']['name'][0]) && !empty($_FILES['upld_file']['name'][0])){
 			
 			$this->load->library('upload'); 
-			$config['upload_path'] = './assets/uploads/leads/';
-			$config['allowed_types'] = 'pdf|xlsx|xls|doc|docx|jpg|png|jpeg';
-			$config['max_size'] = '10000';			
-			$this->upload->initialize($config);
 			
-			if($this->upload->do_upload('upld_file')){
-				$file_uploaded = true;
-				if($status_id == 3){
-					$file_type = 3;
-					$file_log_description = 'DNCS File Uploaded successfully';
-				} else if($status_id == 4){
-					$file_type = 4;
-					$file_log_description = 'Installation & Activation Pic File Uploaded successfully';
-				}
-			} 
+			$files = $_FILES;
+			$cpt = count($_FILES['upld_file']['name']);
+			
+			$FileData = array(); $files_name = array();
+			for($i = 0; $i < $cpt; $i++){
+				
+				$_FILES['userfile']['name']= $files['upld_file']['name'][$i];
+				$_FILES['userfile']['type']= $files['upld_file']['type'][$i];
+				$_FILES['userfile']['tmp_name']= $files['upld_file']['tmp_name'][$i];
+				$_FILES['userfile']['error']= $files['upld_file']['error'][$i];
+				$_FILES['userfile']['size']= $files['upld_file']['size'][$i]; 
+				
+				$file_name = str_replace(' ','',$_FILES['userfile']['name']);
+				$temp = explode('.',$file_name);					
+				$file_name = "File-$lead_id-".(time()*microtime());
+				$file_name = $file_name.'.'.end($temp);
+				$_FILES['userfile']['name'] = $file_name;
+				
+				$this->upload->initialize($this->set_upload_options());
+				
+				if($this->upload->do_upload('userfile')){
+					
+					$file_uploaded = true;
+					if($status_id == 3){
+						$file_type = 3;
+						$file_log_description = 'DNCS File(s) Uploaded successfully';
+					} else if($status_id == 4){
+						$file_type = 4;
+						$file_log_description = 'Installation & Activation Pic File(s) Uploaded successfully';
+					}
+					
+					$files_name[] = $file_name;
+				} 
+			}
+			
+			$FileData = array('lead_id' => $lead_id, 'file_name' => implode('*-*', $files_name), 'file_type' => $file_type, 'file_added_on' => date('Y-m-d H:i:s'));	
 		}
 		
 		try{
@@ -587,13 +609,16 @@ class User extends CI_Controller {
 			$LeadData = array('user_lead_status_id' => $status_id, 'user_updated_on' => date('Y-m-d H:i:s'));
 			
 			$and_sts_Desc = '';
-			if($status_id == 3){
-				$LeadData = array_merge($LeadData, array('user_cpe_payment_mode' => $cpe_payment_mode, 'user_cpe_payment_amnt' => $cpe_payment_amnt, 'user_bsnl_id' => $bsnl_user_id));
+			if($status_id == 2){
+				$LeadData = array_merge($LeadData, array('user_bsnl_id' => $bsnl_user_id, 'installation_date' => date('Y-m-d', strtotime($installation_date))));
+				
+			} else if($status_id == 3){
+				$LeadData = array_merge($LeadData, array('user_cpe_payment_mode' => $cpe_payment_mode, 'user_cpe_payment_amnt' => $cpe_payment_amnt));
 				$and_sts_Desc = '<br/><b>Payment Amt: </b>'.$cpe_payment_amnt;
 				$and_sts_Desc .= '<br/><b>Payment Mode: </b>'.$cpe_payment_mode;
 				
 			} else if($status_id == 4){
-				$LeadData = array_merge($LeadData, array('installation_date' => date('Y-m-d', strtotime($installation_date))));
+				//$LeadData = array_merge($LeadData, array('installation_date' => date('Y-m-d', strtotime($installation_date))));
 			}
 			
 			$this->db->where('user_id', $lead_id);
@@ -607,8 +632,6 @@ class User extends CI_Controller {
 				
 				$sts = $this->db->insert('bs_user_call_logs', $CallInsertData);
 				if($file_uploaded){
-					
-					$FileData = array('lead_id' => $lead_id, 'file_name' => $file_name, 'file_type' => $file_type, 'file_added_on' => date('Y-m-d H:i:s'));
 					$sts = $this->db->insert('bs_lead_files', $FileData);
 					
 					$CallInsertData['call_desc'] = $file_log_description;
@@ -617,14 +640,14 @@ class User extends CI_Controller {
 				
 				if($sts) {
 					if($this->db->trans_status() === FALSE) {
-						throw new Exception('Unable to proocess your request right now.<br/> Please try again or some time later');								
+						throw new Exception('Unable to proocess your request right now.<br/> Please try again or some time later [2]');								
 					} else {
 						$this->db->trans_commit(); // Transaction Commit
 						$response['status'] = true;
 						$response['message'] = 'Status has been changed successfully.';
 					}
 				} else {
-					throw new Exception('Unable to proocess your request right now.<br/> Please try again or some time later');	
+					throw new Exception('Unable to proocess your request right now.<br/> Please try again or some time later [3]');	
 				}
 			}
 			
@@ -634,5 +657,15 @@ class User extends CI_Controller {
 		}
 		
 		echo json_encode($response);die;	
+	}
+	
+	private function set_upload_options() {   
+		
+		$config = array();
+		$config['upload_path'] = './assets/uploads/leads/';
+		$config['allowed_types'] = 'pdf|jpg|png|jpeg';
+		$config['max_size'] = '2048';			
+
+		return $config;
 	}
 }

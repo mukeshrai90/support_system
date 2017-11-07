@@ -186,4 +186,140 @@ class Commission extends CI_Controller {
 		
 		echo json_encode($response); die;
 	}
+	
+	public function bsnl_commissions_c()
+	{
+		$loggedIn_data = chk_access('bsnl_commissions', 1, true);
+		
+		$per_page = 20; 
+        $page = @$_GET['per_page']? $_GET['per_page'] : 0;
+		
+		$current_month = date('m');
+		$current_year = date('Y');
+		$last_month = date('m', strtotime('-27 days'));
+		$last_month_year = date('Y', strtotime('-27 days'));
+		
+		$month = $last_month;
+		if(!empty($_GET['month'])) {	
+			$month = $_GET['month'];
+		}
+		
+		$year = $last_month_year;
+		if(!empty($_GET['year'])) {	
+			$year = $_GET['year'];
+		}
+		
+		$data["pageUrl"] = BASE_URL.'commissions/bsnl/list';
+		$current_role_id = $loggedIn_data['current_role_id'];
+		
+		$sts_in_whr = array();
+		if(!empty($_GET['t']) && $_GET['t'] == 'pending') {	
+			if($current_role_id == 2){
+				$sts_in_whr = array(2);
+			} else if($current_role_id == 7){
+				$sts_in_whr = array(3);
+			}
+			
+			$data["pageUrl"] = $data["pageUrl"].'?t=pending';
+			$month = '';
+		}
+		
+		$and_whre = array();
+		
+		$result = $this->admin_model->get_bsnl_commissions(1, $per_page, $page, $month, $year, $and_whre, $sts_in_whr);
+		$data['records'] = @$result['results'];
+		
+		$total_rows = $result['count'];
+		
+		$base_url = $data["pageUrl"].'?'.$_SERVER['QUERY_STRING'];
+		
+        $data["links"] = create_links($per_page,$total_rows,$base_url);
+		
+        $data["current_month"] = $current_month;
+        $data["current_year"] = $current_year;
+        $data["last_month"] = $last_month;
+        $data["last_month_year"] = $last_month_year;
+        $data["month"] = $month;
+        $data["year"] = $year;
+        $data["logged_in_role_id"] = $current_role_id;
+		//prx($data);
+		
+		$data['pageTitle'] = 'Commission';
+		$data['subPageTitle'] = ' | '.$this->months_arr_gl[$month]." - $year";
+		$data['months_arr_gl'] = $this->months_arr_gl;
+		
+		if($this->input->is_ajax_request()) {
+			$data['result'] = $this->load->view('elements/bsnl-commission-circle-list',$data,true);
+			echo json_encode($data);die;
+		}
+		
+		$data['circles'] = $this->admin_model->get_Circles();
+		
+		$data['content'] = 'commission/bsnl_commissions_c';
+		$this->load->view('layout',$data);
+	}
+	
+	public function bsnl_commissions_s(){
+		$loggedIn_data = chk_access('bsnl_commissions', 1, true);
+		
+		$per_page = 2000; 
+        $page = @$_GET['per_page']? $_GET['per_page'] : 0;
+		
+		$month = $_GET['month'];
+		$year = $_GET['year'];
+		
+		$current_role_id = $loggedIn_data['current_role_id'];
+		
+		$result = $this->admin_model->get_bsnl_commissions(2, $per_page, $page, $month, $year);
+		$data['records'] = @$result['results'];
+		
+		$total_rows = $result['count'];
+		
+        $data["current_month"] = $current_month;
+        $data["current_year"] = $current_year;
+        $data["last_month"] = $last_month;
+        $data["last_month_year"] = $last_month_year;
+        $data["month"] = $month;
+        $data["year"] = $year;
+        $data["logged_in_role_id"] = $current_role_id;
+		
+		$circle_name = '';
+		if(!empty($_GET['circle'])){
+			$circle_id = DeCrypt($_GET['circle']);
+			$circle = $this->admin_model->get_Circles($circle_id);
+			
+			$circle_name = ' For <u>Circle: '.$circle[0]['circle_name'].'</u>';
+		}
+		
+		$data['pageTitle'] = 'Commission'.$circle_name;
+		$data['subPageTitle'] = ' | '.$this->months_arr_gl[$month]." - $year";
+		$data['months_arr_gl'] = $this->months_arr_gl;
+		
+		$data['content'] = 'commission/bsnl_commissions_s';
+		$this->load->view('layout',$data);	
+	}
+	
+	public function bsnl_commissions_leads(){
+		$ssa_id = DeCrypt($ssa_id);
+		
+		$month = $_GET['month'];
+		$year = $_GET['year'];
+		
+		$ssa_name = '';
+		if(!empty($_GET['ssa'])){
+			$ssa_id = DeCrypt($_GET['ssa_id']);
+			$ssa = $this->admin_model->get_SSA($ssa_id);
+			
+			$ssa_name = ' For <u>SSA: '.$ssa[0]['ssa_name'].'</u>';
+		}
+		
+		$results = $this->admin_model->get_all_commision_leads($month, $year, '', $ssa_id);	
+		
+		$data['pageTitle'] = 'Commission'.$ssa_name;
+		$data['subPageTitle'] = ' | '.$this->months_arr_gl[$month]." - $year";
+		$data['months_arr_gl'] = $this->months_arr_gl;
+		
+		$data['content'] = 'commission/view_bsnl_commission_leads';
+		$this->load->view('layout',$data);	
+	}
 }

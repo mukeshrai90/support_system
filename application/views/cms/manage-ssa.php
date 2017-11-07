@@ -52,7 +52,7 @@
 							<div class="col-lg-8">
 								<select name="ssa_status" id="ssa_status" class="form-control">
 									<option value="1" <?php echo $record['ssa_status']== 1 ? 'selected="selected"':''?>>Active</option>
-									<option value="0" <?php echo $record['ssa_status']=== 0 ? 'selected="selected"':''?>>Inactive</option></select>
+									<option value="0" <?php echo $record['ssa_status']== 0 ? 'selected="selected"':''?>>Inactive</option></select>
 							</div>
 						</div>
 						<div class="form-group">

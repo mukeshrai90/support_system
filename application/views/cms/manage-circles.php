@@ -33,7 +33,7 @@
 							<div class="col-lg-8">
 								<select name="circle_status" id="circle_status" class="form-control">
 									<option value="1" <?php echo $record['circle_status'] == 1 ? 'selected="selected"':''?>>Active</option>
-									<option value="0" <?php echo $record['circle_status'] === 0 ? 'selected="selected"':''?>>Inactive</option></select>
+									<option value="0" <?php echo $record['circle_status'] == 0 ? 'selected="selected"':''?>>Inactive</option></select>
 							</div>
 						</div>
 						<div class="form-group">

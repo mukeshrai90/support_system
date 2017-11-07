@@ -86,3 +86,20 @@ if(!function_exists('get_all_allowed_actions')) {
 	}
 }
 
+if(!function_exists('is_cmsn_inctv_updatable')) {
+	
+	function is_cmsn_inctv_updatable($arr, $type=NULL){
+		$start_date = $arr['start_date'];
+		$start_date_y = date('Y', strtotime($start_date));
+		$start_date_m = date('m', strtotime($start_date));
+		
+		$current_date_y = date('Y');
+		$current_date_m = date('m');
+		
+		if(($start_date_m >= $current_date_m && ($start_date_y >= $current_date_y))){
+			return true;
+		}
+		return false;
+	}
+}
+

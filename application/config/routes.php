@@ -89,6 +89,14 @@ $route['cms/circles/list'] = "cms/circles_list";
 $route['cms/circles/add'] = "cms/manage_circles";
 $route['cms/circles/edit/(:any)'] = "cms/manage_circles/$1";
 
+$route['cms/commission/list'] = "cms/commission_list";
+$route['cms/commission/add'] = "cms/manage_commission";
+$route['cms/commission/edit/(:any)'] = "cms/manage_commission/$1";
+
+$route['cms/incentive/list'] = "cms/incentive_list";
+$route['cms/incentive/add'] = "cms/manage_incentive";
+$route['cms/incentive/edit/(:any)'] = "cms/manage_incentive/$1";
+
 $route['cms/ssa/list'] = "cms/ssa_list";
 $route['cms/ssa/add'] = "cms/manage_ssa";
 $route['cms/ssa/edit/(:any)'] = "cms/manage_ssa/$1";
@@ -104,7 +112,11 @@ $route['commissions/change/status'] = "commission/changet_commissions_sts";
 
 $route['incentives/fe/list'] = "incentive/fe_incentives";
 $route['incentives/cbh/list'] = "incentive/cbh_incentives";
-$route['incentives/cbh/view/leadsincentives/cbh/view/leads'] = "incentive/get_cbh_incentive_leads";
+$route['incentives/cbh/view/leads'] = "incentive/get_cbh_incentive_leads";
 $route['incentives/view/leads'] = "incentive/get_incentive_leads";
 
 $route['reports/leads'] = "report/get_leads_reports";
+
+$route['commissions/bsnl/list'] = "commission/bsnl_commissions_c";
+$route['commissions/bsnl/list/ssa'] = "commission/bsnl_commissions_s";
+$route['commissions/bsnl/view/leads'] = "commission/bsnl_commissions_leads";

@@ -125,6 +125,8 @@ class Admin extends CI_Controller {
 		$admin_id = DeCrypt($admin_id);
 		
 		$data['user'] = $this->admin_model->get_record('bs_admins', 'admin_id', $admin_id);
+		$data['role_details'] = $this->admin_model->get_admin_roles($admin_id);
+		
 		$data['pageTitle'] = 'Admin Details';
 		$data['content'] = 'admin/admin-details';
 		$this->load->view('layout',$data);

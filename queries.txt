@@ -4,3 +4,10 @@ ALTER TABLE bs_users ADD user_cpe_payment_amnt DOUBLE AFTER user_cpe_payment_sta
 ALTER TABLE bs_users ADD user_cpe_payment_mode VARCHAR(20) AFTER user_cpe_payment_amnt;
 ALTER TABLE bs_users ADD user_lead_source tinyint(1);
 ALTER TABLE bs_users ADD user_lead_sdca VARCHAR(100);
+
+/** 27Oct **/
+ALTER TABLE bs_lead_files CHANGE file_name file_name varchar(500);
+
+/** 30Oct **/
+ALTER TABLE bs_commission_master CHANGE circle_id circle_id int(11);
+ALTER TABLE bs_incentive_master CHANGE circle_id circle_id int(11) DEFAULT NULL;

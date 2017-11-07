@@ -130,16 +130,16 @@
 									</select>
 								</div>
 							</div>
-							<div class="form-group cpe_pmn_dv" style="display:none;">
+							<div class="form-group caf_sts_dv" style="display:none;">
 								<label class="col-lg-3 control-label">BSNL ID</label>
 								<div class="col-lg-8">
-									<input type="text" placeholder="BSNL User ID" class="form-control only-alphaNum" name="bsnl_user_id">
+									<input type="text" placeholder="BSNL User ID" class="form-control valid-bsnlid" name="bsnl_user_id">
 								</div>
 							</div>
-							<div class="form-group instln_dv" style="display:none;">
-								<label class="col-lg-3 control-label">Instt Date</label>
+							<div class="form-group caf_sts_dv" style="display:none;">
+								<label class="col-lg-3 control-label">Act. Date</label>
 								<div class="col-lg-8">
-									<input type="text" placeholder="Installation Date" class="form-control" name="installation_date" id="installation_date">
+									<input type="text" placeholder="Activation Date" class="form-control" name="installation_date" id="installation_date">
 								</div>
 							</div>
 							<div class="form-group">
@@ -151,9 +151,13 @@
 							<div class="form-group" id="upld_fl_dv" style="display:none;">							
 								<label class="col-lg-3 control-label">Upload CAF</label>
 								<div class="col-lg-8">
-									<input type="file" class="form-control upld_file" name="upld_file" id="upld_file" style="padding:0;">
+									<input type="file" class="form-control upld_file" name="upld_file[]" id="upld_file" style="padding:0;" multiple>
 									<br/>
-									<span style="color:red;width:100%;float:left;">Accepted Formats: PNG|JPG|JPEG|PDF|DOC<br/>DOCS|XLS|XSLX</span>
+									<small style="color:red;width:100%;float:left;">Hold "[Ctrl]" for Multiple Files</small>
+									<br/>
+									<small style="color:red;width:100%;float:left;">Accepted Formats: PNG|JPG|JPEG|PDF</small>
+									<br/>
+									<small style="color:red;width:100%;float:left;">Max Size: 2MB</small>
 								</div>							
 							</div>
 							<div class="form-group">
@@ -193,7 +197,7 @@
 								<tbody>
 									<?php 
 										
-										$file_type_arr = array('2' => 'CAF File', '3' => 'DNCS File', '4' => 'Installation & Activation File');
+										$file_type_arr = array('1' => 'Application', '2' => 'CAF File', '3' => 'DNCS File', '4' => 'Installation & Activation File');
 										
 										if(!empty($lead_files)) { 
 											$k = 1;
@@ -204,8 +208,12 @@
 											<td><?php echo $file_type_arr[$rcd['file_type']]?></td>
 											<td>
 												<?php 
-													if($rcd['file_name'] != ''){
-														echo '<a href="'.BASE_URL.'assets/uploads/leads/'.$rcd['file_name'].'" target="_blank">View</a>';
+													if(!empty($rcd['file_name'])){
+														$files = explode('*-*', $rcd['file_name']);
+														
+														foreach($files as $file){
+															echo '<a class="vw-files-lnk" href="'.BASE_URL.'assets/uploads/leads/'.$file.'" target="_blank">View</a>';
+														}
 													}
 												?>												
 											</td>										
@@ -284,6 +292,20 @@
 	 </div>
 </div>
 
+<div id="myFilesViewerModal" class="modal fade" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+			</div>
+			<div class="modal-body">
+				<a id="full-files-viewer" href="" target="_blank">Full View</a>
+				<iframe id="files-viewer" style="width: 100%;height:400px;"></iframe>
+			</div>
+		</div>
+	</div>
+</div>
+
 <script src="<?php echo ASSETS_URL?>js/jquery.datetimepicker.js"></script>
 <link href="<?php echo ASSETS_URL?>css/jquery.datetimepicker.css" rel="stylesheet">
 
@@ -298,6 +320,17 @@ jQuery(document).ready(function() {
 		scrollInput:false
 	});
 	
+	$(document).on('input', '.valid-bsnlid', function(){
+		var $this = $(this);
+		var regexp = /[^a-zA-Z0-9\_\-\.\/]/g;
+		var value = $this.val();
+		
+		if(value != '' && regexp.test(value)){			
+			$this.val(value.replace(regexp, '')); 
+		}
+		return false;
+	});
+	
 	$(document).on('change','#status_id',function(e){
 		var stsId = $(this).val();
 		$('.cpe_pmn_dv').hide();
@@ -305,7 +338,9 @@ jQuery(document).ready(function() {
 		if(stsId == 2 || stsId == 3 || stsId == 4){
 			$('#upld_fl_dv').show();
 			$('#upld_fl_dv').find('label').html('Upload CAF');
-			if(stsId == 3){
+			if(stsId == 2){
+				$('.caf_sts_dv').show();
+			} else if(stsId == 3){
 				$('.cpe_pmn_dv').show();
 				$('#upld_fl_dv').find('label').html('Upload DNCS File');
 			} else if(stsId == 4){
@@ -317,6 +352,15 @@ jQuery(document).ready(function() {
 	
 	$(document).on('click','#update-status-btn',function(){
 		if($("#update-status-form").valid()){
+			
+			var status_id = $('#status_id').val();
+			if($.inArray(status_id, ['2','3']) > -1){
+				var files = $('.upld_file')[0].files;
+				if(files.length <= 0){
+					customAlertBox('Please Upload Files', 'e');
+					return false;
+				}
+			}
 			
 			var formData = new FormData($("#update-status-form")[0]);
 			
@@ -400,31 +444,53 @@ jQuery(document).ready(function() {
 	});  
 		
 	$(document).on('change','.upld_file',function(){	
+		var files = $(this)[0].files;
+		
+		if(files.length > 0){
+			$.each(files, function(i, file){
+				
+				var imagePath = file.name;
+				var pathLength = imagePath.length;
+				var lastDot = imagePath.lastIndexOf(".");
+				var fileType = imagePath.substring(lastDot,pathLength);	
+				var fileType = fileType.toLowerCase();
+				var allowedTypes = ['.png','.jpg','.jpeg','.pdf'];							
 
-		var imagePath = $(this).val();
-		var pathLength = imagePath.length;
-		var lastDot = imagePath.lastIndexOf(".");
-		var fileType = imagePath.substring(lastDot,pathLength);	
-		var fileType = fileType.toLowerCase();
-		var allowedTypes = ['.png','.jpg','.jpeg','.pdf','.doc','.docs','.xls','.xlsx'];							
-
-		if($.inArray(fileType,allowedTypes) == '-1') {			
-			$(this).val('');
-			swal('The uploaded file type is not allowed.\nAllowed types : png,jpg,jpeg,pdf,doc,docx,xls,xlsx');
-			return false;
+				if($.inArray(fileType,allowedTypes) == '-1') {			
+					$(this).val('');
+					swal('The uploaded file(s) type is not allowed.\nAllowed types : png,jpg,jpeg,pdf');
+					return false;
+				}
+				
+				var fileSize = file.size;
+				var sizeKB = fileSize/1024;
+				if(parseInt(sizeKB) > 1024) {
+					var sizeMB = sizeKB/1024;
+					var sizeStr = sizeMB.toFixed(2);
+					if(sizeStr > 2)
+					{
+						$(this).val('');
+						swal("Sorry! We can't accept files with size greater than 2MB.\nPlease upload file with size less than 2MB.");
+						return false;
+					}
+				}
+			});
 		}
-		var fileSize = this.files[0].size;
-		var sizeKB = fileSize/1024;
-        if(parseInt(sizeKB) > 1024) {
-            var sizeMB = sizeKB/1024;
-			var sizeStr = sizeMB.toFixed(2);
-            if(sizeStr > 10)
-			{
-				$(this).val('');
-				swal("Sorry! We can't accept files with size greater than 10MB.\nPlease upload file with size less than 10MB.");
-				return false;
-			}
-        }
+	});
+	
+	$(document).on('click','.vw-files-lnk',function(e){
+		e.preventDefault();		
+		var href = $(this).attr('href');
+		try {				
+			$('#full-files-viewer').attr('href', href);
+			$('#files-viewer').attr('src', href);
+			$('#myFilesViewerModal').modal('toggle');
+		} catch (Error) {
+			console.log(Error);
+		}
+		$('#view_document_div').show();
+		
+		$("html,body").animate({scrollTop:$('#view_document_div').offset().top},1000);
 	});
 });
 </script>
