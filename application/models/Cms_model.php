@@ -8,11 +8,11 @@ class Cms_model extends CI_Model
 		$this->load->model('admin_model');	
 	}
 	
-	public function check_commission_exist($date, $id=NULL) {  
+	public function check_commission_exist($date, $type, $circle_id=NULL, $id=NULL) {  
 		if(empty($id)){
 			$id = 9999;
 		}
-		$already = $this->db->get_where('bs_commission_master',array('start_date' => $date, 'id != ' => $id))->row_array();
+		$already = $this->db->get_where('bs_commission_master',array('start_date' => $date, 'type' => $type, 'circle_id' => $circle_id, 'id != ' => $id))->row_array();
 		if(empty($already)) {
 			return false;
 		}
@@ -29,11 +29,15 @@ class Cms_model extends CI_Model
 
 	public function get_all_commission_list($limit, $start, $month=NULL, $year=NULL) {        
 		
-		$data = array(); $where = array('id > ' => 2); $like = array(); 
+		$data = array(); $where = array('id > ' => 2, 'type' => 1); $like = array(); 
 		
 		if(isset($_GET['status'])) {	
 			$_GET['status'] = $_GET['status'] == 2 ? 0 : $_GET['status'];
 			$where = array_merge($where,array('bs_commission_master.status' => $_GET['status']));			
+		}
+		
+		if(!empty($_GET['t'])) {	
+			$where = array_merge($where,array('type' => 2));			
 		}
 		
 		if(isset($_GET['title']) && !empty($_GET['title'])){
@@ -72,7 +76,6 @@ class Cms_model extends CI_Model
 		$data = array();
 		$data['title'] = $this->input->post('title');																							
 		$data['rate'] = $this->input->post('rate');										
-		$data['rate'] = $this->input->post('rate');	
 		$data['type'] = $this->input->post('type');
 		$data['circle_id'] = $this->input->post('circle_id');
 		$data['active'] = 1; //$this->input->post('active');										
@@ -83,7 +86,7 @@ class Cms_model extends CI_Model
 			$data['added_on'] = date('Y-m-d H:i:s');
 			
 			$next_month_date = $this->get_next_month_date();
-			$sts = $this->check_commission_exist($next_month_date);
+			$sts = $this->check_commission_exist($next_month_date, $data['type'], $data['circle_id']);
 			if($sts){
 				$response['status'] = false;	
 				$response['message'] = 'Commission Already Exist for next Month';

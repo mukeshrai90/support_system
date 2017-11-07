@@ -225,10 +225,16 @@ $(document).ready(function(){
 												<span class="nav-label">Plans Master</span>
 											</a>
 										</li>
-										<li class="<?php echo strstr($this->uri->segment(2),'commission')== 'commission' ? 'active' : ''?>">
+										<li class="<?php echo strstr($this->uri->segment(2),'commission')== 'commission' && empty($_GET['t']) ? 'active' : ''?>">
 											<a href="<?php echo BASE_URL.'cms/commission/list'?>">
 												<i class="fa fa-rupee"></i>&nbsp;&nbsp;
-												<span class="nav-label">Sales Partner Commision</span>
+												<span class="nav-label">Sales Partner Commission</span>
+											</a>
+										</li>
+										<li class="<?php echo strstr($this->uri->segment(2),'commission')== 'commission' && !empty($_GET['t']) ? 'active' : ''?>">
+											<a href="<?php echo BASE_URL.'cms/commission/list?t=2'?>">
+												<i class="fa fa-rupee"></i>&nbsp;&nbsp;
+												<span class="nav-label">BSNL Commission Master</span>
 											</a>
 										</li>
 										<li class="<?php echo strstr($this->uri->segment(2),'incentive')== 'incentive' ? 'active' : ''?>">

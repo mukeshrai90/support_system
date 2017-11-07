@@ -10,9 +10,9 @@
 		<div class="col-lg-12">
 			<div class="ibox float-e-margins">
 				<div class="ibox-title">
-					<h5>Sales Partner Commission </h5>	
+					<h5><?=$pageTitle?> </h5>	
 					<?php 
-						$pageUrl = BASE_URL.'cms/commission/list';
+						//$pageUrl = BASE_URL.'cms/commission/list';
 					?>
 					<div class="ibox-tools">
 						<button type="button" class="btn btn-sm btn-primary refresh-all add-new-btn" data-url="<?php echo BASE_URL.'cms/commission/add'?>">Add New</button>

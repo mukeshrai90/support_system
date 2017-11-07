@@ -329,10 +329,17 @@ class Cms extends CI_Controller {
 		$data['subPageTitle'] = ' | '.$this->months_arr_gl[$month]." - $year";
 		$data['months_arr_gl'] = $this->months_arr_gl;
 		
-		if(@$_GET['name'] != '')
+		if(!empty($_GET['name']) || !empty($_GET['t'])) {
 			$base_url = BASE_URL.'cms/commission/list?'.$_SERVER['QUERY_STRING'];
-		else
+		} else {
 			$base_url = BASE_URL.'cms/commission/list?page=true';
+		}
+		
+		if(!empty($_GET['t'])) {
+			$data['pageUrl'] = BASE_URL.'cms/commission/list?t=2';
+		} else {
+			$data['pageUrl'] = BASE_URL.'cms/commission/list';
+		}
 		
         $data["links"] = create_links($per_page,$total_rows,$base_url);
 		
@@ -342,6 +349,9 @@ class Cms extends CI_Controller {
 		}
 		
 		$data['pageTitle'] = 'Sales Partner Commission';
+		if(!empty($_GET['t'])){
+			$data['pageTitle'] = 'BSNL Commission Master';
+		}
 		$data['content'] = 'cms/commission';
 		$this->load->view('layout',$data);
 	}
@@ -357,7 +367,12 @@ class Cms extends CI_Controller {
 				$response['status'] = true;
 				if(isset($result['insert_id'])) {
 					$response['message'] = 'Saved Successfully.';
+					
+					$type = $this->input->post('type');
 					$response['redirectTo'] = BASE_URL.'cms/commission/list';
+					if($type == 2){
+						$response['redirectTo'] = BASE_URL.'cms/commission/list?t=2';
+					}
 				} else {
 					$response['message'] = 'Updated Successfully.';
 					$response['redirectTo'] = $this->session->userdata('referer');
